@@ -1,26 +1,23 @@
 import json
+import csv
+import logging
+from datetime import datetime, timedelta
+from collections import defaultdict
+
 import pandas as pd
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, authenticate, login
 from django.views.decorators.csrf import csrf_exempt
-from django.db import transaction
-from django.db.models import Sum, Count
-from .models import Survey, JobDemand
-from django.contrib import messages
-import csv
-from datetime import datetime
 from django.views.decorators.http import require_http_methods
-import logging
-from django.http import JsonResponse, HttpResponse
-from django.template.loader import render_to_string
-import csv
-from datetime import datetime
-from django.db.models import Sum, Count, Q
+from django.db import transaction
+from django.db.models import Sum, Count, Max, Q
 from django.db.models.functions import TruncDate
-from collections import defaultdict
+from django.contrib import messages
+from django.template.loader import render_to_string
 
+from .models import Survey, JobDemand
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -28,6 +25,7 @@ logger = logging.getLogger(__name__)
 # ============================================
 # PUBLIC FORM VIEWS (No login required)
 # ============================================
+
 def survey_form(request):
     """Main survey form page - directly accessible without login"""
     return render(request, 'form.html')
@@ -110,6 +108,8 @@ def submit_survey(request):
             'status': 'error',
             'message': str(e)
         }, status=500)
+
+
 # ============================================
 # ADMIN PORTAL VIEWS (Login required)
 # ============================================
@@ -273,7 +273,6 @@ def admin_dashboard(request):
         all_sectors = [s for s in all_sectors if s]
         
         # Monthly trend data (last 6 months)
-        from datetime import datetime, timedelta
         six_months_ago = datetime.now() - timedelta(days=180)
         monthly_data = survey_qs.filter(created_at__gte=six_months_ago).extra(
             select={'month': "strftime('%%Y-%%m', created_at)"}
@@ -350,68 +349,6 @@ def admin_job_demands(request):
     """View all job demands"""
     job_demands = JobDemand.objects.all().select_related('survey')
     return render(request, 'portal/job_demands.html', {'job_demands': job_demands})
-
-
-@login_required
-def admin_export_csv(request):
-    """Export all data as CSV - Single row per survey with all job demands combined"""
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="survey_data_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
-    
-    writer = csv.writer(response)
-    
-    # Headers
-    headers = [
-        'Survey ID', 'Employer Code', 'Employer Name', 'Primary Sector', 
-        'District', 'Block', 'Address', 'Organisation Type', 'Company Size',
-        'Senior Official', 'Mobile', 'Email', 'Placement Ready', 'Apprenticeship Ready',
-        'Job Demand Details (Sector, Job Role, Education, Experience, Salary, Current, Future, 6 Months, 12 Months, Apprenticeship, Placement)',
-        'Submission Date'
-    ]
-    writer.writerow(headers)
-    
-    # Data - One row per survey
-    for survey in Survey.objects.all().prefetch_related('job_demands'):
-        # Create job demand string
-        job_details_list = []
-        for job in survey.job_demands.all():
-            job_str = (
-                f"{job.sector}, "
-                f"{job.job_role}, "
-                f"{job.education_req}, "
-                f"{job.experience_req}, "
-                f"{job.salary_expected}, "
-                f"{job.current_demand}, "
-                f"{job.future_demand}, "
-                f"{job.demand_6_months}, "
-                f"{job.demand_12_months}, "
-                f"{job.apprenticeship_demand}, "
-                f"{job.placement_demand}"
-            )
-            job_details_list.append(job_str)
-        
-        all_jobs_str = " | ".join(job_details_list)
-        
-        writer.writerow([
-            survey.id,
-            survey.employer_code,
-            survey.employer_name,
-            survey.primary_sector,
-            survey.district,
-            survey.block,
-            survey.address,
-            survey.organisation_type,
-            survey.company_size,
-            survey.senior_official_name,
-            survey.mobile_number,
-            survey.email_id,
-            survey.placement_ready,
-            survey.apprenticeship_ready,
-            all_jobs_str,  # All job demands in one cell
-            survey.submission_date or survey.created_at.date()
-        ])
-    
-    return response
 
 
 @login_required
@@ -552,13 +489,13 @@ def get_survey_detail(request, survey_id):
 
 @login_required
 def admin_export_full_csv(request):
-    """Export complete survey data with job demands in single row"""
+    """Export complete survey data with job demands in separate columns"""
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="survey_full_data_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
     
     writer = csv.writer(response)
     
-    # Main Headers - Same as before
+    # Main Headers
     main_headers = [
         'Survey ID', 'Start Time', 'Completion Time', 'Submission Date',
         'Employer Code', 'Employer Name', 'Primary Sector', 'District', 'Block',
@@ -572,10 +509,27 @@ def admin_export_full_csv(request):
         'Created At', 'Updated At'
     ]
     
-    # Job Demand Headers - All in one cell
-    job_headers = [
-        'Job Demand Details (Sector, Job Role, Education, Experience, Salary, Current, Future, 6 Months, 12 Months, Apprenticeship, Placement)'
-    ]
+    # First, find maximum number of job demands for any survey
+    max_jobs = JobDemand.objects.values('survey').annotate(
+        job_count=Count('id')
+    ).aggregate(Max('job_count'))['job_count__max'] or 0
+    
+    # Job Demand Headers - Dynamic columns
+    job_headers = []
+    for i in range(1, max_jobs + 1):
+        job_headers.extend([
+            f'Job Demand-{i} (Sector)',
+            f'Job Demand-{i} (Job Role)',
+            f'Job Demand-{i} (Education)',
+            f'Job Demand-{i} (Experience)',
+            f'Job Demand-{i} (Salary)',
+            f'Job Demand-{i} (Current Demand)',
+            f'Job Demand-{i} (Future Demand)',
+            f'Job Demand-{i} (6 Months)',
+            f'Job Demand-{i} (12 Months)',
+            f'Job Demand-{i} (Apprenticeship)',
+            f'Job Demand-{i} (Placement)'
+        ])
     
     # Combine headers
     all_headers = main_headers + job_headers
@@ -583,28 +537,6 @@ def admin_export_full_csv(request):
     
     # Data
     for survey in Survey.objects.all().prefetch_related('job_demands'):
-        # Create job demand string with all jobs in one cell
-        job_details_list = []
-        
-        for job in survey.job_demands.all():
-            job_str = (
-                f"{job.sector}, "
-                f"{job.job_role}, "
-                f"{job.education_req}, "
-                f"{job.experience_req}, "
-                f"{job.salary_expected}, "
-                f"{job.current_demand}, "
-                f"{job.future_demand}, "
-                f"{job.demand_6_months}, "
-                f"{job.demand_12_months}, "
-                f"{job.apprenticeship_demand}, "
-                f"{job.placement_demand}"
-            )
-            job_details_list.append(job_str)
-        
-        # Join all job demands with semicolon and newline for better readability
-        all_jobs_str = " | ".join(job_details_list)
-        
         row = [
             survey.id,
             survey.start_time or '',
@@ -638,9 +570,33 @@ def admin_export_full_csv(request):
             survey.hiring_challenges or '',
             survey.remarks or '',
             survey.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            survey.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
-            all_jobs_str  # All job demands in one cell
+            survey.updated_at.strftime('%Y-%m-%d %H:%M:%S')
         ]
+        
+        # Add job demands data
+        job_list = list(survey.job_demands.all())
+        
+        # For each job demand, add its fields
+        for i in range(max_jobs):
+            if i < len(job_list):
+                job = job_list[i]
+                row.extend([
+                    job.sector,
+                    job.job_role,
+                    job.education_req,
+                    job.experience_req,
+                    job.salary_expected,
+                    job.current_demand,
+                    job.future_demand,
+                    job.demand_6_months,
+                    job.demand_12_months,
+                    job.apprenticeship_demand,
+                    job.placement_demand
+                ])
+            else:
+                # Empty columns for surveys with fewer job demands
+                row.extend([''] * 11)  # 11 fields per job demand
+        
         writer.writerow(row)
     
     return response
