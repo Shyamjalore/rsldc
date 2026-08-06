@@ -1,0 +1,1188 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Demand Dashboard 2026</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f4f8;
+            color: #0a1628;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 10px;
+        }
+
+        /* Sidebar Styles - Same as before */
+        .sidebar-modern {
+            width: 280px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0a1628, #1a2a4a);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+
+        .sidebar-brand-modern {
+            padding: 28px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .brand-logo-modern {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-circle {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+
+        .logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        .brand-text-modern h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text-modern p {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .nav-modern {
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 12px 12px 8px;
+        }
+
+        .nav-link-modern {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .nav-link-modern:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+            transform: translateX(4px);
+        }
+
+        .nav-link-modern.active {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(124, 58, 237, 0.2));
+            color: #ffffff;
+            box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.2);
+        }
+
+        .nav-link-modern.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: linear-gradient(180deg, #2563eb, #7c3aed);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-icon-modern {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link-modern.active .nav-icon-modern {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #ffffff;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        .sidebar-footer-modern {
+            margin-top: auto;
+            padding: 20px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .sidebar-footer-modern p {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .sidebar-footer-modern strong {
+            display: block;
+            font-size: 14px;
+            color: #ffffff;
+            margin-top: 4px;
+            font-weight: 700;
+        }
+
+        .main-content-modern {
+            flex: 1;
+            padding: 32px;
+            min-height: 100vh;
+            background: #f0f4f8;
+        }
+
+        .header-modern {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0a1628;
+            letter-spacing: -0.5px;
+        }
+
+        .header-title p {
+            font-size: 15px;
+            color: #64748b;
+            font-weight: 400;
+            margin-top: 4px;
+        }
+
+        .header-actions-modern {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-modern {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary-modern {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #ffffff;
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-success-modern {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #ffffff;
+            box-shadow: 0 4px 16px rgba(5, 150, 105, 0.25);
+        }
+
+        .btn-success-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35);
+        }
+
+        .btn-outline-modern {
+            background: transparent;
+            color: #0a1628;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-outline-modern:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            transform: translateY(-2px);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px 24px;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .filter-bar select {
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+            background: #ffffff;
+            min-width: 150px;
+        }
+
+        .filter-bar select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .filter-bar .btn-reset {
+            padding: 8px 20px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-bar .btn-reset:hover {
+            background: #cbd5e1;
+        }
+
+        /* KPI Cards */
+        .kpi-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card-modern {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .kpi-card-modern:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .kpi-icon-modern {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon-modern.blue { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #2563eb; }
+        .kpi-icon-modern.green { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #059669; }
+        .kpi-icon-modern.orange { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706; }
+        .kpi-icon-modern.purple { background: linear-gradient(135deg, #ede9fe, #c4b5fd); color: #7c3aed; }
+
+        .kpi-info p {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .kpi-info h2 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0a1628;
+            letter-spacing: -0.5px;
+        }
+
+        .kpi-trend {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .kpi-trend.up { background: #dcfce7; color: #059669; }
+
+        /* Chart Grid */
+        .chart-grid-modern {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card-modern {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .chart-card-modern:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-header-modern {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chart-header-modern h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0a1628;
+        }
+
+        .chart-header-modern p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .chart-header-modern .chart-tag {
+            background: #f1f5f9;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .chart-box-modern {
+            position: relative;
+            height: 320px;
+        }
+
+        /* Latest Surveys */
+        .latest-surveys-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            margin-bottom: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .latest-surveys-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .latest-surveys-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0a1628;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .latest-surveys-card h3 i { color: #2563eb; }
+
+        .survey-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+        }
+
+        .survey-item:hover {
+            background: #f8fafc;
+        }
+
+        .survey-item:last-child {
+            border-bottom: none;
+        }
+
+        .survey-item .survey-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .survey-item .survey-id {
+            font-weight: 700;
+            color: #2563eb;
+            font-size: 14px;
+        }
+
+        .survey-item .survey-name {
+            font-weight: 600;
+            color: #0a1628;
+        }
+
+        .survey-item .survey-detail {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .survey-item .survey-demand {
+            font-weight: 700;
+            color: #059669;
+        }
+
+        .survey-badge {
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .survey-badge.sector {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .survey-badge.district {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        /* Quick Actions */
+        .quick-section-modern {
+            margin-bottom: 0;
+        }
+
+        .quick-card-modern {
+            background: linear-gradient(135deg, #0a1628, #1a2a4a);
+            border-radius: 20px;
+            padding: 32px;
+            color: #ffffff;
+            box-shadow: 0 8px 32px rgba(10, 22, 40, 0.2);
+        }
+
+        .quick-card-modern h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .quick-links-modern {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .quick-links-modern a {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .quick-links-modern a:hover {
+            background: rgba(37, 99, 235, 0.3);
+            border-color: #2563eb;
+            transform: translateY(-2px);
+            color: #ffffff;
+        }
+
+        .quick-links-modern a i { font-size: 16px; }
+
+        /* Responsive */
+        @media (max-width: 1280px) {
+            .kpi-grid-modern { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 1024px) {
+            .chart-grid-modern { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-modern {
+                width: 100%;
+                min-height: auto;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                top: auto;
+                height: auto;
+                border-right: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(10, 22, 40, 0.95);
+                z-index: 100;
+            }
+
+            .sidebar-brand-modern { display: none; }
+            .nav-modern {
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 8px 12px;
+                gap: 4px;
+            }
+            .nav-label { display: none; }
+            .nav-link-modern {
+                padding: 10px 14px;
+                font-size: 12px;
+                white-space: nowrap;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .nav-link-modern span:not(.nav-icon-modern) { font-size: 10px; }
+            .nav-icon-modern { width: 32px; height: 32px; font-size: 14px; }
+            .nav-badge { display: none; }
+            .sidebar-footer-modern { display: none; }
+
+            .main-content-modern {
+                padding: 16px;
+                padding-bottom: 100px;
+            }
+
+            .header-modern {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-title h1 { font-size: 22px; }
+            .header-actions-modern {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            .header-actions-modern .btn-modern {
+                flex: 1;
+                justify-content: center;
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-bar select { width: 100%; }
+
+            .kpi-grid-modern {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            .kpi-card-modern { padding: 16px; gap: 12px; }
+            .kpi-icon-modern { width: 48px; height: 48px; font-size: 20px; }
+            .kpi-info h2 { font-size: 24px; }
+            .kpi-info p { font-size: 12px; }
+
+            .chart-card-modern { padding: 16px; }
+            .chart-box-modern { height: 240px; }
+
+            .survey-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .survey-item .survey-info { width: 100%; }
+            .survey-item .survey-demand { align-self: flex-start; }
+
+            .quick-card-modern { padding: 20px; }
+            .quick-links-modern a { padding: 8px 16px; font-size: 12px; }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-grid-modern { grid-template-columns: 1fr; }
+        }
+
+        @media print {
+            .sidebar-modern, .header-actions-modern, .quick-section-modern, .filter-bar { display: none; }
+            .main-content-modern { padding: 0; }
+            .kpi-card-modern, .chart-card-modern, .latest-surveys-card {
+                break-inside: avoid;
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            body { background: #ffffff !important; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar-modern">
+        <div class="sidebar-brand-modern">
+            <div class="brand-logo-modern">
+                <div class="logo-circle">
+                    <img src="{% static 'img/rsldc-logo.png' %}" alt="RSLDC">
+                </div>
+                <div class="brand-text-modern">
+                    <h2>Skill Demand</h2>
+                    <p>MIS Portal 2026</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-modern">
+            <div class="nav-label">Main</div>
+            <a href="{% url 'survey:admin_dashboard' %}" class="nav-link-modern active">
+                <span class="nav-icon-modern"><i class="fas fa-chart-pie"></i></span>
+                <span>Dashboard</span>
+                <span class="nav-badge">Live</span>
+            </a>
+            <a href="{% url 'survey:admin_surveys' %}" class="nav-link-modern">
+                <span class="nav-icon-modern"><i class="fas fa-file-alt"></i></span>
+                <span>Survey Records</span>
+                <span class="nav-badge">{{ total_surveys|default:0 }}</span>
+            </a>
+            <a href="{% url 'survey:admin_job_demands' %}" class="nav-link-modern">
+                <span class="nav-icon-modern"><i class="fas fa-briefcase"></i></span>
+                <span>Job Demands</span>
+                <span class="nav-badge">{{ total_jobs|default:0 }}</span>
+            </a>
+            <div class="nav-label" style="margin-top:12px;">Tools</div>
+            <a href="{% url 'survey:admin_export_csv' %}" class="nav-link-modern">
+                <span class="nav-icon-modern"><i class="fas fa-download"></i></span>
+                <span>Export CSV</span>
+            </a>
+            <a href="{% url 'survey:admin_logout' %}" class="nav-link-modern" style="margin-top:8px; border-top:1px solid rgba(255,255,255,0.05); padding-top:16px;">
+                <span class="nav-icon-modern"><i class="fas fa-sign-out-alt"></i></span>
+                <span>Logout</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer-modern">
+            <p>Rajasthan Skill Demand</p>
+            <strong>Aggregation Portal v2.0</strong>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content-modern">
+
+        <!-- Top Header -->
+        <header class="header-modern">
+            <div class="header-title">
+                <h1>📊 State Industry Demand Dashboard</h1>
+                <p>Rajasthan Skill Demand Aggregation Portal · <span id="liveTime" class="text-blue-600 font-semibold"></span></p>
+            </div>
+            <div class="header-actions-modern">
+                <a href="{% url 'survey:admin_export_csv' %}" class="btn-modern btn-success-modern">
+                    <i class="fas fa-file-export"></i> Export CSV
+                </a>
+                <button type="button" class="btn-modern btn-primary-modern" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button type="button" class="btn-modern btn-outline-modern" onclick="window.location.reload()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <label><i class="fas fa-filter"></i> Filters:</label>
+            <form method="GET" action="{% url 'survey:admin_dashboard' %}" id="filterForm">
+                <select name="district" onchange="this.form.submit()">
+                    <option value="">All Districts</option>
+                    {% for district in all_districts %}
+                        <option value="{{ district }}" {% if selected_district == district %}selected{% endif %}>
+                            {{ district }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                <select name="block" onchange="this.form.submit()">
+                    <option value="">All Blocks</option>
+                    {% for block in all_blocks %}
+                        <option value="{{ block }}" {% if selected_block == block %}selected{% endif %}>
+                            {{ block }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                <select name="sector" onchange="this.form.submit()">
+                    <option value="">All Sectors</option>
+                    {% for sector in all_sectors %}
+                        <option value="{{ sector }}" {% if selected_sector == sector %}selected{% endif %}>
+                            {{ sector }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                <a href="{% url 'survey:admin_dashboard' %}" class="btn-reset">
+                    <i class="fas fa-times"></i> Reset
+                </a>
+            </form>
+        </div>
+
+        <!-- KPI Cards -->
+        <section class="kpi-grid-modern">
+            <div class="kpi-card-modern">
+                <div class="kpi-icon-modern blue"><i class="fas fa-file-alt"></i></div>
+                <div class="kpi-info">
+                    <p>Total Surveys</p>
+                    <h2>{{ total_surveys|default:0 }}</h2>
+                    <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> Active</span>
+                </div>
+            </div>
+            <div class="kpi-card-modern">
+                <div class="kpi-icon-modern green"><i class="fas fa-briefcase"></i></div>
+                <div class="kpi-info">
+                    <p>Total Job Roles</p>
+                    <h2>{{ total_jobs|default:0 }}</h2>
+                    <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> Active</span>
+                </div>
+            </div>
+            <div class="kpi-card-modern">
+                <div class="kpi-icon-modern orange"><i class="fas fa-users"></i></div>
+                <div class="kpi-info">
+                    <p>Current Demand</p>
+                    <h2>{{ total_current|default:0 }}</h2>
+                    <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> Immediate</span>
+                </div>
+            </div>
+            <div class="kpi-card-modern">
+                <div class="kpi-icon-modern purple"><i class="fas fa-rocket"></i></div>
+                <div class="kpi-info">
+                    <p>Future Demand</p>
+                    <h2>{{ total_future|default:0 }}</h2>
+                    <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> Projected</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Latest 5 Surveys -->
+        <div class="latest-surveys-card">
+            <h3><i class="fas fa-clock"></i> Latest 5 Surveys</h3>
+            {% for survey in latest_surveys %}
+            <div class="survey-item">
+                <div class="survey-info">
+                    <span class="survey-id">#{{ survey.id }}</span>
+                    <span class="survey-name">{{ survey.employer_name }}</span>
+                    <span class="survey-badge sector">{{ survey.primary_sector }}</span>
+                    <span class="survey-badge district">{{ survey.district }}</span>
+                    <span class="survey-detail">{{ survey.created_at }}</span>
+                </div>
+                <span class="survey-demand">{{ survey.total_demand }} Demands</span>
+            </div>
+            {% empty %}
+            <p class="text-slate-500 text-center py-4">No surveys available</p>
+            {% endfor %}
+        </div>
+
+        <!-- Charts -->
+        <section class="chart-grid-modern">
+            <!-- Chart 1: District-wise Demand -->
+            <div class="chart-card-modern">
+                <div class="chart-header-modern">
+                    <div>
+                        <h3>🏙️ District-wise Demand</h3>
+                        <p>Total demand by district</p>
+                    </div>
+                    <span class="chart-tag">Top 10</span>
+                </div>
+                <div class="chart-box-modern">
+                    <canvas id="districtChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Product/Service Type -->
+            <div class="chart-card-modern">
+                <div class="chart-header-modern">
+                    <div>
+                        <h3>📦 Product vs Service</h3>
+                        <p>Demand by product/service type</p>
+                    </div>
+                    <span class="chart-tag">Comparison</span>
+                </div>
+                <div class="chart-box-modern">
+                    <canvas id="productServiceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 3: Sector-wise Demand -->
+            <div class="chart-card-modern">
+                <div class="chart-header-modern">
+                    <div>
+                        <h3>🏭 Sector-wise Demand</h3>
+                        <p>Current vs Future by sector</p>
+                    </div>
+                    <span class="chart-tag">Top 10</span>
+                </div>
+                <div class="chart-box-modern">
+                    <canvas id="sectorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 4: Block-wise Demand -->
+            <div class="chart-card-modern">
+                <div class="chart-header-modern">
+                    <div>
+                        <h3>📍 Block-wise Demand</h3>
+                        <p>Top 10 blocks by demand</p>
+                    </div>
+                    <span class="chart-tag">Top 10</span>
+                </div>
+                <div class="chart-box-modern">
+                    <canvas id="blockChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-section-modern">
+            <div class="quick-card-modern">
+                <div class="flex items-center justify-between mb-4">
+                    <h3><i class="fas fa-bolt mr-3"></i> Quick Actions</h3>
+                    <span class="text-slate-400 text-sm">⚡ Instant access</span>
+                </div>
+                <div class="quick-links-modern">
+                    <a href="{% url 'survey:admin_surveys' %}">
+                        <i class="fas fa-list-ul"></i> View All Surveys
+                    </a>
+                    <a href="{% url 'survey:admin_job_demands' %}">
+                        <i class="fas fa-briefcase"></i> View Job Demands
+                    </a>
+                    <a href="{% url 'survey:admin_export_csv' %}">
+                        <i class="fas fa-file-csv"></i> Download CSV
+                    </a>
+                    <a href="#" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print Report
+                    </a>
+                    <a href="{% url 'survey:survey_form' %}" target="_blank">
+                        <i class="fas fa-plus-circle"></i> New Survey
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+</div>
+
+<!-- Safe Django Data for JS -->
+<script>
+    // Pass data from Django to JavaScript
+    const dashboardData = {
+        districtStats: {{ district_stats|safe }},
+        productServiceData: {{ product_service_data|safe }},
+        sectorData: {{ sector_data|safe }},
+        blockStats: {{ block_stats|safe }},
+        totalCurrent: {{ total_current|default:0 }},
+        totalFuture: {{ total_future|default:0 }}
+    };
+</script>
+
+<script>
+    // Live Clock
+    function updateClock() {
+        const now = new Date();
+        const options = { 
+            weekday: 'short', 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        };
+        document.getElementById('liveTime').textContent = now.toLocaleString('en-IN', options);
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // All Charts
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof Chart === "undefined") {
+            console.error("Chart.js is not loaded.");
+            return;
+        }
+
+        // Color palette
+        const colors = [
+            '#2563eb', '#7c3aed', '#059669', '#d97706', '#dc2626',
+            '#0891b2', '#4f46e5', '#16a34a', '#ea580c', '#6d28d9'
+        ];
+
+        // 1. District-wise Demand Chart (Bar)
+        const districtCtx = document.getElementById('districtChart');
+        if (districtCtx && dashboardData.districtStats.length > 0) {
+            const districts = dashboardData.districtStats.slice(0, 10);
+            new Chart(districtCtx, {
+                type: 'bar',
+                data: {
+                    labels: districts.map(d => d.district),
+                    datasets: [{
+                        label: 'Total Demand',
+                        data: districts.map(d => d.total_demand),
+                        backgroundColor: colors.slice(0, districts.length),
+                        borderRadius: 8,
+                        barThickness: 30
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Demand: ' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 2. Product/Service Type Chart (Doughnut)
+        const psCtx = document.getElementById('productServiceChart');
+        if (psCtx && dashboardData.productServiceData.length > 0) {
+            const psData = dashboardData.productServiceData;
+            new Chart(psCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: psData.map(d => d.type),
+                    datasets: [{
+                        data: psData.map(d => d.total_current + d.total_future),
+                        backgroundColor: ['#2563eb', '#7c3aed', '#059669', '#d97706'],
+                        borderColor: '#ffffff',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 16, usePointStyle: true }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.raw / total) * 100).toFixed(1);
+                                    return context.label + ': ' + context.raw.toLocaleString() + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. Sector-wise Demand Chart (Grouped Bar)
+        const sectorCtx = document.getElementById('sectorChart');
+        if (sectorCtx && dashboardData.sectorData.length > 0) {
+            const sectors = dashboardData.sectorData.slice(0, 8);
+            new Chart(sectorCtx, {
+                type: 'bar',
+                data: {
+                    labels: sectors.map(d => d.sector),
+                    datasets: [
+                        {
+                            label: 'Current Demand',
+                            data: sectors.map(d => d.total_current),
+                            backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                            borderRadius: 4,
+                            barThickness: 20
+                        },
+                        {
+                            label: 'Future Demand',
+                            data: sectors.map(d => d.total_future),
+                            backgroundColor: 'rgba(124, 58, 237, 0.8)',
+                            borderRadius: 4,
+                            barThickness: 20
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { usePointStyle: true }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 4. Block-wise Demand Chart (Horizontal Bar)
+        const blockCtx = document.getElementById('blockChart');
+        if (blockCtx && dashboardData.blockStats.length > 0) {
+            const blocks = dashboardData.blockStats.slice(0, 10);
+            new Chart(blockCtx, {
+                type: 'bar',
+                data: {
+                    labels: blocks.map(d => d.block),
+                    datasets: [{
+                        label: 'Total Demand',
+                        data: blocks.map(d => d.total_demand),
+                        backgroundColor: blocks.map((_, i) => colors[i % colors.length]),
+                        borderRadius: 8,
+                        barThickness: 25
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Demand: ' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { precision: 0 } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

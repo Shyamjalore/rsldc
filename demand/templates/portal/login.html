@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSLDC Portal Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+            <div class="text-center mb-6">
+                <img src="{% static 'img/rsldc-logo.png' %}" alt="RSLDC Logo" class="h-20 mx-auto mb-4">
+                <h1 class="text-2xl font-bold text-slate-800">Admin Portal Login</h1>
+                <p class="text-slate-600">Rajasthan Skill Demand Aggregation</p>
+            </div>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block text-slate-700 font-medium mb-2">Username</label>
+                    <input type="text" name="username" required
+                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-slate-700 font-medium mb-2">Password</label>
+                    <input type="password" name="password" required
+                           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                    Login
+                </button>
+            </form>
+            
+            <div class="mt-4 text-center text-sm text-gray-500">
+                <a href="{% url 'survey:survey_form' %}" class="text-blue-600 hover:underline">← Back to Survey Form</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
