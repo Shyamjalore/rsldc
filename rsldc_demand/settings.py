@@ -23,25 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-60f^)&seznih9lrl5-&+z(uwjjb6(-2!ngf7+gr2ucl6%(-p&j'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost',
-    '127.0.0.1',
-    '*',  # For testing - allows all
-    'totipalmate-shani-unsealed.ngrok-free.dev',  # Your Ngrok URL
-    '*.ngrok-free.dev',  # All ngrok-free domains
-    '*.ngrok.io',]
+ALLOWED_HOSTS = ['rsldc.onrender.com',
+    '*', ]
 
 # ===== CSRF TRUSTED ORIGINS - FIX =====
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.trycloudflare.com',
-    'https://lion-lounge-creativity-hours.trycloudflare.com',
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
-    'https://totipalmate-shani-unsealed.ngrok-free.dev',  # Your Ngrok URL
-    'https://*.ngrok-free.dev',  # All ngrok-free domains
-    'https://*.ngrok.io',
-]
+
 
 # ===== CORS SETTINGS - ADD THESE =====
 # Install: pip install django-cors-headers
@@ -78,13 +66,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # Add this at TOP
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    
 ]
 
 ROOT_URLCONF = 'rsldc_demand.urls'
