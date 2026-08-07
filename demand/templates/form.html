@@ -34,6 +34,41 @@
       color: #dc2626;
       font-weight: bold;
     }
+
+    .section-divider {
+      border-top: 3px dashed #e2e8f0;
+      margin: 32px 0;
+    }
+
+    .subsection-title {
+      background: #f1f5f9;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 16px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 400;
+      font-size: 14px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #2563eb;
+    }
   </style>
 </head>
 
@@ -45,99 +80,77 @@
       <!-- Header -->
       <div class="bg-gradient-to-r from-blue-700 to-indigo-700 p-6 text-white">
           <div class="flex items-center gap-4">
-          
-              <!-- Logo -->
-              <img
-                  src="{% static 'img/rsldc-logo.png' %}"
-                  alt="RSLDC Logo"
-                  class="w-28 h-auto rounded-xl bg-white p-1 shadow-md"
-              >
-          
-              <!-- Title -->
+              <img src="{% static 'img/rsldc-logo.png' %}" alt="RSLDC Logo" class="w-28 h-auto rounded-xl bg-white p-1 shadow-md">
               <div>
-                  <h1 class="text-2xl md:text-3xl font-bold">
-                      Rajasthan Skill Demand Aggregation Survey
-                  </h1>
-                
-                  <p class="mt-2 text-blue-100">
-                      Employer Skill Demand, Placement, Apprenticeship and Collaboration Data Entry Form
-                  </p>
+                  <h1 class="text-2xl md:text-3xl font-bold">Rajasthan Skill Demand Aggregation Survey</h1>
+                  <p class="mt-2 text-blue-100">Employer Skill Demand, Placement, Apprenticeship and Collaboration Data Entry Form</p>
               </div>
-            
           </div>
       </div>
 
       <form id="surveyForm" class="p-6 space-y-8" novalidate>
 
-        <!-- System Fields -->
+        <!-- ============================================ -->
+        <!-- 1. MANDATORY INFORMATION -->
+        <!-- ============================================ -->
         <section>
-          <h2 class="text-xl font-semibold border-b pb-2 mb-4">
-            System Information
-          </h2>
+          <h2 class="text-xl font-semibold border-b pb-2 mb-4">1. Mandatory Information</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label class="block font-medium mb-1">ID</label>
-              <input type="text" name="id" id="id"
-                class="w-full border rounded-lg px-3 py-2 bg-slate-100"
-                placeholder="Auto / Manual ID">
+              <label class="block font-medium mb-1">Survey ID</label>
+              <input type="text" name="id" id="id" class="w-full border rounded-lg px-3 py-2 bg-slate-100" placeholder="Auto / Manual ID">
+            </div>
+
+            <div>
+              <label class="block font-medium mb-1 field-required">Mode of Interview</label>
+              <select name="mode_of_interview" id="mode_of_interview" class="required-field w-full border rounded-lg px-3 py-2" required>
+                <option value="">-- Select --</option>
+                <option value="Field Visit">Field Visit</option>
+                <option value="Telephonic">Telephonic</option>
+              </select>
+              <p class="error-text hidden"></p>
             </div>
 
             <div>
               <label class="block font-medium mb-1">Start Time</label>
-              <input type="text" name="start_time" id="start_time"
-                class="w-full border rounded-lg px-3 py-2 bg-slate-100" readonly>
+              <input type="text" name="start_time" id="start_time" class="w-full border rounded-lg px-3 py-2 bg-slate-100" readonly>
             </div>
 
             <div>
-              <label class="block font-medium mb-1">Completion Time</label>
-              <input type="text" name="completion_time" id="completion_time"
-                class="w-full border rounded-lg px-3 py-2 bg-slate-100" readonly>
-            </div>
-
-            <div>
-              <label class="block font-medium mb-1">Submission Date</label>
-              <input type="date" name="submission_date" id="submission_date"
-                class="required-field w-full border rounded-lg px-3 py-2">
+              <label class="block font-medium mb-1 field-required">Submission Date</label>
+              <input type="date" name="submission_date" id="submission_date" class="required-field w-full border rounded-lg px-3 py-2" required>
               <p class="error-text hidden"></p>
             </div>
           </div>
         </section>
 
-        <!-- Employer Information -->
+        <div class="section-divider"></div>
+
+        <!-- ============================================ -->
+        <!-- 2. EMPLOYER INFORMATION -->
+        <!-- ============================================ -->
         <section>
-          <h2 class="text-xl font-semibold border-b pb-2 mb-4">
-            Employer Information
-          </h2>
+          <h2 class="text-xl font-semibold border-b pb-2 mb-4">2. Employer Information</h2>
+          <p class="text-sm text-slate-500 mb-4">General organization profile and geographic domain details</p>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Employer Code
-              </label>
-              <input type="text" name="employer_code" id="employer_code"
-                class="required-field w-full border rounded-lg px-3 py-2"
-                placeholder="Enter employer code" required>
+              <label class="block font-medium mb-1 field-required">Employer Code</label>
+              <input type="text" name="employer_code" id="employer_code" class="required-field w-full border rounded-lg px-3 py-2" placeholder="Enter employer code" required>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Employer Name
-              </label>
-              <input type="text" name="employer_name" id="employer_name"
-                class="required-field w-full border rounded-lg px-3 py-2"
-                placeholder="Enter employer name" required>
+              <label class="block font-medium mb-1 field-required">Employer Name</label>
+              <input type="text" name="employer_name" id="employer_name" class="required-field w-full border rounded-lg px-3 py-2" placeholder="Enter employer name" required>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Primary Sector
-              </label>
-              <select name="primary_sector" id="primary_sector"
-                class="required-field w-full border rounded-lg px-3 py-2" required>
+              <label class="block font-medium mb-1 field-required">Primary Sector</label>
+              <select name="primary_sector" id="primary_sector" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select Sector --</option>
                 <option value="Agriculture">Agriculture</option>
                 <option value="Manufacturing">Manufacturing</option>
@@ -155,68 +168,64 @@
                 <option value="Other">Other</option>
               </select>
               <div class="other-input" id="primary_sector_other">
-                <input type="text" name="primary_sector_other" 
-                  class="w-full border rounded-lg px-3 py-2 mt-1"
-                  placeholder="Please specify">
+                <input type="text" name="primary_sector_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
               </div>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                District
-              </label>
-              <select name="district" id="district"
-                class="required-field w-full border rounded-lg px-3 py-2" required>
+              <label class="block font-medium mb-1 field-required">District</label>
+              <select name="district" id="district" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select District --</option>
               </select>
               <div class="other-input" id="district_other">
-                <input type="text" name="district_other" 
-                  class="w-full border rounded-lg px-3 py-2 mt-1"
-                  placeholder="Please specify">
+                <input type="text" name="district_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
               </div>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Block
-              </label>
-              <select name="block" id="block"
-                class="required-field w-full border rounded-lg px-3 py-2" required>
+              <label class="block font-medium mb-1 field-required">Block</label>
+              <select name="block" id="block" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select Block --</option>
               </select>
               <div class="other-input" id="block_other">
-                <input type="text" name="block_other" 
-                  class="w-full border rounded-lg px-3 py-2 mt-1"
-                  placeholder="Please specify">
+                <input type="text" name="block_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
               </div>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1">RIICO Area</label>
-              <input type="text" name="riico_area" id="riico_area"
-                class="w-full border rounded-lg px-3 py-2"
-                placeholder="Enter RIICO area">
+              <label class="block font-medium mb-1">RIICO Area / Industrial Zone</label>
+              <input type="text" name="riico_area" id="riico_area" class="w-full border rounded-lg px-3 py-2" placeholder="Enter RIICO area">
             </div>
 
             <div class="md:col-span-3">
-              <label class="block font-medium mb-1 field-required">
-                Address
-              </label>
-              <textarea name="address" id="address" rows="3"
-                class="required-field w-full border rounded-lg px-3 py-2"
-                placeholder="Enter full address" required></textarea>
+              <label class="block font-medium mb-1 field-required">Full Office / Unit Address</label>
+              <textarea name="address" id="address" rows="2" class="required-field w-full border rounded-lg px-3 py-2" placeholder="Enter full address" required></textarea>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Organisation Type
-              </label>
-              <select name="organisation_type" id="organisation_type"
-                class="required-field w-full border rounded-lg px-3 py-2" required>
+              <label class="block font-medium mb-1">Organisation URL</label>
+              <input type="url" name="organisation_url" id="organisation_url" class="w-full border rounded-lg px-3 py-2" placeholder="https://example.com">
+            </div>
+
+            <div>
+              <label class="block font-medium mb-1 field-required">Nature of Operations</label>
+              <select name="nature_of_operations" id="nature_of_operations" class="required-field w-full border rounded-lg px-3 py-2" required>
+                <option value="">-- Select --</option>
+                <option value="Year-round">Year-round</option>
+                <option value="Seasonal">Seasonal</option>
+                <option value="Project-Based">Project-Based</option>
+                <option value="Mixed">Mixed</option>
+              </select>
+              <p class="error-text hidden"></p>
+            </div>
+
+            <div>
+              <label class="block font-medium mb-1 field-required">Organisation Type</label>
+              <select name="organisation_type" id="organisation_type" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select Organisation Type --</option>
                 <option value="Factory">Factory</option>
                 <option value="Private Limited Company">Private Limited Company</option>
@@ -228,19 +237,14 @@
                 <option value="Other">Other</option>
               </select>
               <div class="other-input" id="organisation_type_other">
-                <input type="text" name="organisation_type_other" 
-                  class="w-full border rounded-lg px-3 py-2 mt-1"
-                  placeholder="Please specify">
+                <input type="text" name="organisation_type_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
               </div>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Product / Service Type
-              </label>
-              <select name="product_service_type" id="product_service_type"
-                class="required-field w-full border rounded-lg px-3 py-2" required>
+              <label class="block font-medium mb-1 field-required">Product / Service</label>
+              <select name="product_service_type" id="product_service_type" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select Type --</option>
                 <option value="Product">Product</option>
                 <option value="Service">Service</option>
@@ -250,154 +254,121 @@
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Company Size
-              </label>
-              <input type="number" name="company_size" id="company_size"
-                class="required-field numeric-field w-full border rounded-lg px-3 py-2"
-                placeholder="Number of employees" min="0" required>
+              <label class="block font-medium mb-1 field-required">Company Size</label>
+              <input type="number" name="company_size" id="company_size" class="required-field numeric-field w-full border rounded-lg px-3 py-2" placeholder="Number of employees" min="0" required>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1">Active Status</label>
-              <select name="active_status" id="active_status"
-                class="w-full border rounded-lg px-3 py-2">
+              <label class="block font-medium mb-1 field-required">Active Status</label>
+              <select name="active_status" id="active_status" class="required-field w-full border rounded-lg px-3 py-2" required>
+                <option value="">-- Select --</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </select>
+              <p class="error-text hidden"></p>
             </div>
 
           </div>
         </section>
 
-        <!-- Contact Details -->
+        <div class="section-divider"></div>
+
+        <!-- ============================================ -->
+        <!-- 3. KEY CONTACT INFORMATION -->
+        <!-- ============================================ -->
         <section>
-          <h2 class="text-xl font-semibold border-b pb-2 mb-4">
-            Contact Details
-          </h2>
+          <h2 class="text-xl font-semibold border-b pb-2 mb-4">3. Key Contact Information</h2>
+          <p class="text-sm text-slate-500 mb-4">Official contact details of primary &amp; HR representatives</p>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Senior Official Name
-              </label>
-              <input type="text" name="senior_official_name" id="senior_official_name"
-                class="required-field w-full border rounded-lg px-3 py-2"
-                placeholder="Enter official name" required>
+              <label class="block font-medium mb-1 field-required">Senior Official Name</label>
+              <input type="text" name="senior_official_name" id="senior_official_name" class="required-field w-full border rounded-lg px-3 py-2" placeholder="Enter official name" required>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Mobile Number
-              </label>
-              <input type="tel" name="mobile_number" id="mobile_number"
-                class="required-field w-full border rounded-lg px-3 py-2"
-                placeholder="10 digit mobile number" maxlength="10" required>
+              <label class="block font-medium mb-1 field-required">Official Mobile Number</label>
+              <input type="tel" name="mobile_number" id="mobile_number" class="required-field w-full border rounded-lg px-3 py-2" placeholder="10 digit mobile number" maxlength="10" required>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Email ID
-              </label>
-              <input type="email" name="email_id" id="email_id"
-                class="required-field w-full border rounded-lg px-3 py-2"
-                placeholder="example@email.com" required>
+              <label class="block font-medium mb-1 field-required">Official Email ID</label>
+              <input type="email" name="email_id" id="email_id" class="required-field w-full border rounded-lg px-3 py-2" placeholder="example@email.com" required>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1">HR Email</label>
-              <input type="email" name="email" id="email"
-                class="w-full border rounded-lg px-3 py-2"
-                placeholder="Optional respondent email">
+              <label class="block font-medium mb-1">Respondent Name (Preferably HR)</label>
+              <input type="text" name="respondent_name" id="respondent_name" class="w-full border rounded-lg px-3 py-2" placeholder="Enter respondent name">
             </div>
 
             <div>
-              <label class="block font-medium mb-1">HR Name</label>
-              <input type="text" name="name" id="name"
-                class="w-full border rounded-lg px-3 py-2"
-                placeholder="Optional respondent name">
-            </div>
-
-            <div>
-              <label class="block font-medium mb-1">HR Mobile Number</label>
-              <input type="tel" name="hr_mobile_number" id="hr_mobile_number"
-                class="w-full border rounded-lg px-3 py-2"
-                placeholder="10 digit mobile number" maxlength="10">
+              <label class="block font-medium mb-1">Respondent Mobile Number</label>
+              <input type="tel" name="respondent_mobile" id="respondent_mobile" class="w-full border rounded-lg px-3 py-2" placeholder="10 digit mobile number" maxlength="10">
               <p class="error-text hidden"></p>
+            </div>
+
+            <div>
+              <label class="block font-medium mb-1">Respondent Email ID</label>
+              <input type="email" name="respondent_email" id="respondent_email" class="w-full border rounded-lg px-3 py-2" placeholder="respondent@email.com">
             </div>
 
           </div>
         </section>
 
-        <!-- Dynamic Job Demand Section -->
+        <div class="section-divider"></div>
+
+        <!-- ============================================ -->
+        <!-- 4. DYNAMIC JOB DEMAND DETAILS -->
+        <!-- ============================================ -->
         <section>
           <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b pb-2 mb-4">
-            <h2 class="text-xl font-semibold">
-              Dynamic Job Demand Details
-            </h2>
-
-            <button type="button" id="addJobRow"
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
-              + Add Job Demand
-            </button>
+            <h2 class="text-xl font-semibold">4. Dynamic Job Demand Details</h2>
+            <button type="button" id="addJobRow" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">+ Add New Job Demand</button>
           </div>
 
           <div id="jobRows" class="space-y-5"></div>
 
+          <!-- Apprenticeship/OJT Section -->
+          <div class="mt-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b pb-2 mb-4">
+              <h3 class="text-lg font-semibold">4B. Apprenticeship / OJT Requirement Details</h3>
+              <button type="button" id="addApprenticeshipRow" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">+ Add Apprenticeship/OJT</button>
+            </div>
+            <div id="apprenticeshipRows" class="space-y-4"></div>
+          </div>
+
+          <!-- Demand Summary -->
           <div class="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
             <h3 class="text-lg font-semibold mb-3">Demand Summary</h3>
-
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 text-sm">
-              <div>
-                <p class="text-slate-500">Current Demand</p>
-                <p id="total_current_demand" class="text-xl font-bold">0</p>
-              </div>
-
-              <div>
-                <p class="text-slate-500">6 Months</p>
-                <p id="total_6_months" class="text-xl font-bold">0</p>
-              </div>
-
-              <div>
-                <p class="text-slate-500">12 Months</p>
-                <p id="total_12_months" class="text-xl font-bold">0</p>
-              </div>
-
-              <div>
-                <p class="text-slate-500">Future Demand</p>
-                <p id="total_future_demand" class="text-xl font-bold text-purple-600">0</p>
-              </div>
-
-              <div>
-                <p class="text-slate-500">Apprenticeship</p>
-                <p id="total_apprenticeship" class="text-xl font-bold">0</p>
-              </div>
-
-              <div>
-                <p class="text-slate-500">Placement</p>
-                <p id="total_placement" class="text-xl font-bold">0</p>
-              </div>
+              <div><p class="text-slate-500">Current Demand</p><p id="total_current_demand" class="text-xl font-bold">0</p></div>
+              <div><p class="text-slate-500">6 Months</p><p id="total_6_months" class="text-xl font-bold">0</p></div>
+              <div><p class="text-slate-500">12 Months</p><p id="total_12_months" class="text-xl font-bold">0</p></div>
+              <div><p class="text-slate-500">Future Demand</p><p id="total_future_demand" class="text-xl font-bold text-purple-600">0</p></div>
+              <div><p class="text-slate-500">Apprenticeship</p><p id="total_apprenticeship" class="text-xl font-bold">0</p></div>
+              <div><p class="text-slate-500">Placement</p><p id="total_placement" class="text-xl font-bold">0</p></div>
             </div>
           </div>
         </section>
 
-        <!-- Readiness and Collaboration -->
+        <div class="section-divider"></div>
+
+        <!-- ============================================ -->
+        <!-- 5. READINESS & COLLABORATION POTENTIAL -->
+        <!-- ============================================ -->
         <section>
-          <h2 class="text-xl font-semibold border-b pb-2 mb-4">
-            Readiness & Collaboration
-          </h2>
+          <h2 class="text-xl font-semibold border-b pb-2 mb-4">5. Readiness &amp; Collaboration Potential</h2>
+          <p class="text-sm text-slate-500 mb-4">Institutional partnership readiness and CSR participation metrics</p>
 
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Placement Ready
-              </label>
+              <label class="block font-medium mb-1 field-required">Placement Ready</label>
               <select name="placement_ready" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select --</option>
                 <option value="Yes">Yes</option>
@@ -407,9 +378,7 @@
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Apprenticeship Ready
-              </label>
+              <label class="block font-medium mb-1 field-required">Apprenticeship Ready</label>
               <select name="apprenticeship_ready" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select --</option>
                 <option value="Yes">Yes</option>
@@ -419,9 +388,7 @@
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Guest Lecture Ready
-              </label>
+              <label class="block font-medium mb-1 field-required">Guest Lecture Ready</label>
               <select name="guest_lecture_ready" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select --</option>
                 <option value="Yes">Yes</option>
@@ -431,9 +398,7 @@
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Exposure Visit Ready
-              </label>
+              <label class="block font-medium mb-1 field-required">Exposure Visit Ready</label>
               <select name="exposure_visit_ready" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select --</option>
                 <option value="Yes">Yes</option>
@@ -443,9 +408,7 @@
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                CSR Interest
-              </label>
+              <label class="block font-medium mb-1 field-required">CSR Interest</label>
               <select name="csr_interest" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select --</option>
                 <option value="Yes">Yes</option>
@@ -455,9 +418,17 @@
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Awareness of RSLDC
-              </label>
+              <label class="block font-medium mb-1 field-required">On-the-Job Training / Internship Ready</label>
+              <select name="on_the_job_training_ready" class="required-field w-full border rounded-lg px-3 py-2" required>
+                <option value="">-- Select --</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+              <p class="error-text hidden"></p>
+            </div>
+
+            <div>
+              <label class="block font-medium mb-1 field-required">Awareness of RSLDC</label>
               <select name="awareness_of_rsldc" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select --</option>
                 <option value="Yes">Yes</option>
@@ -467,9 +438,7 @@
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Local Employee Ready
-              </label>
+              <label class="block font-medium mb-1 field-required">Local Employee Ready</label>
               <select name="local_employee_ready" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select --</option>
                 <option value="Yes">Yes</option>
@@ -479,9 +448,7 @@
             </div>
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Collaboration Ready
-              </label>
+              <label class="block font-medium mb-1 field-required">Collaboration Ready</label>
               <select name="collaboration_ready" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select --</option>
                 <option value="Yes">Yes</option>
@@ -493,20 +460,20 @@
           </div>
         </section>
 
-        <!-- Challenges and Remarks -->
+        <div class="section-divider"></div>
+
+        <!-- ============================================ -->
+        <!-- 6. HIRING CHALLENGES & REMARKS -->
+        <!-- ============================================ -->
         <section>
-          <h2 class="text-xl font-semibold border-b pb-2 mb-4">
-            Hiring Challenges & Remarks
-          </h2>
+          <h2 class="text-xl font-semibold border-b pb-2 mb-4">6. Hiring Challenges &amp; Remarks</h2>
+          <p class="text-sm text-slate-500 mb-4">Key operational bottlenecks and contextual notes</p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             <div>
-              <label class="block font-medium mb-1 field-required">
-                Hiring Challenges
-              </label>
-              <select name="hiring_challenges" id="hiring_challenges"
-                class="required-field w-full border rounded-lg px-3 py-2" required>
+              <label class="block font-medium mb-1 field-required">Primary Hiring Challenges</label>
+              <select name="hiring_challenges" id="hiring_challenges" class="required-field w-full border rounded-lg px-3 py-2" required>
                 <option value="">-- Select Challenge --</option>
                 <option value="Absenteeism">Absenteeism</option>
                 <option value="Demand for Higher Salary">Demand for Higher Salary</option>
@@ -520,41 +487,44 @@
                 <option value="Other">Other</option>
               </select>
               <div class="other-input" id="hiring_challenges_other">
-                <input type="text" name="hiring_challenges_other" 
-                  class="w-full border rounded-lg px-3 py-2 mt-1"
-                  placeholder="Please specify">
+                <input type="text" name="hiring_challenges_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
               </div>
               <p class="error-text hidden"></p>
             </div>
 
             <div>
-              <label class="block font-medium mb-1">Remarks</label>
-              <textarea name="remarks" id="remarks" rows="3"
-                class="w-full border rounded-lg px-3 py-2"
-                placeholder="Enter remarks"></textarea>
+              <label class="block font-medium mb-1">Additional Remarks / Suggestions</label>
+              <textarea name="remarks" id="remarks" rows="3" class="w-full border rounded-lg px-3 py-2" placeholder="Enter remarks"></textarea>
             </div>
 
           </div>
+
+          <!-- Supporting Evidence -->
+          <div class="mt-4 border-t pt-4">
+            <label class="block font-medium mb-2">Supporting Evidence (If any):</label>
+            <div class="checkbox-group">
+              <label><input type="checkbox" name="supporting_evidence_vacancy" value="Vacancy Note"> Vacancy Note</label>
+              <label><input type="checkbox" name="supporting_evidence_hr" value="HR plan"> HR plan</label>
+              <label><input type="checkbox" name="supporting_evidence_email" value="Email from authorized official"> Email from authorized official</label>
+              <label><input type="checkbox" name="supporting_evidence_advertisement" value="Job Advertisement"> Job Advertisement</label>
+              <label><input type="checkbox" name="supporting_evidence_other" value="Others"> Others (specify)</label>
+            </div>
+            <div class="mt-2">
+              <input type="text" name="supporting_evidence_other_text" id="supporting_evidence_other_text" class="w-full border rounded-lg px-3 py-2 hidden" placeholder="Please specify others">
+              <input type="hidden" name="supporting_evidence" id="supporting_evidence">
+            </div>
+          </div>
         </section>
 
-        <!-- Form Buttons -->
+        <div class="section-divider"></div>
+
+        <!-- ============================================ -->
+        <!-- FORM BUTTONS -->
+        <!-- ============================================ -->
         <div class="flex flex-col md:flex-row gap-3 justify-end pt-4 border-t">
-
-          <button type="button" id="previewBtn"
-            class="bg-slate-700 hover:bg-slate-800 text-white px-6 py-3 rounded-lg">
-            Preview Data
-          </button>
-
-          <button type="reset"
-            class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg">
-            Reset Form
-          </button>
-
-          <button type="submit"
-            class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg">
-            Submit Survey
-          </button>
-
+          <button type="button" id="previewBtn" class="bg-slate-700 hover:bg-slate-800 text-white px-6 py-3 rounded-lg">Preview Data</button>
+          <button type="reset" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg">Reset Form</button>
+          <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg">Submit Survey</button>
         </div>
 
       </form>
@@ -568,9 +538,73 @@
   </div>
 
   <script>
+    // ============================================
+    // DISTRICT & BLOCK DATA (Complete)
+    // ============================================
+    const districtBlockMap = {
+        "Ajmer": ["Ajmer Rural", "Arain", "Bhinay", "Jawaja", "Kekri", "Kishangarh/Silora", "Masooda", "Pisangan", "Sarwar", "Sawar", "Srinagar"],
+        "Alwar": ["Bansur", "Behror", "Govindgarh", "Kathumar", "Kishangarh Bas", "Kotkasim", "Laxmangarh", "Malakheda", "Mandawar", "Neemrana", "Rajgarh", "Ramgarh", "Reni", "Thanagazi", "Tijara", "Umren"],
+        "Balotra": ["Balotra", "Baytu", "Gida", "Kalyanpur", "Pachpadra", "Patodi", "Samdari", "Sindhari", "Siwana"],
+        "Banswara": ["Anandpuri", "Bagidora", "Banswara", "Chhoti Sarwan", "Garhi", "Ghatol", "Kushalgarh", "Sajjangarh"],
+        "Baran": ["Anta", "Atru", "Baran", "Chhabra", "Chhipabarod", "Kishanganj", "Mangrol", "Shahbad"],
+        "Barmer": ["Aadel", "Balotra", "Barmer", "Barmer Rural", "Baytoo", "Chohtan", "Dhanau", "Dhorimanna", "Fagliya", "Gadra Road", "Gira", "Gudhamalani", "Kalyanpur", "Panyla Kla", "Patodi", "Ramsar", "Samdari", "Sedwa", "Sheo", "Sindhari", "Siwana"],
+        "Beawar": ["Badnor", "Beawar", "Jawaja", "Masuda", "Raipur", "Todgarh"],
+        "Bharatpur": ["Bayana", "Bhusawar", "Deeg", "Kaman", "Kumher", "Nadbai", "Nagar Pahari", "Pahari", "Rupbas", "Sewar", "Uchain", "Weir"],
+        "Bhilwara": ["Asind", "Banera", "Bijoliya", "Hurda", "Jahazpur", "Kotri", "Mandal", "Mandalgarh", "Raipur", "Sahara", "Shahpura", "Suwana"],
+        "Bikaner": ["Bikaner", "Dungargarh", "Khajuwala", "Kolayat", "Lunkaransar", "Nokha", "Poogal", "Shri Dungargarh"],
+        "Bundi": ["Bundi", "Hindoli", "Keshoraipatan", "Nainwa", "Talera"],
+        "Chittorgarh": ["Bari Sadri", "Begun", "Bhadesar", "Bhupalsagar", "Chittorgarh", "Dungla", "Gangrar", "Kapasan", "Nimbahera", "Rashmi", "Rawatbhata"],
+        "Churu": ["Bidasar", "Churu", "Rajgarh", "Ratangarh", "Sardarshahar", "Sujangarh", "Taranagar"],
+        "Dausa": ["Bandikui", "Dausa", "Lalsot", "Mahwa", "Sikrai"],
+        "Dholpur": ["Bari", "Baseri", "Dholpur", "Rajakhera", "Saipau"],
+        "Didwana-Kuchaman": ["Didwana", "Kuchaman City", "Ladnun", "Makrana", "Nawa", "Parbatsar"],
+        "Dudu": ["Dudu", "Mauzamabad", "Phagi"],
+        "Dungarpur": ["Aspur", "Bichhiwara", "Dungarpur", "Sagwara", "Simalwara"],
+        "Ganganagar": ["Anupgarh", "Ganganagar", "Gharsana", "Karanpur", "Padampur", "Raisinghnagar", "Sadulshahar", "Suratgarh", "Vijainagar"],
+        "Hanumangarh": ["Bhadra", "Hanumangarh", "Nohar", "Pilibanga", "Rawatsar", "Sangaria", "Tibbi"],
+        "Jaipur": ["Amber", "Andhi", "Bassi", "Chaksu", "Chomu", "Dudu", "Govindgarh", "Jalsu", "Jamwa Ramgarh", "Jhotwara", "Kotputli", "Sambhar", "Sanganer", "Shahpura", "Viratnagar", "Jahazpur", "Kotri", "Phulera", "Shahpura"],
+        "Jaisalmer": ["Jaisalmer", "Pokaran", "Sam"],
+        "Jalore": ["Ahore", "Bhinmal", "Chitalwana", "Jalore", "Jaswantpura", "Raniwara", "Sanchore", "Sayla"],
+        "Jhalawar": ["Aklera", "Bakani", "Dag", "Jhalrapatan", "Khanpur", "Manohar Thana", "Pachpahar", "Pirawa"],
+        "Jhunjhunu": ["Alsisar", "Buhana", "Chirawa", "Jhunjhunu", "Khetri", "Malsisar", "Nawalgarh", "Udaipurwati"],
+        "Jodhpur": ["Baori", "Bap", "Bilara", "Bhopalgarh", "Jodhpur", "Luni", "Mandore", "Osian", "Phalodi", "Shergarh", "Tinwari"],
+        "Karauli": ["Hindaun", "Karauli", "Mandrayal", "Nadoti", "Sapotra", "Todabhim"],
+        "Khairthal-Tijara": ["Harsoli", "Khairthal", "Kishangarh Bas", "Kotkasim", "Mundawar", "Tapukara", "Tijara"],
+        "Kota": ["Itawa", "Kanwas", "Kota", "Ladpura", "Sultanpur"],
+        "Kotputli-Behror": ["Behror", "Kotputli", "Mandawar", "Neemrana", "Viratnagar"],
+        "Nagaur": ["Degana", "Didwana", "Jayal", "Kuchaman", "Ladnun", "Makrana", "Merta", "Mundwa", "Nagaur", "Nawa", "Parbatsar"],
+        "Pali": ["Bali", "Desuri", "Jaitaran", "Marwar Junction", "Pali", "Rani", "Raipur", "Rohat", "Sojat", "Sumerpur"],
+        "Phalodi": ["Aau", "Bap", "Lohawat", "Phalodi"],
+        "Pratapgarh": ["Arnod", "Chhoti Sadri", "Dhariawad", "Peepalkhunt", "Pratapgarh"],
+        "Rajsamand": ["Amet", "Bhim", "Deogarh", "Khamnor", "Kumbhalgarh", "Railmagra", "Rajsamand"],
+        "Salumbar": ["Jhallara", "Lasadiya", "Salumbar", "Sarada", "Semari"],
+        "Sawai Madhopur": ["Bonli", "Gangapur City", "Khandar", "Sawai Madhopur", "Wazirpur"],
+        "Sikar": ["Danta Ramgarh", "Fatehpur", "Khandela", "Lachhmangarh", "Neem Ka Thana", "Piprali", "Sikar", "Sri Madhopur", "Udaipurwati"],
+        "Sirohi": ["Abu Road", "Pindwara", "Reodar", "Sheoganj", "Sirohi"],
+        "Tonk": ["Deoli", "Malpura", "Niwai", "Peeplu", "Todaraisingh", "Tonk", "Uniara"],
+        "Udaipur": ["Badgaon", "Bhindar", "Girwa", "Gogunda", "Jhadol", "Kherwara", "Kotra", "Lasadiya", "Mavli", "Rishabhdeo", "Salumbar", "Sarada", "Semari", "Udaipur", "Vallabhnagar", "Gogunda", "Kotra"]
+    };
+
+    // ============================================
+    // OPTIONS DATA
+    // ============================================
+    const sectors = ["Agriculture", "Manufacturing", "Education & Training", "Textile", "Logistics & Supply Chain", "Chemical & Petrochemical", "Food Processing", "Information Technology (IT)", "Banking & Financial Services", "Automotive", "Construction", "Green Jobs & Renewable Energy", "Mining & Minerals", "Other"];
+
+    const jobRoles = ["Data Entry Operator", "Dairy Worker", "Machine Operator", "Office Assistant", "HR Executive", "Receptionist", "Auto Electrician", "CNC Operator", "Automobile Service Technician", "Driver", "Admin Executive", "Accountant", "Mechanic", "Housekeeping Staff", "Helper", "IT Support Executive", "Sales Executive", "Store Manager", "Cutting Operator", "Retail Sales Associate", "Other"];
+
+    const educationOptions = ["10th Pass", "12th Pass", "ITI", "Diploma", "Graduate", "Post Graduate", "Other"];
+    const experienceOptions = ["0-1 Years", "1-2 Years", "2-3 Years", "3-5 Years", "5+ Years"];
+    const salaryOptions = ["8000-10000", "10001-12000", "12001-15000", "15001-18000", "18001-20000", "20001+"];
+    const opportunityTypes = ["Apprenticeship", "OJT", "Internship"];
+
+    // ============================================
+    // DOM REFERENCES
+    // ============================================
     const form = document.getElementById("surveyForm");
     const jobRowsContainer = document.getElementById("jobRows");
     const addJobRowBtn = document.getElementById("addJobRow");
+    const apprenticeshipRowsContainer = document.getElementById("apprenticeshipRows");
+    const addApprenticeshipRowBtn = document.getElementById("addApprenticeshipRow");
     const previewBtn = document.getElementById("previewBtn");
     const previewBox = document.getElementById("previewBox");
     const previewContent = document.getElementById("previewContent");
@@ -578,281 +612,12 @@
     const districtSelect = document.getElementById("district");
     const blockSelect = document.getElementById("block");
 
-    // ===== COMPLETE DISTRICT WISE BLOCK DATA =====
-    const districtBlockMap = {
-        "Ajmer": [
-            "Ajmer Rural", "Arain", "Bhinay", "Jawaja", "Kekri", 
-            "Kishangarh/Silora", "Masooda", "Pisangan", "Sarwar", "Sawar", "Srinagar"
-        ],
-        "Alwar": [
-            "Bansur", "Behror", "Govindgarh", "Kathumar", "Kishangarh Bas", 
-            "Kotkasim", "Laxmangarh", "Malakheda", "Mandawar", "Neemrana", 
-            "Rajgarh", "Ramgarh", "Reni", "Thanagazi", "Tijara", "Umren"
-        ],
-        "Balotra": [
-            "Balotra", "Baytu", "Gida", "Kalyanpur", "Pachpadra", 
-            "Patodi", "Samdari", "Sindhari", "Siwana"
-        ],
-        "Banswara": [
-            "Anandpuri", "Bagidora", "Banswara", "Chhoti Sarwan", 
-            "Garhi", "Ghatol", "Kushalgarh", "Sajjangarh"
-        ],
-        "Baran": [
-            "Anta", "Atru", "Baran", "Chhabra", "Chhipabarod", 
-            "Kishanganj", "Mangrol", "Shahbad"
-        ],
-        "Barmer": [
-            "Aadel", "Balotra", "Barmer", "Barmer Rural", "Baytoo", 
-            "Chohtan", "Dhanau", "Dhorimanna", "Fagliya", "Gadra Road", 
-            "Gira", "Gudhamalani", "Kalyanpur", "Panyla Kla", "Patodi", 
-            "Ramsar", "Samdari", "Sedwa", "Sheo", "Sindhari", "Siwana"
-        ],
-        "Beawar": [
-            "Badnor", "Beawar", "Jawaja", "Masuda", "Raipur", "Todgarh"
-        ],
-        "Bharatpur": [
-            "Bayana", "Bhusawar", "Deeg", "Kaman", "Kumher", 
-            "Nadbai", "Nagar Pahari", "Pahari", "Rupbas", "Sewar", 
-            "Uchain", "Weir"
-        ],
-        "Bhilwara": [
-            "Asind", "Banera", "Bijoliya", "Hurda", "Jahazpur", 
-            "Kotri", "Mandal", "Mandalgarh", "Raipur", "Sahara", 
-            "Shahpura", "Suwana"
-        ],
-        "Bikaner": [
-            "Bikaner", "Dungargarh", "Khajuwala", "Kolayat", 
-            "Lunkaransar", "Nokha", "Poogal", "Shri Dungargarh"
-        ],
-        "Bundi": [
-            "Bundi", "Hindoli", "Keshoraipatan", "Nainwa", "Talera"
-        ],
-        "Chittorgarh": [
-            "Bari Sadri", "Begun", "Bhadesar", "Bhupalsagar", "Chittorgarh", 
-            "Dungla", "Gangrar", "Kapasan", "Nimbahera", "Rashmi", "Rawatbhata"
-        ],
-        "Churu": [
-            "Bidasar", "Churu", "Rajgarh", "Ratangarh", "Sardarshahar", 
-            "Sujangarh", "Taranagar"
-        ],
-        "Dausa": [
-            "Bandikui", "Dausa", "Lalsot", "Mahwa", "Sikrai"
-        ],
-        "Dholpur": [
-            "Bari", "Baseri", "Dholpur", "Rajakhera", "Saipau"
-        ],
-        "Didwana-Kuchaman": [
-            "Didwana", "Kuchaman City", "Ladnun", "Makrana", "Nawa", "Parbatsar"
-        ],
-        "Dudu": [
-            "Dudu", "Mauzamabad", "Phagi"
-        ],
-        "Dungarpur": [
-            "Aspur", "Bichhiwara", "Dungarpur", "Sagwara", "Simalwara"
-        ],
-        "Ganganagar": [
-            "Anupgarh", "Ganganagar", "Gharsana", "Karanpur", "Padampur", 
-            "Raisinghnagar", "Sadulshahar", "Suratgarh", "Vijainagar"
-        ],
-        "Hanumangarh": [
-            "Bhadra", "Hanumangarh", "Nohar", "Pilibanga", "Rawatsar", 
-            "Sangaria", "Tibbi"
-        ],
-        "Jaipur": [
-            "Amber", "Andhi", "Bassi", "Chaksu", "Chomu", 
-            "Dudu", "Govindgarh", "Jalsu", "Jamwa Ramgarh", "Jhotwara", 
-            "Kotputli", "Sambhar", "Sanganer", "Shahpura", "Viratnagar",
-            "Jahazpur", "Kotri", "Phulera", "Shahpura"
-        ],
-        "Jaisalmer": [
-            "Jaisalmer", "Pokaran", "Sam"
-        ],
-        "Jalore": [
-            "Ahore", "Bhinmal", "Chitalwana", "Jalore", "Jaswantpura", 
-            "Raniwara", "Sanchore", "Sayla"
-        ],
-        "Jhalawar": [
-            "Aklera", "Bakani", "Dag", "Jhalrapatan", "Khanpur", 
-            "Manohar Thana", "Pachpahar", "Pirawa"
-        ],
-        "Jhunjhunu": [
-            "Alsisar", "Buhana", "Chirawa", "Jhunjhunu", "Khetri", 
-            "Malsisar", "Nawalgarh", "Udaipurwati"
-        ],
-        "Jodhpur": [
-            "Baori", "Bap", "Bilara", "Bhopalgarh", "Jodhpur", 
-            "Luni", "Mandore", "Osian", "Phalodi", "Shergarh", "Tinwari"
-        ],
-        "Karauli": [
-            "Hindaun", "Karauli", "Mandrayal", "Nadoti", "Sapotra", "Todabhim"
-        ],
-        "Khairthal-Tijara": [
-            "Harsoli", "Khairthal", "Kishangarh Bas", "Kotkasim", 
-            "Mundawar", "Tapukara", "Tijara"
-        ],
-        "Kota": [
-            "Itawa", "Kanwas", "Kota", "Ladpura", "Sultanpur"
-        ],
-        "Kotputli-Behror": [
-            "Behror", "Kotputli", "Mandawar", "Neemrana", "Viratnagar"
-        ],
-        "Nagaur": [
-            "Degana", "Didwana", "Jayal", "Kuchaman", "Ladnun", 
-            "Makrana", "Merta", "Mundwa", "Nagaur", "Nawa", "Parbatsar"
-        ],
-        "Pali": [
-            "Bali", "Desuri", "Jaitaran", "Marwar Junction", "Pali", 
-            "Rani", "Raipur", "Rohat", "Sojat", "Sumerpur"
-        ],
-        "Phalodi": [
-            "Aau", "Bap", "Lohawat", "Phalodi"
-        ],
-        "Pratapgarh": [
-            "Arnod", "Chhoti Sadri", "Dhariawad", "Peepalkhunt", "Pratapgarh"
-        ],
-        "Rajsamand": [
-            "Amet", "Bhim", "Deogarh", "Khamnor", "Kumbhalgarh", 
-            "Railmagra", "Rajsamand"
-        ],
-        "Salumbar": [
-            "Jhallara", "Lasadiya", "Salumbar", "Sarada", "Semari"
-        ],
-        "Sawai Madhopur": [
-            "Bonli", "Gangapur City", "Khandar", "Sawai Madhopur", "Wazirpur"
-        ],
-        "Sikar": [
-            "Danta Ramgarh", "Fatehpur", "Khandela", "Lachhmangarh", 
-            "Neem Ka Thana", "Piprali", "Sikar", "Sri Madhopur", "Udaipurwati"
-        ],
-        "Sirohi": [
-            "Abu Road", "Pindwara", "Reodar", "Sheoganj", "Sirohi"
-        ],
-        "Tonk": [
-            "Deoli", "Malpura", "Niwai", "Peeplu", "Todaraisingh", "Tonk", "Uniara"
-        ],
-        "Udaipur": [
-            "Badgaon", "Bhindar", "Girwa", "Gogunda", "Jhadol", 
-            "Kherwara", "Kotra", "Lasadiya", "Mavli", "Rishabhdeo", 
-            "Salumbar", "Sarada", "Semari", "Udaipur", "Vallabhnagar",
-            "Gogunda", "Kotra"
-        ]
-    };
-
-    // Get all district names
-    const allDistricts = Object.keys(districtBlockMap).sort();
-
-    // Populate District dropdown
-    function populateDistricts() {
-        districtSelect.innerHTML = '<option value="">-- Select District --</option>';
-        allDistricts.forEach(function(district) {
-            const option = document.createElement("option");
-            option.value = district;
-            option.textContent = district;
-            districtSelect.appendChild(option);
-        });
-        // Add Other option
-        const otherOption = document.createElement("option");
-        otherOption.value = "Other";
-        otherOption.textContent = "Other";
-        districtSelect.appendChild(otherOption);
-    }
-
-    // Populate Blocks based on selected district
-    function populateBlocks(district) {
-        blockSelect.innerHTML = '<option value="">-- Select Block --</option>';
-        
-        if (district === 'Other') {
-            document.getElementById('block_other').classList.add('active');
-            document.getElementById('block_other').querySelector('input').setAttribute('required', 'required');
-            return;
-        }
-
-        document.getElementById('block_other').classList.remove('active');
-        document.getElementById('block_other').querySelector('input').removeAttribute('required');
-        document.getElementById('block_other').querySelector('input').value = '';
-
-        const blocks = districtBlockMap[district] || [];
-        blocks.forEach(function(block) {
-            const option = document.createElement("option");
-            option.value = block;
-            option.textContent = block;
-            blockSelect.appendChild(option);
-        });
-        
-        // Add Other option to block
-        const otherOption = document.createElement("option");
-        otherOption.value = "Other";
-        otherOption.textContent = "Other";
-        blockSelect.appendChild(otherOption);
-    }
-
-    // District change handler
-    districtSelect.addEventListener('change', function() {
-        const district = this.value;
-        
-        // Handle Other for District
-        if (district === 'Other') {
-            document.getElementById('district_other').classList.add('active');
-            document.getElementById('district_other').querySelector('input').setAttribute('required', 'required');
-            populateBlocks('Other');
-        } else {
-            document.getElementById('district_other').classList.remove('active');
-            document.getElementById('district_other').querySelector('input').removeAttribute('required');
-            document.getElementById('district_other').querySelector('input').value = '';
-            populateBlocks(district);
-        }
-    });
-
-    // Other Input Toggle for all selects
-    document.querySelectorAll('select').forEach(function(select) {
-        select.addEventListener('change', function() {
-            const otherDiv = this.closest('div')?.querySelector('.other-input');
-            if (otherDiv) {
-                if (this.value === 'Other') {
-                    otherDiv.classList.add('active');
-                    const input = otherDiv.querySelector('input');
-                    if (input) input.setAttribute('required', 'required');
-                } else {
-                    otherDiv.classList.remove('active');
-                    const input = otherDiv.querySelector('input');
-                    if (input) {
-                        input.removeAttribute('required');
-                        input.value = '';
-                    }
-                }
-            }
-        });
-    });
-
     let jobRowIndex = 0;
+    let apprenticeshipRowIndex = 0;
 
-    const sectors = [
-      "Agriculture", "Manufacturing", "Education & Training", "Textile",
-      "Logistics & Supply Chain", "Chemical & Petrochemical", "Food Processing",
-      "Information Technology (IT)", "Banking & Financial Services", "Automotive",
-      "Construction", "Green Jobs & Renewable Energy", "Mining & Minerals", "Other"
-    ];
-
-    const jobRoles = [
-      "Data Entry Operator", "Dairy Worker", "Machine Operator", "Office Assistant",
-      "HR Executive", "Receptionist", "Auto Electrician", "CNC Operator",
-      "Automobile Service Technician", "Driver", "Admin Executive", "Accountant",
-      "Mechanic", "Housekeeping Staff", "Helper", "IT Support Executive",
-      "Sales Executive", "Store Manager", "Cutting Operator", "Retail Sales Associate", "Other"
-    ];
-
-    const educationOptions = [
-      "10th Pass", "12th Pass", "ITI", "Diploma", "Graduate", "Post Graduate", "Other"
-    ];
-
-    const experienceOptions = [
-      "0-1 Years", "1-2 Years", "2-3 Years", "3-5 Years", "5+ Years"
-    ];
-
-    const salaryOptions = [
-      "8000-10000", "10001-12000", "12001-15000", "15001-18000", "18001-20000", "20001+"
-    ];
-
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
     function getCurrentDateTime() {
       const now = new Date();
       return now.toLocaleString("en-IN");
@@ -865,33 +630,107 @@
 
     function createOptions(optionsArray, includeSelect = true) {
       let html = '';
-      if (includeSelect) {
-        html += `<option value="">-- Select --</option>`;
-      }
+      if (includeSelect) html += `<option value="">-- Select --</option>`;
       optionsArray.forEach(item => {
         html += `<option value="${item}">${item}</option>`;
       });
       return html;
     }
 
+    // ============================================
+    // DISTRICT & BLOCK FUNCTIONS
+    // ============================================
+    function populateDistricts() {
+      const allDistricts = Object.keys(districtBlockMap).sort();
+      districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+      allDistricts.forEach(function(district) {
+        const option = document.createElement("option");
+        option.value = district;
+        option.textContent = district;
+        districtSelect.appendChild(option);
+      });
+      const otherOption = document.createElement("option");
+      otherOption.value = "Other";
+      otherOption.textContent = "Other";
+      districtSelect.appendChild(otherOption);
+    }
+
+    function populateBlocks(district) {
+      blockSelect.innerHTML = '<option value="">-- Select Block --</option>';
+      if (district === 'Other') {
+        document.getElementById('block_other').classList.add('active');
+        document.getElementById('block_other').querySelector('input').setAttribute('required', 'required');
+        return;
+      }
+      document.getElementById('block_other').classList.remove('active');
+      document.getElementById('block_other').querySelector('input').removeAttribute('required');
+      document.getElementById('block_other').querySelector('input').value = '';
+      const blocks = districtBlockMap[district] || [];
+      blocks.forEach(function(block) {
+        const option = document.createElement("option");
+        option.value = block;
+        option.textContent = block;
+        blockSelect.appendChild(option);
+      });
+      const otherOption = document.createElement("option");
+      otherOption.value = "Other";
+      otherOption.textContent = "Other";
+      blockSelect.appendChild(otherOption);
+    }
+
+    districtSelect.addEventListener('change', function() {
+      const district = this.value;
+      if (district === 'Other') {
+        document.getElementById('district_other').classList.add('active');
+        document.getElementById('district_other').querySelector('input').setAttribute('required', 'required');
+        populateBlocks('Other');
+      } else {
+        document.getElementById('district_other').classList.remove('active');
+        document.getElementById('district_other').querySelector('input').removeAttribute('required');
+        document.getElementById('district_other').querySelector('input').value = '';
+        populateBlocks(district);
+      }
+    });
+
+    // ============================================
+    // OTHER INPUT TOGGLE
+    // ============================================
+    document.querySelectorAll('select').forEach(function(select) {
+      select.addEventListener('change', function() {
+        const otherDiv = this.closest('div')?.querySelector('.other-input');
+        if (otherDiv) {
+          if (this.value === 'Other') {
+            otherDiv.classList.add('active');
+            const input = otherDiv.querySelector('input');
+            if (input) input.setAttribute('required', 'required');
+          } else {
+            otherDiv.classList.remove('active');
+            const input = otherDiv.querySelector('input');
+            if (input) {
+              input.removeAttribute('required');
+              input.value = '';
+            }
+          }
+        }
+      });
+    });
+
+    // ============================================
+    // ADD JOB ROW
+    // ============================================
     function addJobRow() {
       jobRowIndex++;
-
       const row = document.createElement("div");
       row.className = "job-row border border-slate-200 rounded-xl p-4 bg-slate-50";
       row.setAttribute("data-index", jobRowIndex);
 
       row.innerHTML = `
         <div class="flex justify-between items-center mb-4">
-          <h3 class="font-semibold text-lg">Job Demand #${jobRowIndex}</h3>
-          <button type="button"
-            class="remove-job-row bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg">
-            Remove
-          </button>
+          <h3 class="font-semibold text-lg">Job Demand Entry #${jobRowIndex}</h3>
+          <button type="button" class="remove-job-row bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg">Remove</button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
           <div>
             <label class="block font-medium mb-1 field-required">Sector</label>
             <select name="job_sector[]" class="job-required w-full border rounded-lg px-3 py-2" required>
@@ -899,9 +738,7 @@
               ${createOptions(sectors, false)}
             </select>
             <div class="other-input sector-other">
-              <input type="text" name="job_sector_other[]" 
-                class="w-full border rounded-lg px-3 py-2 mt-1"
-                placeholder="Please specify">
+              <input type="text" name="job_sector_other[]" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
             </div>
             <p class="error-text hidden"></p>
           </div>
@@ -913,9 +750,7 @@
               ${createOptions(jobRoles, false)}
             </select>
             <div class="other-input role-other">
-              <input type="text" name="job_roles_other[]" 
-                class="w-full border rounded-lg px-3 py-2 mt-1"
-                placeholder="Please specify">
+              <input type="text" name="job_roles_other[]" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
             </div>
             <p class="error-text hidden"></p>
           </div>
@@ -927,9 +762,7 @@
               ${createOptions(educationOptions, false)}
             </select>
             <div class="other-input edu-other">
-              <input type="text" name="education_req_other[]" 
-                class="w-full border rounded-lg px-3 py-2 mt-1"
-                placeholder="Please specify">
+              <input type="text" name="education_req_other[]" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
             </div>
             <p class="error-text hidden"></p>
           </div>
@@ -944,71 +777,66 @@
           </div>
 
           <div>
+            <label class="block font-medium mb-1">Certification (if required)</label>
+            <input type="text" name="certification[]" class="w-full border rounded-lg px-3 py-2" placeholder="Enter certification">
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1">Gender Suitability / PwD (if applicable)</label>
+            <input type="text" name="gender_suitability[]" class="w-full border rounded-lg px-3 py-2" placeholder="e.g., Male, Female, Any, PwD">
+          </div>
+
+          <div>
             <label class="block font-medium mb-1 field-required">Salary Expected</label>
             <select name="salary_expected[]" class="job-required w-full border rounded-lg px-3 py-2" required>
               <option value="">-- Select Salary --</option>
               ${createOptions(salaryOptions, false)}
             </select>
             <div class="other-input salary-other">
-              <input type="text" name="salary_expected_other[]" 
-                class="w-full border rounded-lg px-3 py-2 mt-1"
-                placeholder="Please specify">
+              <input type="text" name="salary_expected_other[]" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
             </div>
             <p class="error-text hidden"></p>
           </div>
 
           <div>
             <label class="block font-medium mb-1 field-required">Current Demand</label>
-            <input type="number" name="current_demand[]"
-              class="job-required demand-field current-demand w-full border rounded-lg px-3 py-2"
-              min="0" value="0" required>
+            <input type="number" name="current_demand[]" class="job-required demand-field current-demand w-full border rounded-lg px-3 py-2" min="0" value="0" required>
             <p class="error-text hidden"></p>
           </div>
 
           <div>
             <label class="block font-medium mb-1 field-required">Demand - 6 Months</label>
-            <input type="number" name="demand_6_months[]"
-              class="job-required demand-field demand-6-months w-full border rounded-lg px-3 py-2"
-              min="0" value="0" required>
+            <input type="number" name="demand_6_months[]" class="job-required demand-field demand-6-months w-full border rounded-lg px-3 py-2" min="0" value="0" required>
             <p class="error-text hidden"></p>
           </div>
 
           <div>
             <label class="block font-medium mb-1 field-required">Demand - 12 Months</label>
-            <input type="number" name="demand_12_months[]"
-              class="job-required demand-field demand-12-months w-full border rounded-lg px-3 py-2"
-              min="0" value="0" required>
+            <input type="number" name="demand_12_months[]" class="job-required demand-field demand-12-months w-full border rounded-lg px-3 py-2" min="0" value="0" required>
             <p class="error-text hidden"></p>
           </div>
 
           <div>
             <label class="block font-medium mb-1 field-required">Future Demand</label>
-            <input type="number" name="future_demand[]"
-              class="job-required demand-field future-demand w-full border rounded-lg px-3 py-2 bg-slate-100"
-              min="0" value="0" readonly>
+            <input type="number" name="future_demand[]" class="job-required demand-field future-demand w-full border rounded-lg px-3 py-2 bg-slate-100" min="0" value="0" readonly>
             <p class="error-text hidden"></p>
           </div>
 
           <div>
             <label class="block font-medium mb-1">Apprenticeship Demand</label>
-            <input type="number" name="apprenticeship_demand[]"
-              class="demand-field apprenticeship-demand w-full border rounded-lg px-3 py-2"
-              min="0" value="0">
+            <input type="number" name="apprenticeship_demand[]" class="demand-field apprenticeship-demand w-full border rounded-lg px-3 py-2" min="0" value="0">
           </div>
 
           <div>
             <label class="block font-medium mb-1">Placement Demand</label>
-            <input type="number" name="placement_demand[]"
-              class="demand-field placement-demand w-full border rounded-lg px-3 py-2"
-              min="0" value="0">
+            <input type="number" name="placement_demand[]" class="demand-field placement-demand w-full border rounded-lg px-3 py-2" min="0" value="0">
           </div>
-
         </div>
       `;
 
       jobRowsContainer.appendChild(row);
       
-      // Add event listeners for "Other" options in job row
+      // "Other" options handler
       const selects = row.querySelectorAll('select');
       selects.forEach(function(select) {
         select.addEventListener('change', function() {
@@ -1032,10 +860,9 @@
       });
 
       // Future Demand = 6 Months + 12 Months
-      const rowDiv = row;
-      const sixMonthsInput = rowDiv.querySelector('.demand-6-months');
-      const twelveMonthsInput = rowDiv.querySelector('.demand-12-months');
-      const futureDemandInput = rowDiv.querySelector('.future-demand');
+      const sixMonthsInput = row.querySelector('.demand-6-months');
+      const twelveMonthsInput = row.querySelector('.demand-12-months');
+      const futureDemandInput = row.querySelector('.future-demand');
 
       function calculateFutureDemand() {
         const six = parseInt(sixMonthsInput.value) || 0;
@@ -1049,6 +876,83 @@
       calculateTotals();
     }
 
+    // ============================================
+    // ADD APPRENTICESHIP ROW
+    // ============================================
+    function addApprenticeshipRow() {
+      apprenticeshipRowIndex++;
+      const row = document.createElement("div");
+      row.className = "apprenticeship-row border border-slate-200 rounded-xl p-4 bg-green-50";
+      row.setAttribute("data-index", apprenticeshipRowIndex);
+
+      row.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-semibold text-lg">Apprenticeship/OJT #${apprenticeshipRowIndex}</h3>
+          <button type="button" class="remove-apprenticeship-row bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg">Remove</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block font-medium mb-1 field-required">Job Role</label>
+            <input type="text" name="apprenticeship_job_role[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" placeholder="Enter job role" required>
+            <p class="error-text hidden"></p>
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1 field-required">Opportunity Type</label>
+            <select name="apprenticeship_opportunity_type[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" required>
+              <option value="">-- Select --</option>
+              ${createOptions(opportunityTypes, false)}
+            </select>
+            <p class="error-text hidden"></p>
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1 field-required">Seats / Capacity</label>
+            <input type="number" name="apprenticeship_seats[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" min="0" value="0" required>
+            <p class="error-text hidden"></p>
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1 field-required">Duration (Months)</label>
+            <input type="number" name="apprenticeship_duration[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" min="0" value="0" required>
+            <p class="error-text hidden"></p>
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1 field-required">Monthly Stipend (Rs.)</label>
+            <input type="number" name="apprenticeship_stipend[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" min="0" value="0" required>
+            <p class="error-text hidden"></p>
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1">Expected Start Month</label>
+            <input type="month" name="apprenticeship_start_month[]" class="w-full border rounded-lg px-3 py-2">
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1">Minimum Qualification</label>
+            <input type="text" name="apprenticeship_min_qualification[]" class="w-full border rounded-lg px-3 py-2" placeholder="e.g., 10th Pass, ITI">
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1 field-required">Employment Conversion</label>
+            <select name="apprenticeship_employment_conversion[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" required>
+              <option value="">-- Select --</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+            <p class="error-text hidden"></p>
+          </div>
+        </div>
+      `;
+
+      apprenticeshipRowsContainer.appendChild(row);
+    }
+
+    // ============================================
+    // VALIDATION FUNCTIONS
+    // ============================================
     function showError(field, message) {
       field.classList.add("input-error");
       const errorText = field.parentElement.querySelector(".error-text");
@@ -1069,16 +973,13 @@
 
     function validateRequiredFields() {
       let isValid = true;
-      const requiredFields = document.querySelectorAll(".required-field, .job-required");
+      const requiredFields = document.querySelectorAll(".required-field, .job-required, .apprenticeship-required");
 
       requiredFields.forEach(field => {
-        // Skip hidden other inputs
         if (field.closest('.other-input') && !field.closest('.other-input').classList.contains('active')) {
           return;
         }
-        
         clearError(field);
-
         if (!field.value.trim()) {
           showError(field, "This field is required.");
           isValid = false;
@@ -1091,83 +992,62 @@
     function validateMobile() {
       const mobile = document.getElementById("mobile_number");
       const mobilePattern = /^[6-9][0-9]{9}$/;
-
       clearError(mobile);
-
       if (!mobile.value.trim()) {
         showError(mobile, "Mobile number is required.");
         return false;
       }
-
       if (!mobilePattern.test(mobile.value.trim())) {
         showError(mobile, "Enter a valid 10 digit Indian mobile number.");
         return false;
       }
-
       return true;
     }
 
     function validateEmail() {
       const email = document.getElementById("email_id");
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
       clearError(email);
-
       if (!email.value.trim()) {
         showError(email, "Email ID is required.");
         return false;
       }
-
       if (!emailPattern.test(email.value.trim())) {
         showError(email, "Enter a valid email address.");
         return false;
       }
-
       return true;
     }
 
     function validateHRMobile() {
-      const hrMobile = document.getElementById("hr_mobile_number");
+      const hrMobile = document.getElementById("respondent_mobile");
       const mobilePattern = /^[6-9][0-9]{9}$/;
-
       clearError(hrMobile);
-
       if (hrMobile.value.trim() && !mobilePattern.test(hrMobile.value.trim())) {
         showError(hrMobile, "Enter a valid 10 digit Indian mobile number.");
         return false;
       }
-
       return true;
     }
 
     function validateNumbers() {
       let isValid = true;
-      const numberFields = document.querySelectorAll("input[type='number']");
-
-      numberFields.forEach(field => {
+      document.querySelectorAll("input[type='number']").forEach(field => {
         clearError(field);
-
-        if (field.value === "") {
-          field.value = 0;
-        }
-
+        if (field.value === "") field.value = 0;
         if (Number(field.value) < 0) {
           showError(field, "Negative value is not allowed.");
           isValid = false;
         }
       });
-
       return isValid;
     }
 
     function validateAtLeastOneJobRow() {
-      const rows = document.querySelectorAll(".job-row");
-
-      if (rows.length === 0) {
+      if (document.querySelectorAll(".job-row").length === 0) {
         alert("Please add at least one Job Demand row.");
         return false;
       }
-
       return true;
     }
 
@@ -1177,93 +1057,113 @@
           .reduce((sum, input) => sum + Number(input.value || 0), 0);
       };
 
-      document.getElementById("total_current_demand").textContent =
-        getTotal(".current-demand");
-
-      document.getElementById("total_future_demand").textContent =
-        getTotal(".future-demand");
-
-      document.getElementById("total_6_months").textContent =
-        getTotal(".demand-6-months");
-
-      document.getElementById("total_12_months").textContent =
-        getTotal(".demand-12-months");
-
-      document.getElementById("total_apprenticeship").textContent =
-        getTotal(".apprenticeship-demand");
-
-      document.getElementById("total_placement").textContent =
-        getTotal(".placement-demand");
+      document.getElementById("total_current_demand").textContent = getTotal(".current-demand");
+      document.getElementById("total_future_demand").textContent = getTotal(".future-demand");
+      document.getElementById("total_6_months").textContent = getTotal(".demand-6-months");
+      document.getElementById("total_12_months").textContent = getTotal(".demand-12-months");
+      document.getElementById("total_apprenticeship").textContent = getTotal(".apprenticeship-demand");
+      document.getElementById("total_placement").textContent = getTotal(".placement-demand");
     }
 
+    // ============================================
+    // COLLECT FORM DATA
+    // ============================================
     function collectFormData() {
       const formData = new FormData(form);
 
+      // Supporting Evidence
+      const evidenceList = [];
+      document.querySelectorAll('input[name^="supporting_evidence_"]:checked').forEach(el => {
+        evidenceList.push(el.value);
+      });
+      const otherText = document.getElementById('supporting_evidence_other_text');
+      if (otherText && otherText.value.trim()) {
+        evidenceList.push(otherText.value.trim());
+      }
+      document.getElementById('supporting_evidence').value = evidenceList.join(', ');
+
       const data = {
-        id: formData.get("id"),
+        mode_of_interview: formData.get("mode_of_interview"),
         start_time: formData.get("start_time"),
         completion_time: formData.get("completion_time"),
         submission_date: formData.get("submission_date"),
-
-        email: formData.get("email"),
-        name: formData.get("name"),
-        hr_mobile_number: formData.get("hr_mobile_number"),
 
         employer_code: formData.get("employer_code"),
         employer_name: formData.get("employer_name"),
         primary_sector: formData.get("primary_sector") === 'Other' ? formData.get("primary_sector_other") : formData.get("primary_sector"),
         district: formData.get("district") === 'Other' ? formData.get("district_other") : formData.get("district"),
         block: formData.get("block") === 'Other' ? formData.get("block_other") : formData.get("block"),
+        riico_area: formData.get("riico_area"),
         address: formData.get("address"),
+        organisation_url: formData.get("organisation_url"),
+        nature_of_operations: formData.get("nature_of_operations"),
         organisation_type: formData.get("organisation_type") === 'Other' ? formData.get("organisation_type_other") : formData.get("organisation_type"),
         product_service_type: formData.get("product_service_type"),
+        company_size: formData.get("company_size"),
+        active_status: formData.get("active_status"),
+
         senior_official_name: formData.get("senior_official_name"),
         mobile_number: formData.get("mobile_number"),
         email_id: formData.get("email_id"),
-        company_size: formData.get("company_size"),
-        riico_area: formData.get("riico_area"),
-        active_status: formData.get("active_status"),
+        respondent_name: formData.get("respondent_name"),
+        respondent_mobile: formData.get("respondent_mobile"),
+        respondent_email: formData.get("respondent_email"),
 
         placement_ready: formData.get("placement_ready"),
         apprenticeship_ready: formData.get("apprenticeship_ready"),
         guest_lecture_ready: formData.get("guest_lecture_ready"),
         exposure_visit_ready: formData.get("exposure_visit_ready"),
         csr_interest: formData.get("csr_interest"),
+        on_the_job_training_ready: formData.get("on_the_job_training_ready"),
         awareness_of_rsldc: formData.get("awareness_of_rsldc"),
         local_employee_ready: formData.get("local_employee_ready"),
         collaboration_ready: formData.get("collaboration_ready"),
 
         hiring_challenges: formData.get("hiring_challenges") === 'Other' ? formData.get("hiring_challenges_other") : formData.get("hiring_challenges"),
         remarks: formData.get("remarks"),
+        supporting_evidence: document.getElementById('supporting_evidence').value,
 
-        job_demands: []
+        job_demands: [],
+        apprenticeships: []
       };
 
-      const rows = document.querySelectorAll(".job-row");
-
-      rows.forEach((row, index) => {
+      // Job Demands
+      document.querySelectorAll(".job-row").forEach((row, index) => {
         const sectorSelect = row.querySelector("[name='job_sector[]']");
-        const sectorOther = row.querySelector("[name='job_sector_other[]']");
         const roleSelect = row.querySelector("[name='job_roles[]']");
-        const roleOther = row.querySelector("[name='job_roles_other[]']");
         const eduSelect = row.querySelector("[name='education_req[]']");
-        const eduOther = row.querySelector("[name='education_req_other[]']");
         const salarySelect = row.querySelector("[name='salary_expected[]']");
-        const salaryOther = row.querySelector("[name='salary_expected_other[]']");
 
         data.job_demands.push({
           row_no: index + 1,
-          sector: sectorSelect.value === 'Other' ? sectorOther.value : sectorSelect.value,
-          job_role: roleSelect.value === 'Other' ? roleOther.value : roleSelect.value,
-          education_req: eduSelect.value === 'Other' ? eduOther.value : eduSelect.value,
+          sector: sectorSelect.value === 'Other' ? row.querySelector("[name='job_sector_other[]']").value : sectorSelect.value,
+          job_role: roleSelect.value === 'Other' ? row.querySelector("[name='job_roles_other[]']").value : roleSelect.value,
+          education_req: eduSelect.value === 'Other' ? row.querySelector("[name='education_req_other[]']").value : eduSelect.value,
           experience_req: row.querySelector("[name='experience_req[]']").value,
-          salary_expected: salarySelect.value === 'Other' ? salaryOther.value : salarySelect.value,
+          certification: row.querySelector("[name='certification[]']").value,
+          gender_suitability: row.querySelector("[name='gender_suitability[]']").value,
+          salary_expected: salarySelect.value === 'Other' ? row.querySelector("[name='salary_expected_other[]']").value : salarySelect.value,
           current_demand: row.querySelector("[name='current_demand[]']").value,
           future_demand: row.querySelector("[name='future_demand[]']").value,
           demand_6_months: row.querySelector("[name='demand_6_months[]']").value,
           demand_12_months: row.querySelector("[name='demand_12_months[]']").value,
           apprenticeship_demand: row.querySelector("[name='apprenticeship_demand[]']").value,
           placement_demand: row.querySelector("[name='placement_demand[]']").value
+        });
+      });
+
+      // Apprenticeships
+      document.querySelectorAll(".apprenticeship-row").forEach((row, index) => {
+        data.apprenticeships.push({
+          row_no: index + 1,
+          job_role: row.querySelector("[name='apprenticeship_job_role[]']").value,
+          opportunity_type: row.querySelector("[name='apprenticeship_opportunity_type[]']").value,
+          seats_capacity: row.querySelector("[name='apprenticeship_seats[]']").value,
+          duration_months: row.querySelector("[name='apprenticeship_duration[]']").value,
+          monthly_stipend: row.querySelector("[name='apprenticeship_stipend[]']").value,
+          expected_start_month: row.querySelector("[name='apprenticeship_start_month[]']").value,
+          minimum_qualification: row.querySelector("[name='apprenticeship_min_qualification[]']").value,
+          employment_conversion: row.querySelector("[name='apprenticeship_employment_conversion[]']").value
         });
       });
 
@@ -1288,53 +1188,73 @@
         validateHRMobile(),
         validateNumbers()
       ];
-
       return checks.every(Boolean);
     }
 
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
     addJobRowBtn.addEventListener("click", addJobRow);
+    addApprenticeshipRowBtn.addEventListener("click", addApprenticeshipRow);
 
+    // Remove job row
     jobRowsContainer.addEventListener("click", function(event) {
       if (event.target.classList.contains("remove-job-row")) {
-        const rows = document.querySelectorAll(".job-row");
-
-        if (rows.length === 1) {
+        if (document.querySelectorAll(".job-row").length === 1) {
           alert("At least one Job Demand row is required.");
           return;
         }
-
         event.target.closest(".job-row").remove();
         calculateTotals();
       }
     });
 
+    // Remove apprenticeship row
+    apprenticeshipRowsContainer.addEventListener("click", function(event) {
+      if (event.target.classList.contains("remove-apprenticeship-row")) {
+        if (document.querySelectorAll(".apprenticeship-row").length === 0) {
+          return;
+        }
+        event.target.closest(".apprenticeship-row").remove();
+      }
+    });
+
+    // Auto-calculate totals
     jobRowsContainer.addEventListener("input", function(event) {
       if (event.target.classList.contains("demand-field")) {
         calculateTotals();
       }
     });
 
+    // Supporting Evidence checkbox handler
+    document.querySelectorAll('input[name^="supporting_evidence_"]').forEach(function(cb) {
+      cb.addEventListener('change', function() {
+        const otherText = document.getElementById('supporting_evidence_other_text');
+        if (this.value === 'Others' && this.checked) {
+          otherText.classList.remove('hidden');
+        } else {
+          otherText.classList.add('hidden');
+          otherText.value = '';
+        }
+      });
+    });
+
+    // Preview
     previewBtn.addEventListener("click", function() {
       document.getElementById("completion_time").value = getCurrentDateTime();
-
       if (!validateForm()) {
         previewBox.classList.add("hidden");
         return;
       }
-
       const data = collectFormData();
       previewContent.textContent = JSON.stringify(data, null, 2);
       previewBox.classList.remove("hidden");
-
-      window.scrollTo({
-        top: previewBox.offsetTop - 20,
-        behavior: "smooth"
-      });
+      window.scrollTo({ top: previewBox.offsetTop - 20, behavior: "smooth" });
     });
 
+    // Submit
     form.addEventListener("submit", function(event) {
       event.preventDefault();
-
       document.getElementById("completion_time").value = getCurrentDateTime();
 
       if (!validateForm()) {
@@ -1343,39 +1263,24 @@
       }
 
       const data = collectFormData();
-
       previewContent.textContent = JSON.stringify(data, null, 2);
       previewBox.classList.remove("hidden");
 
-      console.log("Final Form Data:", data);
-
       fetch("/api/submit-survey/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       })
-      .then(response => {
-        return response.json().then(result => {
-          return {
-            statusCode: response.status,
-            ok: response.ok,
-            result: result
-          };
-        });
-      })
+      .then(response => response.json().then(result => ({ statusCode: response.status, ok: response.ok, result })))
       .then(({ statusCode, ok, result }) => {
-        console.log("Backend Response:", result);
-
         if (ok && result.status === "success") {
           alert("Survey submitted successfully. Survey ID: " + result.survey_id);
-
           form.reset();
-
           setTimeout(() => {
             jobRowsContainer.innerHTML = "";
+            apprenticeshipRowsContainer.innerHTML = "";
             jobRowIndex = 0;
+            apprenticeshipRowIndex = 0;
             addJobRow();
             calculateTotals();
             previewBox.classList.add("hidden");
@@ -1383,28 +1288,23 @@
             document.getElementById("completion_time").value = "";
             document.getElementById("submission_date").value = getTodayDate();
           }, 100);
-
         } else {
-          let errorMessage = result.message || "Submission failed.";
-
-          if (result.missing_fields) {
-            errorMessage += "\nMissing fields: " + result.missing_fields.join(", ");
-          }
-
-          alert(errorMessage);
-          console.error("Submission Error:", statusCode, result);
+          alert(result.message || "Submission failed.");
         }
       })
       .catch(error => {
         console.error("Fetch Error:", error);
-        alert("Server error. Please check Django backend or API URL.");
+        alert("Server error. Please check Django backend.");
       });
     });
 
+    // Reset
     form.addEventListener("reset", function() {
       setTimeout(() => {
         jobRowsContainer.innerHTML = "";
+        apprenticeshipRowsContainer.innerHTML = "";
         jobRowIndex = 0;
+        apprenticeshipRowIndex = 0;
         addJobRow();
         calculateTotals();
         previewBox.classList.add("hidden");
@@ -1414,7 +1314,9 @@
       }, 50);
     });
 
-    // Initialize
+    // ============================================
+    // INITIALIZE
+    // ============================================
     window.addEventListener("load", function() {
       populateDistricts();
       document.getElementById("start_time").value = getCurrentDateTime();

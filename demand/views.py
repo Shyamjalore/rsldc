@@ -39,9 +39,9 @@ def submit_survey(request):
         data = json.loads(request.body)
         logger.info(f"Received survey data: {data.keys()}")
         
-        # Create Survey
         with transaction.atomic():
             survey = Survey.objects.create(
+                mode_of_interview=data.get('mode_of_interview', ''),
                 start_time=data.get('start_time', ''),
                 completion_time=data.get('completion_time', ''),
                 submission_date=data.get('submission_date') or datetime.now().date(),
@@ -52,6 +52,8 @@ def submit_survey(request):
                 block=data.get('block', '').strip(),
                 riico_area=data.get('riico_area', '').strip(),
                 address=data.get('address', '').strip(),
+                organisation_url=data.get('organisation_url', '').strip(),
+                nature_of_operations=data.get('nature_of_operations', ''),
                 organisation_type=data.get('organisation_type', '').strip(),
                 product_service_type=data.get('product_service_type', '').strip(),
                 company_size=int(data.get('company_size', 0)) if data.get('company_size') else 0,
@@ -59,33 +61,36 @@ def submit_survey(request):
                 senior_official_name=data.get('senior_official_name', '').strip(),
                 mobile_number=data.get('mobile_number', '').strip(),
                 email_id=data.get('email_id', '').strip(),
-                email=data.get('email', '').strip(),
-                name=data.get('name', '').strip(),
-                hr_mobile_number=data.get('hr_mobile_number', '').strip(),
+                respondent_name=data.get('respondent_name', '').strip(),
+                respondent_mobile=data.get('respondent_mobile', '').strip(),
+                respondent_email=data.get('respondent_email', '').strip(),
                 placement_ready=data.get('placement_ready', 'Yes'),
                 apprenticeship_ready=data.get('apprenticeship_ready', 'Yes'),
                 guest_lecture_ready=data.get('guest_lecture_ready', 'Yes'),
                 exposure_visit_ready=data.get('exposure_visit_ready', 'Yes'),
                 csr_interest=data.get('csr_interest', 'Yes'),
+                on_the_job_training_ready=data.get('on_the_job_training_ready', 'No'),
                 awareness_of_rsldc=data.get('awareness_of_rsldc', 'Yes'),
                 local_employee_ready=data.get('local_employee_ready', 'Yes'),
                 collaboration_ready=data.get('collaboration_ready', 'Yes'),
                 hiring_challenges=data.get('hiring_challenges', '').strip(),
-                remarks=data.get('remarks', '').strip()
+                remarks=data.get('remarks', '').strip(),
+                supporting_evidence=data.get('supporting_evidence', '').strip()
             )
             
             logger.info(f"Created survey: {survey.id}")
             
             # Create Job Demands
-            job_demands = data.get('job_demands', [])
-            for idx, job_data in enumerate(job_demands, 1):
-                job = JobDemand.objects.create(
+            for idx, job_data in enumerate(data.get('job_demands', []), 1):
+                JobDemand.objects.create(
                     survey=survey,
                     row_no=idx,
                     sector=job_data.get('sector', '').strip(),
                     job_role=job_data.get('job_role', '').strip(),
                     education_req=job_data.get('education_req', '').strip(),
                     experience_req=job_data.get('experience_req', '').strip(),
+                    certification=job_data.get('certification', '').strip(),
+                    gender_suitability=job_data.get('gender_suitability', '').strip(),
                     salary_expected=job_data.get('salary_expected', '').strip(),
                     current_demand=int(job_data.get('current_demand', 0)),
                     future_demand=int(job_data.get('future_demand', 0)),
@@ -94,7 +99,22 @@ def submit_survey(request):
                     apprenticeship_demand=int(job_data.get('apprenticeship_demand', 0)),
                     placement_demand=int(job_data.get('placement_demand', 0))
                 )
-                logger.info(f"Created job demand: {job.id} for survey {survey.id}")
+            
+            # Create Apprenticeship/OJT
+            from .models import ApprenticeshipOJT
+            for idx, app_data in enumerate(data.get('apprenticeships', []), 1):
+                ApprenticeshipOJT.objects.create(
+                    survey=survey,
+                    row_no=idx,
+                    job_role=app_data.get('job_role', '').strip(),
+                    opportunity_type=app_data.get('opportunity_type', ''),
+                    seats_capacity=int(app_data.get('seats_capacity', 0)),
+                    duration_months=int(app_data.get('duration_months', 0)),
+                    monthly_stipend=int(app_data.get('monthly_stipend', 0)),
+                    expected_start_month=app_data.get('expected_start_month', ''),
+                    minimum_qualification=app_data.get('minimum_qualification', '').strip(),
+                    employment_conversion=app_data.get('employment_conversion', 'No')
+                )
         
         return JsonResponse({
             'status': 'success',

@@ -5,6 +5,8 @@ from django.utils import timezone
 class Survey(models.Model):
     # System Fields
     id = models.AutoField(primary_key=True)
+    mode_of_interview = models.CharField(max_length=20, blank=True, null=True, 
+                                         choices=[('Field Visit', 'Field Visit'), ('Telephonic', 'Telephonic')])
     start_time = models.CharField(max_length=100, blank=True, null=True)
     completion_time = models.CharField(max_length=100, blank=True, null=True)
     submission_date = models.DateField(blank=True, null=True)
@@ -17,6 +19,14 @@ class Survey(models.Model):
     block = models.CharField(max_length=100, blank=False, null=False)
     riico_area = models.CharField(max_length=255, blank=True, null=True)
     address = models.TextField(blank=False, null=False)
+    organisation_url = models.URLField(max_length=500, blank=True, null=True)
+    nature_of_operations = models.CharField(max_length=50, blank=True, null=True,
+                                            choices=[
+                                                ('Year-round', 'Year-round'),
+                                                ('Seasonal', 'Seasonal'),
+                                                ('Project-Based', 'Project-Based'),
+                                                ('Mixed', 'Mixed')
+                                            ])
     organisation_type = models.CharField(max_length=100, blank=False, null=False)
     product_service_type = models.CharField(max_length=50, blank=False, null=False)
     company_size = models.IntegerField(blank=False, null=False, default=0)
@@ -26,9 +36,9 @@ class Survey(models.Model):
     senior_official_name = models.CharField(max_length=255, blank=False, null=False)
     mobile_number = models.CharField(max_length=10, blank=False, null=False)
     email_id = models.EmailField(blank=False, null=False)
-    email = models.EmailField(blank=True, null=True)
-    name = models.CharField(max_length=255, blank=True, null=True)
-    hr_mobile_number = models.CharField(max_length=10, blank=True, null=True)
+    respondent_name = models.CharField(max_length=255, blank=True, null=True)
+    respondent_mobile = models.CharField(max_length=10, blank=True, null=True)
+    respondent_email = models.EmailField(blank=True, null=True)
     
     # Readiness and Collaboration
     placement_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
@@ -36,6 +46,7 @@ class Survey(models.Model):
     guest_lecture_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
     exposure_visit_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
     csr_interest = models.CharField(max_length=10, default='Yes', blank=True, null=True)
+    on_the_job_training_ready = models.CharField(max_length=10, default='No', blank=True, null=True)
     awareness_of_rsldc = models.CharField(max_length=10, default='Yes', blank=True, null=True)
     local_employee_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
     collaboration_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
@@ -43,6 +54,7 @@ class Survey(models.Model):
     # Challenges and Remarks
     hiring_challenges = models.CharField(max_length=255, blank=True, null=True)
     remarks = models.TextField(blank=True, null=True)
+    supporting_evidence = models.CharField(max_length=500, blank=True, null=True)
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -57,7 +69,6 @@ class Survey(models.Model):
     def __str__(self):
         return f"{self.employer_code} - {self.employer_name}"
     
-    # ===== PROPERTIES FOR DEMAND TOTALS =====
     @property
     def total_current_demand(self):
         return self.job_demands.aggregate(models.Sum('current_demand'))['current_demand__sum'] or 0
@@ -91,6 +102,8 @@ class JobDemand(models.Model):
     job_role = models.CharField(max_length=255, blank=False, null=False)
     education_req = models.CharField(max_length=100, blank=False, null=False)
     experience_req = models.CharField(max_length=50, blank=False, null=False)
+    certification = models.CharField(max_length=255, blank=True, null=True)
+    gender_suitability = models.CharField(max_length=100, blank=True, null=True)
     salary_expected = models.CharField(max_length=50, blank=False, null=False)
     current_demand = models.IntegerField(default=0)
     future_demand = models.IntegerField(default=0)
@@ -106,6 +119,37 @@ class JobDemand(models.Model):
         ordering = ['survey', 'row_no']
         verbose_name = 'Job Demand'
         verbose_name_plural = 'Job Demands'
+    
+    def __str__(self):
+        return f"{self.survey.employer_code} - {self.job_role}"
+
+
+class ApprenticeshipOJT(models.Model):
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='apprenticeships')
+    row_no = models.IntegerField(default=1)
+    
+    job_role = models.CharField(max_length=255, blank=False, null=False)
+    opportunity_type = models.CharField(max_length=50, blank=False, null=False,
+                                        choices=[
+                                            ('Apprenticeship', 'Apprenticeship'),
+                                            ('OJT', 'OJT'),
+                                            ('Internship', 'Internship')
+                                        ])
+    seats_capacity = models.IntegerField(default=0)
+    duration_months = models.IntegerField(default=0)
+    monthly_stipend = models.IntegerField(default=0)
+    expected_start_month = models.CharField(max_length=50, blank=True, null=True)
+    minimum_qualification = models.CharField(max_length=100, blank=True, null=True)
+    employment_conversion = models.CharField(max_length=3, default='No',
+                                             choices=[('Yes', 'Yes'), ('No', 'No')])
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'survey_apprenticeships'
+        ordering = ['survey', 'row_no']
+        verbose_name = 'Apprenticeship/OJT'
+        verbose_name_plural = 'Apprenticeships/OJTs'
     
     def __str__(self):
         return f"{self.survey.employer_code} - {self.job_role}"
