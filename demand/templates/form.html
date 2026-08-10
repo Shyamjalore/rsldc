@@ -40,15 +40,6 @@
       margin: 32px 0;
     }
 
-    .subsection-title {
-      background: #f1f5f9;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      color: #1e293b;
-      margin-bottom: 16px;
-    }
-
     .checkbox-group {
       display: flex;
       flex-wrap: wrap;
@@ -77,10 +68,12 @@
   <div class="max-w-7xl mx-auto px-4 py-8">
     <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
 
-      <!-- Header -->
+      <!-- Header - FIXED LOGO -->
       <div class="bg-gradient-to-r from-blue-700 to-indigo-700 p-6 text-white">
           <div class="flex items-center gap-4">
-              <img src="{% static 'img/rsldc-logo.png' %}" alt="RSLDC Logo" class="w-28 h-auto rounded-xl bg-white p-1 shadow-md">
+              <div class="w-28 h-auto rounded-xl bg-white p-1 shadow-md flex items-center justify-center">
+                  <span class="text-blue-700 font-bold text-2xl">RSLDC</span>
+              </div>
               <div>
                   <h1 class="text-2xl md:text-3xl font-bold">Rajasthan Skill Demand Aggregation Survey</h1>
                   <p class="mt-2 text-blue-100">Employer Skill Demand, Placement, Apprenticeship and Collaboration Data Entry Form</p>
@@ -539,8 +532,11 @@
 
   <script>
     // ============================================
-    // DISTRICT & BLOCK DATA (Complete)
+    // DISTRICT & BLOCK DATA
     // ============================================
+    // ============================================
+// DISTRICT & BLOCK DATA
+// ============================================
     const districtBlockMap = {
         "Ajmer": ["Ajmer Rural", "Arain", "Bhinay", "Jawaja", "Kekri", "Kishangarh/Silora", "Masooda", "Pisangan", "Sarwar", "Sawar", "Srinagar"],
         "Alwar": ["Bansur", "Behror", "Govindgarh", "Kathumar", "Kishangarh Bas", "Kotkasim", "Laxmangarh", "Malakheda", "Mandawar", "Neemrana", "Rajgarh", "Ramgarh", "Reni", "Thanagazi", "Tijara", "Umren"],
@@ -584,19 +580,19 @@
         "Tonk": ["Deoli", "Malpura", "Niwai", "Peeplu", "Todaraisingh", "Tonk", "Uniara"],
         "Udaipur": ["Badgaon", "Bhindar", "Girwa", "Gogunda", "Jhadol", "Kherwara", "Kotra", "Lasadiya", "Mavli", "Rishabhdeo", "Salumbar", "Sarada", "Semari", "Udaipur", "Vallabhnagar", "Gogunda", "Kotra"]
     };
-
+    
     // ============================================
     // OPTIONS DATA
     // ============================================
     const sectors = ["Agriculture", "Manufacturing", "Education & Training", "Textile", "Logistics & Supply Chain", "Chemical & Petrochemical", "Food Processing", "Information Technology (IT)", "Banking & Financial Services", "Automotive", "Construction", "Green Jobs & Renewable Energy", "Mining & Minerals", "Other"];
-
+    
     const jobRoles = ["Data Entry Operator", "Dairy Worker", "Machine Operator", "Office Assistant", "HR Executive", "Receptionist", "Auto Electrician", "CNC Operator", "Automobile Service Technician", "Driver", "Admin Executive", "Accountant", "Mechanic", "Housekeeping Staff", "Helper", "IT Support Executive", "Sales Executive", "Store Manager", "Cutting Operator", "Retail Sales Associate", "Other"];
-
+    
     const educationOptions = ["10th Pass", "12th Pass", "ITI", "Diploma", "Graduate", "Post Graduate", "Other"];
     const experienceOptions = ["0-1 Years", "1-2 Years", "2-3 Years", "3-5 Years", "5+ Years"];
     const salaryOptions = ["8000-10000", "10001-12000", "12001-15000", "15001-18000", "18001-20000", "20001+"];
     const opportunityTypes = ["Apprenticeship", "OJT", "Internship"];
-
+    
     // ============================================
     // DOM REFERENCES
     // ============================================
@@ -608,13 +604,13 @@
     const previewBtn = document.getElementById("previewBtn");
     const previewBox = document.getElementById("previewBox");
     const previewContent = document.getElementById("previewContent");
-
+    
     const districtSelect = document.getElementById("district");
     const blockSelect = document.getElementById("block");
-
+    
     let jobRowIndex = 0;
     let apprenticeshipRowIndex = 0;
-
+    
     // ============================================
     // UTILITY FUNCTIONS
     // ============================================
@@ -622,12 +618,12 @@
       const now = new Date();
       return now.toLocaleString("en-IN");
     }
-
+    
     function getTodayDate() {
       const today = new Date();
       return today.toISOString().split("T")[0];
     }
-
+    
     function createOptions(optionsArray, includeSelect = true) {
       let html = '';
       if (includeSelect) html += `<option value="">-- Select --</option>`;
@@ -636,7 +632,7 @@
       });
       return html;
     }
-
+    
     // ============================================
     // DISTRICT & BLOCK FUNCTIONS
     // ============================================
@@ -654,7 +650,7 @@
       otherOption.textContent = "Other";
       districtSelect.appendChild(otherOption);
     }
-
+    
     function populateBlocks(district) {
       blockSelect.innerHTML = '<option value="">-- Select Block --</option>';
       if (district === 'Other') {
@@ -677,7 +673,7 @@
       otherOption.textContent = "Other";
       blockSelect.appendChild(otherOption);
     }
-
+    
     districtSelect.addEventListener('change', function() {
       const district = this.value;
       if (district === 'Other') {
@@ -691,7 +687,7 @@
         populateBlocks(district);
       }
     });
-
+    
     // ============================================
     // OTHER INPUT TOGGLE
     // ============================================
@@ -714,7 +710,7 @@
         }
       });
     });
-
+    
     // ============================================
     // ADD JOB ROW
     // ============================================
@@ -723,13 +719,13 @@
       const row = document.createElement("div");
       row.className = "job-row border border-slate-200 rounded-xl p-4 bg-slate-50";
       row.setAttribute("data-index", jobRowIndex);
-
+    
       row.innerHTML = `
         <div class="flex justify-between items-center mb-4">
           <h3 class="font-semibold text-lg">Job Demand Entry #${jobRowIndex}</h3>
           <button type="button" class="remove-job-row bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg">Remove</button>
         </div>
-
+    
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label class="block font-medium mb-1 field-required">Sector</label>
@@ -742,7 +738,7 @@
             </div>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Job Role</label>
             <select name="job_roles[]" class="job-required w-full border rounded-lg px-3 py-2" required>
@@ -754,7 +750,7 @@
             </div>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Education Req.</label>
             <select name="education_req[]" class="job-required w-full border rounded-lg px-3 py-2" required>
@@ -766,7 +762,7 @@
             </div>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Experience Req.</label>
             <select name="experience_req[]" class="job-required w-full border rounded-lg px-3 py-2" required>
@@ -775,17 +771,17 @@
             </select>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1">Certification (if required)</label>
             <input type="text" name="certification[]" class="w-full border rounded-lg px-3 py-2" placeholder="Enter certification">
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1">Gender Suitability / PwD (if applicable)</label>
             <input type="text" name="gender_suitability[]" class="w-full border rounded-lg px-3 py-2" placeholder="e.g., Male, Female, Any, PwD">
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Salary Expected</label>
             <select name="salary_expected[]" class="job-required w-full border rounded-lg px-3 py-2" required>
@@ -797,43 +793,43 @@
             </div>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Current Demand</label>
             <input type="number" name="current_demand[]" class="job-required demand-field current-demand w-full border rounded-lg px-3 py-2" min="0" value="0" required>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Demand - 6 Months</label>
             <input type="number" name="demand_6_months[]" class="job-required demand-field demand-6-months w-full border rounded-lg px-3 py-2" min="0" value="0" required>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Demand - 12 Months</label>
             <input type="number" name="demand_12_months[]" class="job-required demand-field demand-12-months w-full border rounded-lg px-3 py-2" min="0" value="0" required>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Future Demand</label>
             <input type="number" name="future_demand[]" class="job-required demand-field future-demand w-full border rounded-lg px-3 py-2 bg-slate-100" min="0" value="0" readonly>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1">Apprenticeship Demand</label>
             <input type="number" name="apprenticeship_demand[]" class="demand-field apprenticeship-demand w-full border rounded-lg px-3 py-2" min="0" value="0">
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1">Placement Demand</label>
             <input type="number" name="placement_demand[]" class="demand-field placement-demand w-full border rounded-lg px-3 py-2" min="0" value="0">
           </div>
         </div>
       `;
-
+    
       jobRowsContainer.appendChild(row);
       
       // "Other" options handler
@@ -858,24 +854,24 @@
           }
         });
       });
-
+    
       // Future Demand = 6 Months + 12 Months
       const sixMonthsInput = row.querySelector('.demand-6-months');
       const twelveMonthsInput = row.querySelector('.demand-12-months');
       const futureDemandInput = row.querySelector('.future-demand');
-
+    
       function calculateFutureDemand() {
         const six = parseInt(sixMonthsInput.value) || 0;
         const twelve = parseInt(twelveMonthsInput.value) || 0;
         futureDemandInput.value = six + twelve;
       }
-
+    
       sixMonthsInput.addEventListener('input', calculateFutureDemand);
       twelveMonthsInput.addEventListener('input', calculateFutureDemand);
-
+    
       calculateTotals();
     }
-
+    
     // ============================================
     // ADD APPRENTICESHIP ROW
     // ============================================
@@ -884,20 +880,20 @@
       const row = document.createElement("div");
       row.className = "apprenticeship-row border border-slate-200 rounded-xl p-4 bg-green-50";
       row.setAttribute("data-index", apprenticeshipRowIndex);
-
+    
       row.innerHTML = `
         <div class="flex justify-between items-center mb-4">
           <h3 class="font-semibold text-lg">Apprenticeship/OJT #${apprenticeshipRowIndex}</h3>
           <button type="button" class="remove-apprenticeship-row bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg">Remove</button>
         </div>
-
+    
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label class="block font-medium mb-1 field-required">Job Role</label>
             <input type="text" name="apprenticeship_job_role[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" placeholder="Enter job role" required>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Opportunity Type</label>
             <select name="apprenticeship_opportunity_type[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" required>
@@ -906,35 +902,35 @@
             </select>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Seats / Capacity</label>
             <input type="number" name="apprenticeship_seats[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" min="0" value="0" required>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Duration (Months)</label>
             <input type="number" name="apprenticeship_duration[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" min="0" value="0" required>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Monthly Stipend (Rs.)</label>
             <input type="number" name="apprenticeship_stipend[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" min="0" value="0" required>
             <p class="error-text hidden"></p>
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1">Expected Start Month</label>
             <input type="month" name="apprenticeship_start_month[]" class="w-full border rounded-lg px-3 py-2">
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1">Minimum Qualification</label>
             <input type="text" name="apprenticeship_min_qualification[]" class="w-full border rounded-lg px-3 py-2" placeholder="e.g., 10th Pass, ITI">
           </div>
-
+    
           <div>
             <label class="block font-medium mb-1 field-required">Employment Conversion</label>
             <select name="apprenticeship_employment_conversion[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" required>
@@ -946,10 +942,10 @@
           </div>
         </div>
       `;
-
+    
       apprenticeshipRowsContainer.appendChild(row);
     }
-
+    
     // ============================================
     // VALIDATION FUNCTIONS
     // ============================================
@@ -961,7 +957,7 @@
         errorText.classList.remove("hidden");
       }
     }
-
+    
     function clearError(field) {
       field.classList.remove("input-error");
       const errorText = field.parentElement.querySelector(".error-text");
@@ -970,11 +966,11 @@
         errorText.classList.add("hidden");
       }
     }
-
+    
     function validateRequiredFields() {
       let isValid = true;
       const requiredFields = document.querySelectorAll(".required-field, .job-required, .apprenticeship-required");
-
+    
       requiredFields.forEach(field => {
         if (field.closest('.other-input') && !field.closest('.other-input').classList.contains('active')) {
           return;
@@ -985,10 +981,10 @@
           isValid = false;
         }
       });
-
+    
       return isValid;
     }
-
+    
     function validateMobile() {
       const mobile = document.getElementById("mobile_number");
       const mobilePattern = /^[6-9][0-9]{9}$/;
@@ -1003,7 +999,7 @@
       }
       return true;
     }
-
+    
     function validateEmail() {
       const email = document.getElementById("email_id");
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1018,7 +1014,7 @@
       }
       return true;
     }
-
+    
     function validateHRMobile() {
       const hrMobile = document.getElementById("respondent_mobile");
       const mobilePattern = /^[6-9][0-9]{9}$/;
@@ -1029,7 +1025,7 @@
       }
       return true;
     }
-
+    
     function validateNumbers() {
       let isValid = true;
       document.querySelectorAll("input[type='number']").forEach(field => {
@@ -1042,7 +1038,7 @@
       });
       return isValid;
     }
-
+    
     function validateAtLeastOneJobRow() {
       if (document.querySelectorAll(".job-row").length === 0) {
         alert("Please add at least one Job Demand row.");
@@ -1050,13 +1046,13 @@
       }
       return true;
     }
-
+    
     function calculateTotals() {
       const getTotal = selector => {
         return Array.from(document.querySelectorAll(selector))
           .reduce((sum, input) => sum + Number(input.value || 0), 0);
       };
-
+    
       document.getElementById("total_current_demand").textContent = getTotal(".current-demand");
       document.getElementById("total_future_demand").textContent = getTotal(".future-demand");
       document.getElementById("total_6_months").textContent = getTotal(".demand-6-months");
@@ -1064,13 +1060,13 @@
       document.getElementById("total_apprenticeship").textContent = getTotal(".apprenticeship-demand");
       document.getElementById("total_placement").textContent = getTotal(".placement-demand");
     }
-
+    
     // ============================================
     // COLLECT FORM DATA
     // ============================================
     function collectFormData() {
       const formData = new FormData(form);
-
+    
       // Supporting Evidence
       const evidenceList = [];
       document.querySelectorAll('input[name^="supporting_evidence_"]:checked').forEach(el => {
@@ -1081,13 +1077,13 @@
         evidenceList.push(otherText.value.trim());
       }
       document.getElementById('supporting_evidence').value = evidenceList.join(', ');
-
+    
       const data = {
         mode_of_interview: formData.get("mode_of_interview"),
         start_time: formData.get("start_time"),
         completion_time: formData.get("completion_time"),
         submission_date: formData.get("submission_date"),
-
+      
         employer_code: formData.get("employer_code"),
         employer_name: formData.get("employer_name"),
         primary_sector: formData.get("primary_sector") === 'Other' ? formData.get("primary_sector_other") : formData.get("primary_sector"),
@@ -1101,14 +1097,14 @@
         product_service_type: formData.get("product_service_type"),
         company_size: formData.get("company_size"),
         active_status: formData.get("active_status"),
-
+      
         senior_official_name: formData.get("senior_official_name"),
         mobile_number: formData.get("mobile_number"),
         email_id: formData.get("email_id"),
         respondent_name: formData.get("respondent_name"),
         respondent_mobile: formData.get("respondent_mobile"),
         respondent_email: formData.get("respondent_email"),
-
+      
         placement_ready: formData.get("placement_ready"),
         apprenticeship_ready: formData.get("apprenticeship_ready"),
         guest_lecture_ready: formData.get("guest_lecture_ready"),
@@ -1118,30 +1114,30 @@
         awareness_of_rsldc: formData.get("awareness_of_rsldc"),
         local_employee_ready: formData.get("local_employee_ready"),
         collaboration_ready: formData.get("collaboration_ready"),
-
+      
         hiring_challenges: formData.get("hiring_challenges") === 'Other' ? formData.get("hiring_challenges_other") : formData.get("hiring_challenges"),
         remarks: formData.get("remarks"),
         supporting_evidence: document.getElementById('supporting_evidence').value,
-
+      
         job_demands: [],
         apprenticeships: []
       };
-
+    
       // Job Demands
       document.querySelectorAll(".job-row").forEach((row, index) => {
         const sectorSelect = row.querySelector("[name='job_sector[]']");
         const roleSelect = row.querySelector("[name='job_roles[]']");
         const eduSelect = row.querySelector("[name='education_req[]']");
         const salarySelect = row.querySelector("[name='salary_expected[]']");
-
+      
         data.job_demands.push({
           row_no: index + 1,
           sector: sectorSelect.value === 'Other' ? row.querySelector("[name='job_sector_other[]']").value : sectorSelect.value,
           job_role: roleSelect.value === 'Other' ? row.querySelector("[name='job_roles_other[]']").value : roleSelect.value,
           education_req: eduSelect.value === 'Other' ? row.querySelector("[name='education_req_other[]']").value : eduSelect.value,
           experience_req: row.querySelector("[name='experience_req[]']").value,
-          certification: row.querySelector("[name='certification[]']").value,
-          gender_suitability: row.querySelector("[name='gender_suitability[]']").value,
+          certification: row.querySelector("[name='certification[]']").value || '',
+          gender_suitability: row.querySelector("[name='gender_suitability[]']").value || '',
           salary_expected: salarySelect.value === 'Other' ? row.querySelector("[name='salary_expected_other[]']").value : salarySelect.value,
           current_demand: row.querySelector("[name='current_demand[]']").value,
           future_demand: row.querySelector("[name='future_demand[]']").value,
@@ -1151,22 +1147,25 @@
           placement_demand: row.querySelector("[name='placement_demand[]']").value
         });
       });
-
+    
       // Apprenticeships
       document.querySelectorAll(".apprenticeship-row").forEach((row, index) => {
-        data.apprenticeships.push({
-          row_no: index + 1,
-          job_role: row.querySelector("[name='apprenticeship_job_role[]']").value,
-          opportunity_type: row.querySelector("[name='apprenticeship_opportunity_type[]']").value,
-          seats_capacity: row.querySelector("[name='apprenticeship_seats[]']").value,
-          duration_months: row.querySelector("[name='apprenticeship_duration[]']").value,
-          monthly_stipend: row.querySelector("[name='apprenticeship_stipend[]']").value,
-          expected_start_month: row.querySelector("[name='apprenticeship_start_month[]']").value,
-          minimum_qualification: row.querySelector("[name='apprenticeship_min_qualification[]']").value,
-          employment_conversion: row.querySelector("[name='apprenticeship_employment_conversion[]']").value
-        });
+        const jobRoleInput = row.querySelector("[name='apprenticeship_job_role[]']");
+        if (jobRoleInput && jobRoleInput.value.trim()) {
+          data.apprenticeships.push({
+            row_no: index + 1,
+            job_role: jobRoleInput.value.trim(),
+            opportunity_type: row.querySelector("[name='apprenticeship_opportunity_type[]']")?.value || '',
+            seats_capacity: row.querySelector("[name='apprenticeship_seats[]']")?.value || 0,
+            duration_months: row.querySelector("[name='apprenticeship_duration[]']")?.value || 0,
+            monthly_stipend: row.querySelector("[name='apprenticeship_stipend[]']")?.value || 0,
+            expected_start_month: row.querySelector("[name='apprenticeship_start_month[]']")?.value || '',
+            minimum_qualification: row.querySelector("[name='apprenticeship_min_qualification[]']")?.value || '',
+            employment_conversion: row.querySelector("[name='apprenticeship_employment_conversion[]']")?.value || 'No'
+          });
+        }
       });
-
+    
       data.totals = {
         current_demand: document.getElementById("total_current_demand").textContent,
         future_demand: document.getElementById("total_future_demand").textContent,
@@ -1175,10 +1174,10 @@
         apprenticeship_demand: document.getElementById("total_apprenticeship").textContent,
         placement_demand: document.getElementById("total_placement").textContent
       };
-
+    
       return data;
     }
-
+    
     function validateForm() {
       const checks = [
         validateAtLeastOneJobRow(),
@@ -1190,13 +1189,13 @@
       ];
       return checks.every(Boolean);
     }
-
+    
     // ============================================
     // EVENT LISTENERS
     // ============================================
     addJobRowBtn.addEventListener("click", addJobRow);
     addApprenticeshipRowBtn.addEventListener("click", addApprenticeshipRow);
-
+    
     // Remove job row
     jobRowsContainer.addEventListener("click", function(event) {
       if (event.target.classList.contains("remove-job-row")) {
@@ -1208,24 +1207,21 @@
         calculateTotals();
       }
     });
-
+    
     // Remove apprenticeship row
     apprenticeshipRowsContainer.addEventListener("click", function(event) {
       if (event.target.classList.contains("remove-apprenticeship-row")) {
-        if (document.querySelectorAll(".apprenticeship-row").length === 0) {
-          return;
-        }
         event.target.closest(".apprenticeship-row").remove();
       }
     });
-
+    
     // Auto-calculate totals
     jobRowsContainer.addEventListener("input", function(event) {
       if (event.target.classList.contains("demand-field")) {
         calculateTotals();
       }
     });
-
+    
     // Supporting Evidence checkbox handler
     document.querySelectorAll('input[name^="supporting_evidence_"]').forEach(function(cb) {
       cb.addEventListener('change', function() {
@@ -1238,43 +1234,57 @@
         }
       });
     });
-
-    // Preview
+    
+    // ============================================
+    // PREVIEW BUTTON - FIXED
+    // ============================================
     previewBtn.addEventListener("click", function() {
-      document.getElementById("completion_time").value = getCurrentDateTime();
+      const completionTime = document.getElementById("completion_time");
+      if (completionTime) {
+        completionTime.value = getCurrentDateTime();
+      }
+      
       if (!validateForm()) {
+        alert("Please fill all required fields.");
         previewBox.classList.add("hidden");
         return;
       }
+      
       const data = collectFormData();
       previewContent.textContent = JSON.stringify(data, null, 2);
       previewBox.classList.remove("hidden");
       window.scrollTo({ top: previewBox.offsetTop - 20, behavior: "smooth" });
     });
-
-    // Submit
+    
+    // ============================================
+    // SUBMIT BUTTON - FIXED
+    // ============================================
     form.addEventListener("submit", function(event) {
       event.preventDefault();
-      document.getElementById("completion_time").value = getCurrentDateTime();
-
+      
+      const completionTime = document.getElementById("completion_time");
+      if (completionTime) {
+        completionTime.value = getCurrentDateTime();
+      }
+    
       if (!validateForm()) {
-        alert("Please fix validation errors before submitting.");
+        alert("Please fill all required fields before submitting.");
         return;
       }
-
+    
       const data = collectFormData();
       previewContent.textContent = JSON.stringify(data, null, 2);
       previewBox.classList.remove("hidden");
-
+    
       fetch("/api/submit-survey/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       })
-      .then(response => response.json().then(result => ({ statusCode: response.status, ok: response.ok, result })))
-      .then(({ statusCode, ok, result }) => {
-        if (ok && result.status === "success") {
-          alert("Survey submitted successfully. Survey ID: " + result.survey_id);
+      .then(response => response.json())
+      .then(result => {
+        if (result.status === "success") {
+          alert("✅ Survey submitted successfully! Survey ID: " + result.survey_id);
           form.reset();
           setTimeout(() => {
             jobRowsContainer.innerHTML = "";
@@ -1284,21 +1294,24 @@
             addJobRow();
             calculateTotals();
             previewBox.classList.add("hidden");
-            document.getElementById("start_time").value = getCurrentDateTime();
-            document.getElementById("completion_time").value = "";
-            document.getElementById("submission_date").value = getTodayDate();
+            const startTime = document.getElementById("start_time");
+            const submissionDate = document.getElementById("submission_date");
+            if (startTime) startTime.value = getCurrentDateTime();
+            if (submissionDate) submissionDate.value = getTodayDate();
           }, 100);
         } else {
-          alert(result.message || "Submission failed.");
+          alert("❌ " + (result.message || "Submission failed."));
         }
       })
       .catch(error => {
-        console.error("Fetch Error:", error);
-        alert("Server error. Please check Django backend.");
+        console.error("Error:", error);
+        alert("❌ Server error. Please try again.");
       });
     });
-
-    // Reset
+    
+    // ============================================
+    // RESET BUTTON - FIXED
+    // ============================================
     form.addEventListener("reset", function() {
       setTimeout(() => {
         jobRowsContainer.innerHTML = "";
@@ -1308,19 +1321,24 @@
         addJobRow();
         calculateTotals();
         previewBox.classList.add("hidden");
-        document.getElementById("start_time").value = getCurrentDateTime();
-        document.getElementById("completion_time").value = "";
-        document.getElementById("submission_date").value = getTodayDate();
+        const startTime = document.getElementById("start_time");
+        const completionTime = document.getElementById("completion_time");
+        const submissionDate = document.getElementById("submission_date");
+        if (startTime) startTime.value = getCurrentDateTime();
+        if (completionTime) completionTime.value = "";
+        if (submissionDate) submissionDate.value = getTodayDate();
       }, 50);
     });
-
+    
     // ============================================
     // INITIALIZE
     // ============================================
     window.addEventListener("load", function() {
       populateDistricts();
-      document.getElementById("start_time").value = getCurrentDateTime();
-      document.getElementById("submission_date").value = getTodayDate();
+      const startTime = document.getElementById("start_time");
+      const submissionDate = document.getElementById("submission_date");
+      if (startTime) startTime.value = getCurrentDateTime();
+      if (submissionDate) submissionDate.value = getTodayDate();
       addJobRow();
     });
   </script>

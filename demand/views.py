@@ -1,9 +1,8 @@
 import json
-import csv
 import logging
-from datetime import datetime, timedelta
-from collections import defaultdict
-
+import traceback
+from datetime import datetime
+import csv
 import pandas as pd
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
@@ -17,8 +16,9 @@ from django.db.models.functions import TruncDate
 from django.contrib import messages
 from django.template.loader import render_to_string
 
-from .models import Survey, JobDemand
+from .models import Survey, JobDemand, ApprenticeshipOJT
 
+from datetime import datetime, timedelta
 # Set up logging
 logger = logging.getLogger(__name__)
 
@@ -34,11 +34,45 @@ def survey_form(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def submit_survey(request):
-    """API endpoint for survey form submission"""
+    """API endpoint for survey form submission - WITH FULL DEBUG"""
+    
+    print("="*60)
+    print("🔵 SUBMIT SURVEY API CALLED")
+    print("="*60)
+    
     try:
+        # Step 1: Parse JSON data
         data = json.loads(request.body)
-        logger.info(f"Received survey data: {data.keys()}")
+        print(f"✅ Step 1: JSON Parsed Successfully")
+        print(f"📋 Data Keys: {list(data.keys())}")
+        print(f"📋 Job Demands Count: {len(data.get('job_demands', []))}")
+        print(f"📋 Apprenticeships Count: {len(data.get('apprenticeships', []))}")
         
+        # Step 2: Validate required fields
+        print("\n🔍 Step 2: Validating required fields...")
+        required_fields = ['employer_code', 'employer_name', 'primary_sector', 'district', 'block', 'address']
+        missing_fields = []
+        
+        for field in required_fields:
+            value = data.get(field, '').strip()
+            if not value:
+                missing_fields.append(field)
+                print(f"❌ Missing field: {field}")
+            else:
+                print(f"✅ Field OK: {field} = {value}")
+        
+        if missing_fields:
+            print(f"\n❌ Validation Failed! Missing: {missing_fields}")
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Required fields missing: {", ".join(missing_fields)}',
+                'missing_fields': missing_fields
+            }, status=400)
+        
+        print("✅ All required fields present")
+        
+        # Step 3: Create Survey
+        print("\n📝 Step 3: Creating Survey...")
         with transaction.atomic():
             survey = Survey.objects.create(
                 mode_of_interview=data.get('mode_of_interview', ''),
@@ -78,11 +112,26 @@ def submit_survey(request):
                 supporting_evidence=data.get('supporting_evidence', '').strip()
             )
             
-            logger.info(f"Created survey: {survey.id}")
+            print(f"✅ Survey Created Successfully! ID: {survey.id}")
             
-            # Create Job Demands
-            for idx, job_data in enumerate(data.get('job_demands', []), 1):
-                JobDemand.objects.create(
+            # Step 4: Create Job Demands
+            print("\n📝 Step 4: Creating Job Demands...")
+            job_demands_data = data.get('job_demands', [])
+            print(f"📋 Total Job Demands to create: {len(job_demands_data)}")
+            
+            if not job_demands_data:
+                print("⚠️ WARNING: No job demands found in data!")
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'At least one job demand is required.'
+                }, status=400)
+            
+            for idx, job_data in enumerate(job_demands_data, 1):
+                print(f"  📌 Creating Job Demand #{idx}")
+                print(f"     Sector: {job_data.get('sector', 'N/A')}")
+                print(f"     Job Role: {job_data.get('job_role', 'N/A')}")
+                
+                job = JobDemand.objects.create(
                     survey=survey,
                     row_no=idx,
                     sector=job_data.get('sector', '').strip(),
@@ -99,11 +148,20 @@ def submit_survey(request):
                     apprenticeship_demand=int(job_data.get('apprenticeship_demand', 0)),
                     placement_demand=int(job_data.get('placement_demand', 0))
                 )
+                print(f"     ✅ Job Demand #{idx} Created! ID: {job.id}")
             
-            # Create Apprenticeship/OJT
-            from .models import ApprenticeshipOJT
-            for idx, app_data in enumerate(data.get('apprenticeships', []), 1):
-                ApprenticeshipOJT.objects.create(
+            print(f"✅ All {len(job_demands_data)} Job Demands Created Successfully!")
+            
+            # Step 5: Create Apprenticeships/OJT
+            print("\n📝 Step 5: Creating Apprenticeships/OJT...")
+            apprenticeships_data = data.get('apprenticeships', [])
+            print(f"📋 Total Apprenticeships to create: {len(apprenticeships_data)}")
+            
+            for idx, app_data in enumerate(apprenticeships_data, 1):
+                print(f"  📌 Creating Apprenticeship #{idx}")
+                print(f"     Job Role: {app_data.get('job_role', 'N/A')}")
+                
+                app = ApprenticeshipOJT.objects.create(
                     survey=survey,
                     row_no=idx,
                     job_role=app_data.get('job_role', '').strip(),
@@ -115,6 +173,14 @@ def submit_survey(request):
                     minimum_qualification=app_data.get('minimum_qualification', '').strip(),
                     employment_conversion=app_data.get('employment_conversion', 'No')
                 )
+                print(f"     ✅ Apprenticeship #{idx} Created! ID: {app.id}")
+            
+            print(f"✅ All {len(apprenticeships_data)} Apprenticeships Created Successfully!")
+        
+        # Step 6: Return success response
+        print("\n" + "="*60)
+        print(f"✅✅✅ SURVEY SUBMITTED SUCCESSFULLY! Survey ID: {survey.id}")
+        print("="*60)
         
         return JsonResponse({
             'status': 'success',
@@ -122,11 +188,31 @@ def submit_survey(request):
             'survey_id': survey.id
         }, status=201)
         
-    except Exception as e:
-        logger.error(f"Submit survey error: {str(e)}")
+    except json.JSONDecodeError as e:
+        print(f"\n❌❌❌ JSON DECODE ERROR: {str(e)}")
+        print(f"Raw request body: {request.body[:500]}...")
         return JsonResponse({
             'status': 'error',
-            'message': str(e)
+            'message': f'Invalid JSON: {str(e)}'
+        }, status=400)
+        
+    except Exception as e:
+        print("\n" + "="*60)
+        print("❌❌❌ EXCEPTION OCCURRED ❌❌❌")
+        print("="*60)
+        print(f"Error Type: {type(e).__name__}")
+        print(f"Error Message: {str(e)}")
+        print("\nFull Traceback:")
+        traceback.print_exc()
+        print("="*60)
+        
+        logger.error(f"Submit survey error: {str(e)}")
+        logger.error(traceback.format_exc())
+        
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e),
+            'error_type': type(e).__name__
         }, status=500)
 
 
