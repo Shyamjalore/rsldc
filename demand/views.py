@@ -34,134 +34,90 @@ def survey_form(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def submit_survey(request):
-    """API endpoint for survey form submission - WITH FULL DEBUG"""
+    """API endpoint for survey form submission"""
     
     print("="*60)
     print("🔵 SUBMIT SURVEY API CALLED")
     print("="*60)
     
     try:
-        # Step 1: Parse JSON data
         data = json.loads(request.body)
-        print(f"✅ Step 1: JSON Parsed Successfully")
+        print(f"✅ JSON Parsed Successfully")
         print(f"📋 Data Keys: {list(data.keys())}")
-        print(f"📋 Job Demands Count: {len(data.get('job_demands', []))}")
-        print(f"📋 Apprenticeships Count: {len(data.get('apprenticeships', []))}")
         
-        # Step 2: Validate required fields
-        print("\n🔍 Step 2: Validating required fields...")
-        required_fields = ['employer_code', 'employer_name', 'primary_sector', 'district', 'block', 'address']
-        missing_fields = []
-        
-        for field in required_fields:
-            value = data.get(field, '').strip()
-            if not value:
-                missing_fields.append(field)
-                print(f"❌ Missing field: {field}")
-            else:
-                print(f"✅ Field OK: {field} = {value}")
-        
-        if missing_fields:
-            print(f"\n❌ Validation Failed! Missing: {missing_fields}")
-            return JsonResponse({
-                'status': 'error',
-                'message': f'Required fields missing: {", ".join(missing_fields)}',
-                'missing_fields': missing_fields
-            }, status=400)
-        
-        print("✅ All required fields present")
-        
-        # Step 3: Create Survey
-        print("\n📝 Step 3: Creating Survey...")
         with transaction.atomic():
+            # Create Survey
             survey = Survey.objects.create(
-                mode_of_interview=data.get('mode_of_interview', ''),
+                company_code=data.get('company_code', '').strip(),
                 start_time=data.get('start_time', ''),
                 completion_time=data.get('completion_time', ''),
                 submission_date=data.get('submission_date') or datetime.now().date(),
-                employer_code=data.get('employer_code', '').strip(),
-                employer_name=data.get('employer_name', '').strip(),
-                primary_sector=data.get('primary_sector', '').strip(),
+                field_officer_name=data.get('field_officer_name', '').strip(),
+                
+                # Employer Details
+                company_name=data.get('company_name', '').strip(),
+                organisation_type=data.get('organisation_type', '').strip(),
+                organisation_type_other=data.get('organisation_type_other', '').strip(),
+                product_service=data.get('product_service', '').strip(),
+                product_service_specify=data.get('product_service_specify', '').strip(),
+                operational_sector=data.get('operational_sector', '').strip(),
+                operational_sector_other=data.get('operational_sector_other', '').strip(),
+                address=data.get('address', '').strip(),
+                website=data.get('website', '').strip(),
                 district=data.get('district', '').strip(),
                 block=data.get('block', '').strip(),
-                riico_area=data.get('riico_area', '').strip(),
-                address=data.get('address', '').strip(),
-                organisation_url=data.get('organisation_url', '').strip(),
-                nature_of_operations=data.get('nature_of_operations', ''),
-                organisation_type=data.get('organisation_type', '').strip(),
-                product_service_type=data.get('product_service_type', '').strip(),
-                company_size=int(data.get('company_size', 0)) if data.get('company_size') else 0,
-                active_status=data.get('active_status', 'Yes'),
-                senior_official_name=data.get('senior_official_name', '').strip(),
-                mobile_number=data.get('mobile_number', '').strip(),
-                email_id=data.get('email_id', '').strip(),
-                respondent_name=data.get('respondent_name', '').strip(),
-                respondent_mobile=data.get('respondent_mobile', '').strip(),
-                respondent_email=data.get('respondent_email', '').strip(),
-                placement_ready=data.get('placement_ready', 'Yes'),
-                apprenticeship_ready=data.get('apprenticeship_ready', 'Yes'),
-                guest_lecture_ready=data.get('guest_lecture_ready', 'Yes'),
-                exposure_visit_ready=data.get('exposure_visit_ready', 'Yes'),
-                csr_interest=data.get('csr_interest', 'Yes'),
-                on_the_job_training_ready=data.get('on_the_job_training_ready', 'No'),
-                awareness_of_rsldc=data.get('awareness_of_rsldc', 'Yes'),
-                local_employee_ready=data.get('local_employee_ready', 'Yes'),
-                collaboration_ready=data.get('collaboration_ready', 'Yes'),
-                hiring_challenges=data.get('hiring_challenges', '').strip(),
-                remarks=data.get('remarks', '').strip(),
-                supporting_evidence=data.get('supporting_evidence', '').strip()
+                
+                # Contact Details
+                contact_name=data.get('contact_name', '').strip(),
+                contact_mobile=data.get('contact_mobile', '').strip(),
+                contact_email=data.get('contact_email', '').strip(),
+                
+                # Workforce Profile
+                workforce_profile=data.get('workforce_profile', '').strip(),
+                
+                # Employer Partnership
+                placement_willingness=data.get('placement_willingness', 'No'),
+                apprenticeship_willingness=data.get('apprenticeship_willingness', 'No'),
+                guest_lecture_interest=data.get('guest_lecture_interest', 'No'),
+                industrial_visit_interest=data.get('industrial_visit_interest', 'No'),
+                csr_interest=data.get('csr_interest', 'No'),
+                ojt_internship_willingness=data.get('ojt_internship_willingness', 'No'),
+                
+                # Recruitment Challenges
+                recruitment_challenges=data.get('recruitment_challenges', '').strip(),
+                additional_remarks=data.get('additional_remarks', '').strip(),
+                supporting_evidence=data.get('supporting_evidence', '').strip(),
             )
             
-            print(f"✅ Survey Created Successfully! ID: {survey.id}")
+            print(f"✅ Survey Created! ID: {survey.id}")
             
-            # Step 4: Create Job Demands
-            print("\n📝 Step 4: Creating Job Demands...")
-            job_demands_data = data.get('job_demands', [])
-            print(f"📋 Total Job Demands to create: {len(job_demands_data)}")
-            
-            if not job_demands_data:
-                print("⚠️ WARNING: No job demands found in data!")
-                return JsonResponse({
-                    'status': 'error',
-                    'message': 'At least one job demand is required.'
-                }, status=400)
-            
-            for idx, job_data in enumerate(job_demands_data, 1):
-                print(f"  📌 Creating Job Demand #{idx}")
-                print(f"     Sector: {job_data.get('sector', 'N/A')}")
-                print(f"     Job Role: {job_data.get('job_role', 'N/A')}")
-                
-                job = JobDemand.objects.create(
+            # Create Job Demands
+            for idx, job_data in enumerate(data.get('job_demands', []), 1):
+                JobDemand.objects.create(
                     survey=survey,
                     row_no=idx,
-                    sector=job_data.get('sector', '').strip(),
                     job_role=job_data.get('job_role', '').strip(),
-                    education_req=job_data.get('education_req', '').strip(),
-                    experience_req=job_data.get('experience_req', '').strip(),
-                    certification=job_data.get('certification', '').strip(),
-                    gender_suitability=job_data.get('gender_suitability', '').strip(),
-                    salary_expected=job_data.get('salary_expected', '').strip(),
-                    current_demand=int(job_data.get('current_demand', 0)),
-                    future_demand=int(job_data.get('future_demand', 0)),
-                    demand_6_months=int(job_data.get('demand_6_months', 0)),
-                    demand_12_months=int(job_data.get('demand_12_months', 0)),
-                    apprenticeship_demand=int(job_data.get('apprenticeship_demand', 0)),
-                    placement_demand=int(job_data.get('placement_demand', 0))
+                    sector=job_data.get('sector', '').strip(),
+                    qualification=job_data.get('qualification', '').strip(),
+                    qualification_other=job_data.get('qualification_other', '').strip(),
+                    experience=job_data.get('experience', '').strip(),
+                    certification=job_data.get('certification', 'No'),
+                    certification_detail=job_data.get('certification_detail', '').strip(),
+                    salary_offered=job_data.get('salary_offered', '').strip(),
+                    current_openings=int(job_data.get('current_openings', 0)),
+                    openings_6_months=int(job_data.get('openings_6_months', 0)),
+                    openings_12_months=int(job_data.get('openings_12_months', 0)),
+                    apprentice_ojt=job_data.get('apprentice_ojt', 'No'),
+                    apprentice_ojt_detail=job_data.get('apprentice_ojt_detail', '').strip(),
+                    gender_suitability=job_data.get('gender_suitability', 'Any / No Preference'),
+                    pwd=job_data.get('pwd', 'NA'),
+                    additional_remarks=job_data.get('additional_remarks', '').strip()
                 )
-                print(f"     ✅ Job Demand #{idx} Created! ID: {job.id}")
+                print(f"  ✅ Job Demand #{idx} Created!")
             
-            print(f"✅ All {len(job_demands_data)} Job Demands Created Successfully!")
-            
-            # Step 5: Create Apprenticeships/OJT
-            print("\n📝 Step 5: Creating Apprenticeships/OJT...")
-            apprenticeships_data = data.get('apprenticeships', [])
-            print(f"📋 Total Apprenticeships to create: {len(apprenticeships_data)}")
-            
-            for idx, app_data in enumerate(apprenticeships_data, 1):
-                print(f"  📌 Creating Apprenticeship #{idx}")
-                print(f"     Job Role: {app_data.get('job_role', 'N/A')}")
-                
-                app = ApprenticeshipOJT.objects.create(
+            # Create Apprenticeships/OJT
+            for idx, app_data in enumerate(data.get('apprenticeships', []), 1):
+                ApprenticeshipOJT.objects.create(
                     survey=survey,
                     row_no=idx,
                     job_role=app_data.get('job_role', '').strip(),
@@ -171,16 +127,10 @@ def submit_survey(request):
                     monthly_stipend=int(app_data.get('monthly_stipend', 0)),
                     expected_start_month=app_data.get('expected_start_month', ''),
                     minimum_qualification=app_data.get('minimum_qualification', '').strip(),
-                    employment_conversion=app_data.get('employment_conversion', 'No')
+                    minimum_qualification_other=app_data.get('minimum_qualification_other', '').strip(),
+                    conversion_to_employment=app_data.get('conversion_to_employment', 'No')
                 )
-                print(f"     ✅ Apprenticeship #{idx} Created! ID: {app.id}")
-            
-            print(f"✅ All {len(apprenticeships_data)} Apprenticeships Created Successfully!")
-        
-        # Step 6: Return success response
-        print("\n" + "="*60)
-        print(f"✅✅✅ SURVEY SUBMITTED SUCCESSFULLY! Survey ID: {survey.id}")
-        print("="*60)
+                print(f"  ✅ Apprenticeship #{idx} Created!")
         
         return JsonResponse({
             'status': 'success',
@@ -188,31 +138,13 @@ def submit_survey(request):
             'survey_id': survey.id
         }, status=201)
         
-    except json.JSONDecodeError as e:
-        print(f"\n❌❌❌ JSON DECODE ERROR: {str(e)}")
-        print(f"Raw request body: {request.body[:500]}...")
-        return JsonResponse({
-            'status': 'error',
-            'message': f'Invalid JSON: {str(e)}'
-        }, status=400)
-        
     except Exception as e:
-        print("\n" + "="*60)
-        print("❌❌❌ EXCEPTION OCCURRED ❌❌❌")
-        print("="*60)
-        print(f"Error Type: {type(e).__name__}")
-        print(f"Error Message: {str(e)}")
-        print("\nFull Traceback:")
+        print(f"❌ ERROR: {str(e)}")
+        import traceback
         traceback.print_exc()
-        print("="*60)
-        
-        logger.error(f"Submit survey error: {str(e)}")
-        logger.error(traceback.format_exc())
-        
         return JsonResponse({
             'status': 'error',
-            'message': str(e),
-            'error_type': type(e).__name__
+            'message': str(e)
         }, status=500)
 
 

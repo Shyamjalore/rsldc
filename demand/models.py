@@ -5,58 +5,47 @@ from django.utils import timezone
 class Survey(models.Model):
     # System Fields
     id = models.AutoField(primary_key=True)
-    mode_of_interview = models.CharField(max_length=20, blank=True, null=True, 
-                                         choices=[('Field Visit', 'Field Visit'), ('Telephonic', 'Telephonic')])
+    company_code = models.CharField(max_length=100, blank=True, null=True)
     start_time = models.CharField(max_length=100, blank=True, null=True)
     completion_time = models.CharField(max_length=100, blank=True, null=True)
     submission_date = models.DateField(blank=True, null=True)
+    field_officer_name = models.CharField(max_length=255, blank=True, null=True)
+    field_officer_signature = models.CharField(max_length=255, blank=True, null=True)
     
-    # Employer Information
-    employer_code = models.CharField(max_length=100, blank=False, null=False)
-    employer_name = models.CharField(max_length=255, blank=False, null=False)
-    primary_sector = models.CharField(max_length=100, blank=False, null=False)
+    # 1. EMPLOYER DETAILS
+    company_name = models.CharField(max_length=255, blank=False, null=False)
+    organisation_type = models.CharField(max_length=100, blank=False, null=False)
+    organisation_type_other = models.CharField(max_length=100, blank=True, null=True)
+    product_service = models.CharField(max_length=50, blank=False, null=False)
+    product_service_specify = models.CharField(max_length=255, blank=True, null=True)
+    operational_sector = models.CharField(max_length=100, blank=False, null=False)
+    operational_sector_other = models.CharField(max_length=100, blank=True, null=True)
+    address = models.TextField(blank=False, null=False)
+    website = models.URLField(max_length=500, blank=True, null=True)
     district = models.CharField(max_length=100, blank=False, null=False)
     block = models.CharField(max_length=100, blank=False, null=False)
-    riico_area = models.CharField(max_length=255, blank=True, null=True)
-    address = models.TextField(blank=False, null=False)
-    organisation_url = models.URLField(max_length=500, blank=True, null=True)
-    nature_of_operations = models.CharField(max_length=50, blank=True, null=True,
-                                            choices=[
-                                                ('Year-round', 'Year-round'),
-                                                ('Seasonal', 'Seasonal'),
-                                                ('Project-Based', 'Project-Based'),
-                                                ('Mixed', 'Mixed')
-                                            ])
-    organisation_type = models.CharField(max_length=100, blank=False, null=False)
-    product_service_type = models.CharField(max_length=50, blank=False, null=False)
-    company_size = models.IntegerField(blank=False, null=False, default=0)
-    active_status = models.CharField(max_length=10, default='Yes', blank=True, null=True)
     
-    # Contact Details
-    senior_official_name = models.CharField(max_length=255, blank=False, null=False)
-    mobile_number = models.CharField(max_length=10, blank=False, null=False)
-    email_id = models.EmailField(blank=False, null=False)
-    respondent_name = models.CharField(max_length=255, blank=True, null=True)
-    respondent_mobile = models.CharField(max_length=10, blank=True, null=True)
-    respondent_email = models.EmailField(blank=True, null=True)
+    # 1A. CONTACT DETAILS
+    contact_name = models.CharField(max_length=255, blank=False, null=False)
+    contact_mobile = models.CharField(max_length=10, blank=False, null=False)
+    contact_email = models.EmailField(blank=False, null=False)
     
-    # Readiness and Collaboration
-    placement_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
-    apprenticeship_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
-    guest_lecture_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
-    exposure_visit_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
-    csr_interest = models.CharField(max_length=10, default='Yes', blank=True, null=True)
-    on_the_job_training_ready = models.CharField(max_length=10, default='No', blank=True, null=True)
-    awareness_of_rsldc = models.CharField(max_length=10, default='Yes', blank=True, null=True)
-    local_employee_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
-    collaboration_ready = models.CharField(max_length=10, default='Yes', blank=True, null=True)
+    # 1B. CURRENT WORKFORCE PROFILE
+    workforce_profile = models.TextField(blank=True, null=True)
     
-    # Challenges and Remarks
-    hiring_challenges = models.CharField(max_length=255, blank=True, null=True)
-    remarks = models.TextField(blank=True, null=True)
+    # 3. EMPLOYER PARTNERSHIP
+    placement_willingness = models.CharField(max_length=10, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
+    apprenticeship_willingness = models.CharField(max_length=10, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
+    guest_lecture_interest = models.CharField(max_length=10, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
+    industrial_visit_interest = models.CharField(max_length=10, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
+    csr_interest = models.CharField(max_length=10, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
+    ojt_internship_willingness = models.CharField(max_length=10, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
+    
+    # 4. RECRUITMENT CHALLENGES
+    recruitment_challenges = models.TextField(blank=True, null=True)
+    additional_remarks = models.TextField(blank=True, null=True)
     supporting_evidence = models.CharField(max_length=500, blank=True, null=True)
     
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -67,50 +56,41 @@ class Survey(models.Model):
         verbose_name_plural = 'Surveys'
     
     def __str__(self):
-        return f"{self.employer_code} - {self.employer_name}"
+        return f"{self.company_code} - {self.company_name}"
     
     @property
     def total_current_demand(self):
-        return self.job_demands.aggregate(models.Sum('current_demand'))['current_demand__sum'] or 0
-    
-    @property
-    def total_future_demand(self):
-        return self.job_demands.aggregate(models.Sum('future_demand'))['future_demand__sum'] or 0
+        return self.job_demands.aggregate(models.Sum('current_openings'))['current_openings__sum'] or 0
     
     @property
     def total_demand_6_months(self):
-        return self.job_demands.aggregate(models.Sum('demand_6_months'))['demand_6_months__sum'] or 0
+        return self.job_demands.aggregate(models.Sum('openings_6_months'))['openings_6_months__sum'] or 0
     
     @property
     def total_demand_12_months(self):
-        return self.job_demands.aggregate(models.Sum('demand_12_months'))['demand_12_months__sum'] or 0
-    
-    @property
-    def total_apprenticeship_demand(self):
-        return self.job_demands.aggregate(models.Sum('apprenticeship_demand'))['apprenticeship_demand__sum'] or 0
-    
-    @property
-    def total_placement_demand(self):
-        return self.job_demands.aggregate(models.Sum('placement_demand'))['placement_demand__sum'] or 0
+        return self.job_demands.aggregate(models.Sum('openings_12_months'))['openings_12_months__sum'] or 0
 
 
 class JobDemand(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='job_demands')
     row_no = models.IntegerField(default=1)
     
-    sector = models.CharField(max_length=100, blank=False, null=False)
     job_role = models.CharField(max_length=255, blank=False, null=False)
-    education_req = models.CharField(max_length=100, blank=False, null=False)
-    experience_req = models.CharField(max_length=50, blank=False, null=False)
-    certification = models.CharField(max_length=255, blank=True, null=True)
-    gender_suitability = models.CharField(max_length=100, blank=True, null=True)
-    salary_expected = models.CharField(max_length=50, blank=False, null=False)
-    current_demand = models.IntegerField(default=0)
-    future_demand = models.IntegerField(default=0)
-    demand_6_months = models.IntegerField(default=0)
-    demand_12_months = models.IntegerField(default=0)
-    apprenticeship_demand = models.IntegerField(default=0)
-    placement_demand = models.IntegerField(default=0)
+    sector = models.CharField(max_length=100, blank=False, null=False)
+    qualification = models.CharField(max_length=100, blank=False, null=False)
+    qualification_other = models.CharField(max_length=100, blank=True, null=True)
+    experience = models.CharField(max_length=50, blank=False, null=False)
+    certification = models.CharField(max_length=10, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
+    certification_detail = models.CharField(max_length=255, blank=True, null=True)
+    salary_offered = models.CharField(max_length=50, blank=False, null=False)
+    current_openings = models.IntegerField(default=0)
+    openings_6_months = models.IntegerField(default=0)
+    openings_12_months = models.IntegerField(default=0)
+    apprentice_ojt = models.CharField(max_length=10, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
+    apprentice_ojt_detail = models.CharField(max_length=255, blank=True, null=True)
+    gender_suitability = models.CharField(max_length=50, default='Any / No Preference')
+    pwd = models.CharField(max_length=10, default='NA', choices=[('Yes', 'Yes'), ('No', 'No'), ('NA', 'NA')])
+    additional_remarks = models.CharField(max_length=255, blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -121,7 +101,7 @@ class JobDemand(models.Model):
         verbose_name_plural = 'Job Demands'
     
     def __str__(self):
-        return f"{self.survey.employer_code} - {self.job_role}"
+        return f"{self.survey.company_code} - {self.job_role}"
 
 
 class ApprenticeshipOJT(models.Model):
@@ -139,9 +119,9 @@ class ApprenticeshipOJT(models.Model):
     duration_months = models.IntegerField(default=0)
     monthly_stipend = models.IntegerField(default=0)
     expected_start_month = models.CharField(max_length=50, blank=True, null=True)
-    minimum_qualification = models.CharField(max_length=100, blank=True, null=True)
-    employment_conversion = models.CharField(max_length=3, default='No',
-                                             choices=[('Yes', 'Yes'), ('No', 'No')])
+    minimum_qualification = models.CharField(max_length=100, blank=False, null=False)
+    minimum_qualification_other = models.CharField(max_length=100, blank=True, null=True)
+    conversion_to_employment = models.CharField(max_length=10, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
     
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -152,4 +132,4 @@ class ApprenticeshipOJT(models.Model):
         verbose_name_plural = 'Apprenticeships/OJTs'
     
     def __str__(self):
-        return f"{self.survey.employer_code} - {self.job_role}"
+        return f"{self.survey.company_code} - {self.job_role}"
