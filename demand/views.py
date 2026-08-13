@@ -325,20 +325,157 @@ def admin_dashboard(request):
 
 @login_required
 def admin_surveys(request):
-    surveys = Survey.objects.all().prefetch_related('job_demands')
+    surveys = Survey.objects.all().prefetch_related('job_demands', 'apprenticeships')
     unique_districts = surveys.values_list('district', flat=True).distinct().count()
     total_jobs = JobDemand.objects.count()
+    
+    # Convert workforce_profile from JSON string to list if needed
+    for survey in surveys:
+        if isinstance(survey.workforce_profile, str):
+            try:
+                import json
+                survey.workforce_profile = json.loads(survey.workforce_profile)
+            except:
+                survey.workforce_profile = []
     
     return render(request, 'portal/surveys.html', {
         'surveys': surveys,
         'total_jobs': total_jobs,
         'unique_districts': unique_districts,
     })
+    
+    
+# ============================================
+# EDIT/DELETE FUNCTIONS
+# ============================================
+
+@login_required
+@csrf_exempt
+def update_survey(request, survey_id):
+    """Update survey data"""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        survey = Survey.objects.get(id=survey_id)
+        
+        # Update fields
+        for key, value in data.items():
+            if hasattr(survey, key):
+                setattr(survey, key, value)
+        survey.save()
+        
+        return JsonResponse({'status': 'success', 'message': 'Survey updated successfully'})
+    except Survey.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Survey not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+def delete_survey(request, survey_id):
+    """Delete survey and related data"""
+    if request.method != 'DELETE':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    
+    try:
+        survey = Survey.objects.get(id=survey_id)
+        survey.delete()
+        return JsonResponse({'status': 'success', 'message': 'Survey deleted successfully'})
+    except Survey.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Survey not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@csrf_exempt
+def update_job_demand(request, job_id):
+    """Update job demand"""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        job = JobDemand.objects.get(id=job_id)
+        
+        for key, value in data.items():
+            if hasattr(job, key):
+                setattr(job, key, value)
+        job.save()
+        
+        return JsonResponse({'status': 'success', 'message': 'Job demand updated successfully'})
+    except JobDemand.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Job demand not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+def delete_job_demand(request, job_id):
+    """Delete job demand"""
+    if request.method != 'DELETE':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    
+    try:
+        job = JobDemand.objects.get(id=job_id)
+        job.delete()
+        return JsonResponse({'status': 'success', 'message': 'Job demand deleted successfully'})
+    except JobDemand.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Job demand not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@csrf_exempt
+def update_apprenticeship(request, app_id):
+    """Update apprenticeship/OJT"""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        app = ApprenticeshipOJT.objects.get(id=app_id)
+        
+        for key, value in data.items():
+            if hasattr(app, key):
+                setattr(app, key, value)
+        app.save()
+        
+        return JsonResponse({'status': 'success', 'message': 'Apprenticeship updated successfully'})
+    except ApprenticeshipOJT.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Apprenticeship not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+def delete_apprenticeship(request, app_id):
+    """Delete apprenticeship/OJT"""
+    if request.method != 'DELETE':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    
+    try:
+        app = ApprenticeshipOJT.objects.get(id=app_id)
+        app.delete()
+        return JsonResponse({'status': 'success', 'message': 'Apprenticeship deleted successfully'})
+    except ApprenticeshipOJT.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Apprenticeship not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
 @login_required
 def admin_job_demands(request):
+    """View all job demands with updated fields"""
     job_demands = JobDemand.objects.all().select_related('survey')
+    
+    # Debug - print field names
+    for job in job_demands[:1]:
+        print("Job fields:", [f for f in dir(job) if not f.startswith('_')])
+    
     return render(request, 'portal/job_demands.html', {'job_demands': job_demands})
 
 
@@ -443,25 +580,53 @@ def get_survey_detail(request, survey_id):
 
 @login_required
 def admin_export_full_csv(request):
+    """Export complete survey data with all fields - FIXED"""
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="survey_full_data_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
     
     writer = csv.writer(response)
     
-    # Main Headers
+    # ===== MAIN HEADERS =====
     main_headers = [
-        'Survey ID', 'Company Code', 'Company Name', 'Organisation Type',
-        'District', 'Block', 'Address', 'Website',
+        'Survey ID', 'Company Code', 'Company Name', 
+        'Organisation Type', 'Organisation Type (Other)',
+        'Product / Service', 'Product / Service (Specify)',
+        'Operational Sector', 'Operational Sector (Other)',
+        'District', 'Block',
+        'Address', 'Website',
         'Contact Name', 'Contact Mobile', 'Contact Email',
-        'Operational Sector', 'Product/Service',
+        'Field Officer Name', 'Field Officer Signature',
         'Placement Willingness', 'Apprenticeship Willingness',
         'Guest Lecture Interest', 'Industrial Visit Interest',
         'CSR Interest', 'OJT/Internship Willingness',
-        'Recruitment Challenges', 'Additional Remarks', 'Supporting Evidence',
-        'Submission Date', 'Field Officer Name', 'Created At'
+        'Recruitment Challenges', 'Additional Remarks', 
+        'Supporting Evidence', 'Submission Date', 'Created At'
     ]
     
-    # Job Demand Headers - Dynamic
+    # ===== WORKFORCE PROFILE HEADERS =====
+    import json
+    max_workforce = 0
+    for survey in Survey.objects.all():
+        try:
+            if isinstance(survey.workforce_profile, str):
+                wf = json.loads(survey.workforce_profile) if survey.workforce_profile else []
+            else:
+                wf = survey.workforce_profile or []
+            if len(wf) > max_workforce:
+                max_workforce = len(wf)
+        except:
+            pass
+    
+    workforce_headers = []
+    for i in range(1, max_workforce + 1):
+        workforce_headers.extend([
+            f'Workforce-{i} (Position)',
+            f'Workforce-{i} (On Roll)',
+            f'Workforce-{i} (Contractual)',
+            f'Workforce-{i} (Apprentice/Interns)'
+        ])
+    
+    # ===== JOB DEMAND HEADERS =====
     max_jobs = JobDemand.objects.values('survey').annotate(job_count=Count('id')).aggregate(Max('job_count'))['job_count__max'] or 0
     
     job_headers = []
@@ -470,47 +635,108 @@ def admin_export_full_csv(request):
             f'Job Demand-{i} (Job Role)',
             f'Job Demand-{i} (Sector)',
             f'Job Demand-{i} (Qualification)',
+            f'Job Demand-{i} (Qualification Other)',
             f'Job Demand-{i} (Experience)',
+            f'Job Demand-{i} (Certification)',
+            f'Job Demand-{i} (Certification Detail)',
             f'Job Demand-{i} (Salary Offered)',
             f'Job Demand-{i} (Current Openings)',
             f'Job Demand-{i} (6 Months)',
             f'Job Demand-{i} (12 Months)',
             f'Job Demand-{i} (Apprentice/OJT)',
-            f'Job Demand-{i} (Gender)',
-            f'Job Demand-{i} (PwD)'
+            f'Job Demand-{i} (Apprentice/OJT Detail)',
+            f'Job Demand-{i} (Gender Suitability)',
+            f'Job Demand-{i} (PwD)',
+            f'Job Demand-{i} (Additional Remarks)'
         ])
     
-    writer.writerow(main_headers + job_headers)
+    # ===== APPRENTICESHIP HEADERS =====
+    max_apps = ApprenticeshipOJT.objects.values('survey').annotate(app_count=Count('id')).aggregate(Max('app_count'))['app_count__max'] or 0
     
-    for survey in Survey.objects.all().prefetch_related('job_demands'):
+    app_headers = []
+    for i in range(1, max_apps + 1):
+        app_headers.extend([
+            f'Apprenticeship-{i} (Job Role)',
+            f'Apprenticeship-{i} (Opportunity Type)',
+            f'Apprenticeship-{i} (Seats/Capacity)',
+            f'Apprenticeship-{i} (Duration Months)',
+            f'Apprenticeship-{i} (Monthly Stipend)',
+            f'Apprenticeship-{i} (Expected Start Month)',
+            f'Apprenticeship-{i} (Minimum Qualification)',
+            f'Apprenticeship-{i} (Min Qualification Other)',
+            f'Apprenticeship-{i} (Conversion to Employment)'
+        ])
+    
+    # ===== TOTAL HEADERS =====
+    total_headers = [
+        'Total Current Demand',
+        'Total Future Demand',
+        'Total 6 Months Demand',
+        'Total 12 Months Demand'
+    ]
+    
+    # Combine all headers
+    all_headers = main_headers + workforce_headers + job_headers + app_headers + total_headers
+    writer.writerow(all_headers)
+    
+    # ===== DATA =====
+    for survey in Survey.objects.all().prefetch_related('job_demands', 'apprenticeships'):
+        # Parse workforce profile
+        workforce_list = []
+        try:
+            if isinstance(survey.workforce_profile, str):
+                workforce_list = json.loads(survey.workforce_profile) if survey.workforce_profile else []
+            elif isinstance(survey.workforce_profile, list):
+                workforce_list = survey.workforce_profile
+        except:
+            workforce_list = []
+        
         row = [
             survey.id,
             survey.company_code or '',
             survey.company_name,
-            survey.organisation_type,
-            survey.district,
-            survey.block,
-            survey.address,
+            survey.organisation_type or '',
+            survey.organisation_type_other or '',
+            survey.product_service or '',
+            survey.product_service_specify or '',
+            survey.operational_sector or '',
+            survey.operational_sector_other or '',
+            survey.district or '',
+            survey.block or '',
+            survey.address or '',
             survey.website or '',
-            survey.contact_name,
-            survey.contact_mobile,
-            survey.contact_email,
-            survey.operational_sector,
-            survey.product_service,
-            survey.placement_willingness,
-            survey.apprenticeship_willingness,
-            survey.guest_lecture_interest,
-            survey.industrial_visit_interest,
-            survey.csr_interest,
-            survey.ojt_internship_willingness,
+            survey.contact_name or '',
+            survey.contact_mobile or '',
+            survey.contact_email or '',
+            survey.field_officer_name or '',
+            survey.field_officer_signature or '',
+            survey.placement_willingness or '',
+            survey.apprenticeship_willingness or '',
+            survey.guest_lecture_interest or '',
+            survey.industrial_visit_interest or '',
+            survey.csr_interest or '',
+            survey.ojt_internship_willingness or '',
             survey.recruitment_challenges or '',
             survey.additional_remarks or '',
             survey.supporting_evidence or '',
             survey.submission_date.strftime('%Y-%m-%d') if survey.submission_date else '',
-            survey.field_officer_name or '',
             survey.created_at.strftime('%Y-%m-%d %H:%M:%S')
         ]
         
+        # Add Workforce Profile data
+        for i in range(max_workforce):
+            if i < len(workforce_list):
+                w = workforce_list[i]
+                row.extend([
+                    w.get('position', ''),
+                    w.get('onroll', 0),
+                    w.get('contractual', 0),
+                    w.get('apprentice', 0)
+                ])
+            else:
+                row.extend([''] * 4)
+        
+        # Add Job Demands data
         job_list = list(survey.job_demands.all())
         for i in range(max_jobs):
             if i < len(job_list):
@@ -519,17 +745,49 @@ def admin_export_full_csv(request):
                     job.job_role,
                     job.sector,
                     job.qualification,
+                    job.qualification_other or '',
                     job.experience,
+                    job.certification,
+                    job.certification_detail or '',
                     job.salary_offered,
                     job.current_openings,
                     job.openings_6_months,
                     job.openings_12_months,
                     job.apprentice_ojt,
+                    job.apprentice_ojt_detail or '',
                     job.gender_suitability,
-                    job.pwd
+                    job.pwd,
+                    job.additional_remarks or ''
                 ])
             else:
-                row.extend([''] * 11)
+                row.extend([''] * 16)
+        
+        # Add Apprenticeships data
+        app_list = list(survey.apprenticeships.all())
+        for i in range(max_apps):
+            if i < len(app_list):
+                app = app_list[i]
+                row.extend([
+                    app.job_role,
+                    app.opportunity_type,
+                    app.seats_capacity,
+                    app.duration_months,
+                    app.monthly_stipend,
+                    app.expected_start_month or '',
+                    app.minimum_qualification,
+                    app.minimum_qualification_other or '',
+                    app.conversion_to_employment
+                ])
+            else:
+                row.extend([''] * 9)
+        
+        # Add Totals
+        row.extend([
+            survey.total_current_demand,
+            survey.total_future_demand,
+            survey.total_demand_6_months,
+            survey.total_demand_12_months
+        ])
         
         writer.writerow(row)
     

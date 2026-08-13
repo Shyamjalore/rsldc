@@ -1,14 +1,15 @@
 from django.db import models
 from django.core.validators import MinValueValidator, RegexValidator
 from django.utils import timezone
+import re
 
 class Survey(models.Model):
     # System Fields
     id = models.AutoField(primary_key=True)
-    company_code = models.CharField(max_length=100, blank=True, null=True)
+    company_code = models.CharField(max_length=100, blank=True, null=True, unique=True)
     start_time = models.CharField(max_length=100, blank=True, null=True)
     completion_time = models.CharField(max_length=100, blank=True, null=True)
-    submission_date = models.DateField(blank=True, null=True)
+    submission_date = models.DateField(blank=True, null=True, auto_now_add=True)
     field_officer_name = models.CharField(max_length=255, blank=True, null=True)
     field_officer_signature = models.CharField(max_length=255, blank=True, null=True)
     
@@ -30,8 +31,8 @@ class Survey(models.Model):
     contact_mobile = models.CharField(max_length=10, blank=False, null=False)
     contact_email = models.EmailField(blank=False, null=False)
     
-    # 1B. CURRENT WORKFORCE PROFILE
-    workforce_profile = models.TextField(blank=True, null=True)
+    # 1B. CURRENT WORKFORCE PROFILE (Stored as JSON)
+    workforce_profile = models.JSONField(default=list, blank=True, null=True)
     
     # 3. EMPLOYER PARTNERSHIP
     placement_willingness = models.CharField(max_length=10, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
@@ -57,6 +58,16 @@ class Survey(models.Model):
     
     def __str__(self):
         return f"{self.company_code} - {self.company_name}"
+    
+    def save(self, *args, **kwargs):
+        # Auto-generate company code if not provided
+        if not self.company_code and self.district:
+            # Get district code (first 2 letters uppercase)
+            district_code = ''.join(word[0].upper() for word in self.district.split())[:2]
+            # Count existing surveys in this district
+            count = Survey.objects.filter(district=self.district).count() + 1
+            self.company_code = f"{district_code}{str(count).zfill(3)}"
+        super().save(*args, **kwargs)
     
     # ===== PROPERTIES FOR DEMAND TOTALS =====
     @property
