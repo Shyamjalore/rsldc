@@ -5,127 +5,658 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RSLDC Skill Demand Aggregation Survey</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    /* ===== FORM STYLES ===== */
+    /* ===== RESET & BASE ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #f0f4f8; color: #0a1628; }
     
-    .error-text { color: #dc2626; font-size: 0.875rem; margin-top: 4px; }
-    .input-error { border-color: #dc2626 !important; background-color: #fff7f7; }
-    .other-input { display: none; margin-top: 8px; }
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: #f1f5f9; 
+      color: #0a1628;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #1e40af, #4f46e5); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #1e3a8a, #4338ca); }
+
+    /* ===== FORM ELEMENTS ===== */
+    .error-text { color: #dc2626; font-size: 0.8rem; margin-top: 4px; display: none; }
+    .error-text.show { display: block; }
+    
+    .input-error { border-color: #dc2626 !important; background-color: #fef2f2 !important; }
+    
+    .other-input { display: none; margin-top: 6px; }
     .other-input.active { display: block; }
-    .field-required::after { content: " *"; color: #dc2626; font-weight: bold; }
-    .section-divider { border-top: 3px dashed #e2e8f0; margin: 32px 0; }
     
-    .checkbox-group { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; }
-    .checkbox-group label { display: flex; align-items: center; gap: 6px; font-weight: 400; font-size: 14px; }
-    .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: #2563eb; }
+    .section-divider { 
+      border-top: 2px solid #e2e8f0; 
+      margin: 28px 0;
+      position: relative;
+    }
+    .section-divider::after {
+      content: '◆';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f1f5f9;
+      padding: 0 12px;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+    
+    .checkbox-group { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 12px 20px; 
+      margin-top: 6px; 
+    }
+    .checkbox-group label { 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+      font-weight: 400; 
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 4px 0;
+    }
+    .checkbox-group label:hover { color: #1e40af; }
+    .checkbox-group input[type="checkbox"] { 
+      width: 18px; 
+      height: 18px; 
+      accent-color: #1e40af;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
     
     .form-section-title { 
       background: #f1f5f9; 
-      padding: 10px 16px; 
-      border-radius: 8px; 
+      padding: 10px 18px; 
+      border-radius: 10px; 
       font-weight: 700; 
-      color: #1e293b;
+      color: #0f172a;
       font-size: 16px;
-      margin-bottom: 16px;
-      border-left: 4px solid #2563eb;
+      margin-bottom: 18px;
+      border-left: 4px solid #1e40af;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     
     .sub-section-title {
       font-weight: 600;
       color: #475569;
       font-size: 14px;
-      margin: 12px 0 8px 0;
-      padding-left: 12px;
+      margin: 16px 0 10px 0;
+      padding-left: 14px;
       border-left: 3px solid #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ===== LOGO CONTAINER ===== */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 16px;
+    }
+
+    .logo-left, .logo-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .logo-left img, .logo-right img {
+      height: 56px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .logo-placeholder {
+      width: 56px;
+      height: 56px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      padding: 4px;
+      border: 1px dashed rgba(255,255,255,0.2);
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-size: 11px;
+      line-height: 1.3;
+      opacity: 0.85;
+    }
+    .logo-text strong { font-weight: 700; opacity: 1; }
+
+    /* ===== FORM FIELDS ===== */
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.25s ease;
+      background: #ffffff;
+      color: #0f172a;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: #1e40af;
+      box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+    }
+    .form-input:hover { border-color: #94a3b8; }
+    .form-input::placeholder { color: #94a3b8; font-size: 13px; }
+
+    .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.25s ease;
+      background: #ffffff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") no-repeat right 12px center;
+      background-size: 20px;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      color: #0f172a;
+      cursor: pointer;
+    }
+    .form-select:focus {
+      outline: none;
+      border-color: #1e40af;
+      box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+    }
+    .form-select:hover { border-color: #94a3b8; }
+
+    .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.25s ease;
+      resize: vertical;
+      min-height: 70px;
+      background: #ffffff;
+      color: #0f172a;
+    }
+    .form-textarea:focus {
+      outline: none;
+      border-color: #1e40af;
+      box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+    }
+    .form-textarea:hover { border-color: #94a3b8; }
+    .form-textarea::placeholder { color: #94a3b8; font-size: 13px; }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      font-size: 13px;
+      color: #334155;
+      margin-bottom: 5px;
+    }
+    .form-label .optional {
+      font-weight: 400;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    /* ===== TABLE STYLES ===== */
+    .workforce-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .workforce-table th {
+      background: #f1f5f9;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+      font-size: 12px;
+    }
+    .workforce-table td {
+      padding: 4px;
+      border: 1px solid #e2e8f0;
+    }
+    .workforce-table input {
+      width: 100%;
+      padding: 6px 8px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: #0f172a;
+    }
+    .workforce-table input:focus {
+      outline: none;
+      background: #f8fafc;
+      border-radius: 4px;
+    }
+    .workforce-table input[type="number"] {
+      width: 60px;
+      text-align: center;
+      margin: 0 auto;
+      display: block;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-primary {
+      background: linear-gradient(135deg, #1e40af, #4f46e5);
+      color: #ffffff;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(30, 64, 175, 0.25);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(30, 64, 175, 0.35);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: #64748b;
+      color: #ffffff;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-secondary:hover {
+      background: #475569;
+      transform: translateY(-2px);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #ffffff;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+    }
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
+    }
+
+    .btn-warning {
+      background: #d97706;
+      color: #ffffff;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-warning:hover {
+      background: #b45309;
+      transform: translateY(-2px);
+    }
+
+    .btn-sm {
+      padding: 6px 16px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    /* ===== JOB ROW ===== */
+    .job-row {
+      background: #fafbfc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px 20px;
+      transition: all 0.3s ease;
+    }
+    .job-row:hover {
+      border-color: #94a3b8;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    .apprenticeship-row {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 18px 20px;
+      transition: all 0.3s ease;
+    }
+    .apprenticeship-row:hover {
+      border-color: #86efac;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.06);
+    }
+
+    /* ===== SUMMARY CARD ===== */
+    .summary-card {
+      background: linear-gradient(135deg, #eff6ff, #eef2ff);
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 20px 24px;
+    }
+    .summary-card .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1e40af;
+      line-height: 1.2;
+    }
+    .summary-card .stat-label {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .summary-card .stat-value.purple { color: #7c3aed; }
+    .summary-card .stat-value.green { color: #059669; }
+    .summary-card .stat-value.orange { color: #d97706; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-overlay.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-content {
+      background: #ffffff;
+      border-radius: 20px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      padding: 20px 28px;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-close {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #ffffff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-close:hover {
+      background: rgba(255,255,255,0.2);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 24px 28px;
+      overflow-y: auto;
+      max-height: calc(90vh - 80px);
+    }
+    .modal-body pre {
+      background: #0f172a;
+      color: #86efac;
+      padding: 20px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .logo-left img, .logo-right img { height: 44px; }
+      .logo-placeholder { width: 44px; height: 44px; font-size: 8px; }
+      .logo-text { font-size: 10px; }
+    }
+
+    @media (max-width: 768px) {
+      .logo-container { flex-wrap: wrap; justify-content: center; gap: 8px; }
+      .logo-left, .logo-right { flex: 1; min-width: 80px; }
+      .logo-left { justify-content: flex-start; }
+      .logo-right { justify-content: flex-end; }
+      .logo-left img, .logo-right img { height: 36px; }
+      .logo-placeholder { width: 36px; height: 36px; font-size: 7px; }
+      .logo-text { display: none; }
+      
+      .form-section-title { font-size: 14px; padding: 8px 14px; }
+      .sub-section-title { font-size: 13px; }
+      
+      .summary-card .stat-value { font-size: 22px; }
+      
+      .modal-content { max-width: 100%; }
+      .modal-header { padding: 16px 20px; }
+      .modal-header h2 { font-size: 17px; }
+      .modal-body { padding: 16px 20px; }
+      
+      .btn-primary, .btn-secondary, .btn-success, .btn-warning {
+        padding: 8px 18px;
+        font-size: 13px;
+      }
+      
+      .workforce-table { font-size: 12px; }
+      .workforce-table input[type="number"] { width: 44px; }
+      .workforce-table th, .workforce-table td { padding: 6px 8px; }
+      
+      .job-row, .apprenticeship-row { padding: 14px 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .logo-left img, .logo-right img { height: 28px; }
+      .logo-placeholder { width: 28px; height: 28px; font-size: 6px; border-radius: 8px; }
+      
+      .form-input, .form-select, .form-textarea { 
+        font-size: 13px; 
+        padding: 8px 12px;
+      }
+      .form-label { font-size: 12px; }
+      
+      .summary-card .stat-value { font-size: 18px; }
+      .checkbox-group { gap: 8px 12px; }
+      .checkbox-group label { font-size: 13px; }
+      
+      .btn-primary, .btn-secondary, .btn-success, .btn-warning {
+        padding: 6px 14px;
+        font-size: 12px;
+        border-radius: 8px;
+      }
+      
+      .modal-body pre { font-size: 11px; padding: 12px; }
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+      .btn-primary, .btn-secondary, .btn-success, .btn-warning { display: none; }
+      .section-divider { margin: 16px 0; }
+      .job-row, .apprenticeship-row { break-inside: avoid; }
+      body { background: #ffffff; }
+      .bg-gradient-to-r { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
 
 <body>
 
-<div class="max-w-7xl mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 md:py-8">
   <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
 
-    <!-- HEADER -->
-    <div class="bg-gradient-to-r from-blue-700 to-indigo-700 p-6 text-white">
-      <div class="flex items-center gap-4">
-        <div class="w-28 h-auto rounded-xl bg-white p-2 shadow-md flex items-center justify-center">
-          <span class="text-blue-700 font-bold text-xl">RSLDC</span>
+    <!-- ===== HEADER WITH DUAL LOGO ===== -->
+    <div class="bg-gradient-to-r from-blue-800 to-indigo-700 p-4 md:p-6 text-white">
+      <div class="logo-container">
+        <!-- Left Logo - RSLDC -->
+        <div class="logo-left">
+          <img src="{% static 'img/rsldc-logo.png' %}" alt="RSLDC Logo" class="h-14 md:h-16 w-auto object-contain">
         </div>
-        <div>
-          <h1 class="text-2xl md:text-3xl font-bold">Rajasthan Skill Demand Aggregation Survey</h1>
-          <p class="mt-1 text-blue-100 text-sm">Employer Skill Demand, Placement, Apprenticeship and Collaboration Data Entry Form</p>
+      
+        <!-- Center Title -->
+        <div class="text-center flex-1 px-2">
+          <h1 class="text-base sm:text-xl md:text-2xl lg:text-3xl font-extrabold leading-tight tracking-tight">
+            Rajasthan Skill Demand Aggregation Survey
+          </h1>
+          <p class="text-xs sm:text-sm text-blue-100 mt-1 opacity-90">
+            Employer Skill Demand, Placement, Apprenticeship and Collaboration Data Entry Form
+          </p>
+        </div>
+      
+        <!-- Right Logo - Govt of India -->
+        <div class="logo-right">
+          
+          <img src="{% static 'img/images.jpg.jpeg' %}" alt="Govt of India Logo" class="h-14 md:h-16 w-auto object-contain">
         </div>
       </div>
     </div>
 
-    <form id="surveyForm" class="p-6 space-y-6" novalidate>
+    <!-- ===== FORM ===== -->
+    <form id="surveyForm" class="p-4 sm:p-6 md:p-8 space-y-6" novalidate>
 
       <!-- ========================================== -->
       <!-- 1. EMPLOYER DETAILS -->
       <!-- ========================================== -->
       <section>
-        <div class="flex items-center gap-3 border-b pb-2 mb-4">
-          <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">1</span>
-          <h2 class="text-xl font-semibold">EMPLOYER DETAILS</h2>
-          <span class="text-sm text-slate-500 ml-auto">*Tick (☐) the applicable checkbox(es) and fill blanks where required</span>
+        <div class="flex items-center gap-3 border-b pb-3 mb-4">
+          <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm flex-shrink-0">1</span>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-800">EMPLOYER DETAILS</h2>
+          <span class="text-xs text-slate-400 ml-auto hidden sm:inline">*Tick (☐) the applicable checkbox(es) and fill blanks where required</span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- Company Code -->
           <div>
-            <label class="block font-medium mb-1 text-sm">Company/Organisation Code <span class="text-slate-400">(To be filled by Field Officer)</span></label>
-            <input type="text" name="company_code" id="company_code" class="w-full border rounded-lg px-3 py-2 bg-slate-50" placeholder="Enter code">
+            <label class="form-label">Company/Organisation Code <span class="optional">(To be filled by Field Officer)</span></label>
+            <input type="text" name="company_code" id="company_code" class="form-input" placeholder="Enter code">
           </div>
 
           <!-- Company Name -->
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Company/Organisation Name</label>
-            <input type="text" name="company_name" id="company_name" class="required-field w-full border rounded-lg px-3 py-2" placeholder="Enter company name" required>
-            <p class="error-text hidden"></p>
+            <label class="form-label">Company/Organisation Name</label>
+            <input type="text" name="company_name" id="company_name" class="form-input" placeholder="Enter company name">
           </div>
 
           <!-- Organisation Type -->
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Company/Organisation Type</label>
-            <div class="grid grid-cols-2 gap-2">
-              <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="org_type_sole" value="Sole Proprietorship" onchange="updateOrgType()"> Sole Proprietorship</label>
-              <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="org_type_partnership" value="Partnership" onchange="updateOrgType()"> Partnership</label>
-              <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="org_type_llp" value="LLP" onchange="updateOrgType()"> LLP</label>
-              <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="org_type_pvt" value="Pvt. Limited" onchange="updateOrgType()"> Pvt. Limited</label>
-              <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="org_type_public" value="Public Limited" onchange="updateOrgType()"> Public Limited</label>
-              <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="org_type_other" value="Other" onchange="updateOrgType()"> Other</label>
-            </div>
-            <input type="hidden" name="organisation_type" id="organisation_type">
+            <label class="form-label">Company/Organisation Type</label>
+            <select name="organisation_type" id="organisation_type" class="form-select">
+              <option value="">-- Select Organisation Type --</option>
+              <option value="Sole Proprietorship">Sole Proprietorship</option>
+              <option value="Partnership">Partnership</option>
+              <option value="LLP">LLP</option>
+              <option value="Pvt. Limited">Pvt. Limited</option>
+              <option value="Public Limited">Public Limited</option>
+              <option value="Other">Other</option>
+            </select>
             <div class="other-input" id="org_type_other_input">
-              <input type="text" name="organisation_type_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
+              <input type="text" name="organisation_type_other" class="form-input mt-1" placeholder="Please specify">
             </div>
-            <p class="error-text hidden"></p>
           </div>
 
           <!-- Product / Service -->
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Product / Service</label>
-            <div class="flex gap-4">
-              <label class="flex items-center gap-2 text-sm"><input type="radio" name="product_service" value="Product" onchange="toggleProductService()"> Product</label>
-              <label class="flex items-center gap-2 text-sm"><input type="radio" name="product_service" value="Service" onchange="toggleProductService()"> Service</label>
-            </div>
+            <label class="form-label">Product / Service</label>
+            <select name="product_service" id="product_service" class="form-select">
+              <option value="">-- Select --</option>
+              <option value="Product">Product</option>
+              <option value="Service">Service</option>
+            </select>
             <div class="other-input" id="product_service_specify_div">
-              <input type="text" name="product_service_specify" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Specify product/service">
+              <input type="text" name="product_service_specify" class="form-input mt-1" placeholder="Specify product/service">
             </div>
-            <input type="hidden" name="product_service_hidden" id="product_service_hidden">
-            <p class="error-text hidden"></p>
           </div>
 
           <!-- Operational Sector -->
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Operational Sector</label>
-            <select name="operational_sector" id="operational_sector" class="required-field w-full border rounded-lg px-3 py-2" required>
+            <label class="form-label">Operational Sector</label>
+            <select name="operational_sector" id="operational_sector" class="form-select">
               <option value="">-- Select Sector --</option>
               <option value="Manufacturing">Manufacturing</option>
               <option value="IT / ITeS">IT / ITeS</option>
@@ -136,105 +667,102 @@
               <option value="Retail / Trade">Retail / Trade</option>
               <option value="Construction / Infra">Construction / Infra</option>
               <option value="Hospitality / Tourism">Hospitality / Tourism</option>
-              <option value="Logistics & Warehousing">Logistics &amp; Warehousing</option>
+              <option value="Logistics &amp; Warehousing">Logistics &amp; Warehousing</option>
               <option value="Agriculture / Agro-based">Agriculture / Agro-based</option>
               <option value="Other">Other</option>
             </select>
             <div class="other-input" id="operational_sector_other">
-              <input type="text" name="operational_sector_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
+              <input type="text" name="operational_sector_other" class="form-input mt-1" placeholder="Please specify">
             </div>
-            <p class="error-text hidden"></p>
           </div>
 
           <!-- Address -->
-          <div class="md:col-span-2">
-            <label class="block font-medium mb-1 text-sm field-required">Complete Office / Unit Address</label>
-            <textarea name="address" id="address" rows="2" class="required-field w-full border rounded-lg px-3 py-2" placeholder="Enter full address" required></textarea>
-            <p class="error-text hidden"></p>
+          <div class="sm:col-span-2">
+            <label class="form-label">Complete Office / Unit Address</label>
+            <textarea name="address" id="address" rows="2" class="form-textarea" placeholder="Enter full address"></textarea>
           </div>
 
           <!-- Website -->
           <div>
-            <label class="block font-medium mb-1 text-sm">Company/Organisation Website (if any)</label>
-            <input type="url" name="website" id="website" class="w-full border rounded-lg px-3 py-2" placeholder="https://example.com">
+            <label class="form-label">Company/Organisation Website <span class="optional">(if any)</span></label>
+            <input type="url" name="website" id="website" class="form-input" placeholder="https://example.com">
           </div>
 
           <!-- District -->
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">District</label>
-            <select name="district" id="district" class="required-field w-full border rounded-lg px-3 py-2" required>
+            <label class="form-label">District</label>
+            <select name="district" id="district" class="form-select">
               <option value="">-- Select District --</option>
             </select>
             <div class="other-input" id="district_other">
-              <input type="text" name="district_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
+              <input type="text" name="district_other" class="form-input mt-1" placeholder="Please specify">
             </div>
-            <p class="error-text hidden"></p>
           </div>
 
           <!-- Block -->
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Block</label>
-            <select name="block" id="block" class="required-field w-full border rounded-lg px-3 py-2" required>
+            <label class="form-label">Block</label>
+            <select name="block" id="block" class="form-select">
               <option value="">-- Select Block --</option>
             </select>
             <div class="other-input" id="block_other">
-              <input type="text" name="block_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
+              <input type="text" name="block_other" class="form-input mt-1" placeholder="Please specify">
             </div>
-            <p class="error-text hidden"></p>
           </div>
         </div>
 
         <!-- 1A. CONTACT DETAILS -->
-        <div class="mt-4">
-          <div class="sub-section-title">1A. CONTACT DETAILS</div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="mt-6">
+          <div class="sub-section-title"><i class="fas fa-address-card text-blue-600"></i> 1A. CONTACT DETAILS</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label class="block font-medium mb-1 text-sm field-required">Name</label>
-              <input type="text" name="contact_name" id="contact_name" class="required-field w-full border rounded-lg px-3 py-2" placeholder="Enter name" required>
-              <p class="error-text hidden"></p>
+              <label class="form-label">Name</label>
+              <input type="text" name="contact_name" id="contact_name" class="form-input" placeholder="Enter name">
             </div>
             <div>
-              <label class="block font-medium mb-1 text-sm field-required">Mobile Number</label>
-              <input type="tel" name="contact_mobile" id="contact_mobile" class="required-field w-full border rounded-lg px-3 py-2" placeholder="10 digit mobile" maxlength="10" required>
-              <p class="error-text hidden"></p>
+              <label class="form-label">Mobile Number</label>
+              <input type="tel" name="contact_mobile" id="contact_mobile" class="form-input" placeholder="10 digit mobile" maxlength="10">
+              <p class="error-text" id="mobile_error">Enter a valid 10 digit Indian mobile number.</p>
             </div>
             <div>
-              <label class="block font-medium mb-1 text-sm field-required">Email ID</label>
-              <input type="email" name="contact_email" id="contact_email" class="required-field w-full border rounded-lg px-3 py-2" placeholder="email@example.com" required>
-              <p class="error-text hidden"></p>
+              <label class="form-label">Email ID</label>
+              <input type="email" name="contact_email" id="contact_email" class="form-input" placeholder="email@example.com">
+              <p class="error-text" id="email_error">Enter a valid email address.</p>
             </div>
           </div>
         </div>
 
         <!-- 1B. CURRENT WORKFORCE PROFILE -->
-        <div class="mt-4">
-          <div class="sub-section-title">1B. CURRENT WORKFORCE PROFILE</div>
+        <div class="mt-6">
+          <div class="sub-section-title"><i class="fas fa-users text-blue-600"></i> 1B. CURRENT WORKFORCE PROFILE</div>
           <div class="overflow-x-auto">
-            <table class="w-full border-collapse border border-slate-300 text-sm">
+            <table class="workforce-table">
               <thead>
-                <tr class="bg-slate-100">
-                  <th class="border border-slate-300 p-2 text-left">List of all available Positions in the Company</th>
-                  <th class="border border-slate-300 p-2 text-center">On Roll</th>
-                  <th class="border border-slate-300 p-2 text-center">Contractual</th>
-                  <th class="border border-slate-300 p-2 text-center">Apprentice / Interns</th>
+                <tr>
+                  <th style="min-width:180px;">List of all available Positions in the Company</th>
+                  <th style="min-width:80px;text-align:center;">On Roll</th>
+                  <th style="min-width:80px;text-align:center;">Contractual</th>
+                  <th style="min-width:80px;text-align:center;">Apprentice / Interns</th>
                 </tr>
               </thead>
               <tbody id="workforceTable">
                 <tr>
-                  <td class="border border-slate-300 p-1"><input type="text" name="workforce_position_1" class="w-full border-0 px-2 py-1" placeholder="Position 1"></td>
-                  <td class="border border-slate-300 p-1 text-center"><input type="number" name="workforce_onroll_1" class="w-16 border-0 px-1 py-1 text-center" min="0" value="0"></td>
-                  <td class="border border-slate-300 p-1 text-center"><input type="number" name="workforce_contractual_1" class="w-16 border-0 px-1 py-1 text-center" min="0" value="0"></td>
-                  <td class="border border-slate-300 p-1 text-center"><input type="number" name="workforce_apprentice_1" class="w-16 border-0 px-1 py-1 text-center" min="0" value="0"></td>
+                  <td><input type="text" name="workforce_position_1" placeholder="Position 1"></td>
+                  <td style="text-align:center;"><input type="number" name="workforce_onroll_1" min="0" value="0"></td>
+                  <td style="text-align:center;"><input type="number" name="workforce_contractual_1" min="0" value="0"></td>
+                  <td style="text-align:center;"><input type="number" name="workforce_apprentice_1" min="0" value="0"></td>
                 </tr>
                 <tr>
-                  <td class="border border-slate-300 p-1"><input type="text" name="workforce_position_2" class="w-full border-0 px-2 py-1" placeholder="Position 2"></td>
-                  <td class="border border-slate-300 p-1 text-center"><input type="number" name="workforce_onroll_2" class="w-16 border-0 px-1 py-1 text-center" min="0" value="0"></td>
-                  <td class="border border-slate-300 p-1 text-center"><input type="number" name="workforce_contractual_2" class="w-16 border-0 px-1 py-1 text-center" min="0" value="0"></td>
-                  <td class="border border-slate-300 p-1 text-center"><input type="number" name="workforce_apprentice_2" class="w-16 border-0 px-1 py-1 text-center" min="0" value="0"></td>
+                  <td><input type="text" name="workforce_position_2" placeholder="Position 2"></td>
+                  <td style="text-align:center;"><input type="number" name="workforce_onroll_2" min="0" value="0"></td>
+                  <td style="text-align:center;"><input type="number" name="workforce_contractual_2" min="0" value="0"></td>
+                  <td style="text-align:center;"><input type="number" name="workforce_apprentice_2" min="0" value="0"></td>
                 </tr>
               </tbody>
             </table>
-            <button type="button" id="addWorkforceRow" class="mt-2 text-blue-600 text-sm hover:underline">+ Add More Positions</button>
+            <button type="button" id="addWorkforceRow" class="mt-2 text-blue-600 text-sm hover:text-blue-800 font-medium transition-colors">
+              <i class="fas fa-plus-circle"></i> Add More Positions
+            </button>
             <input type="hidden" name="workforce_profile" id="workforce_profile">
           </div>
         </div>
@@ -246,37 +774,53 @@
       <!-- 2. DEMAND AGGREGATION DETAILS -->
       <!-- ========================================== -->
       <section>
-        <div class="flex items-center gap-3 border-b pb-2 mb-4">
-          <span class="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">2</span>
-          <h2 class="text-xl font-semibold">DEMAND AGGREGATION DETAILS</h2>
+        <div class="flex items-center gap-3 border-b pb-3 mb-4">
+          <span class="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm flex-shrink-0">2</span>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-800">DEMAND AGGREGATION DETAILS</h2>
         </div>
 
         <!-- 2A. JOB-ROLE-WISE WORKFORCE DEMAND -->
         <div>
-          <div class="flex items-center justify-between mb-3">
-            <div class="sub-section-title">2A. JOB-ROLE-WISE WORKFORCE DEMAND</div>
-            <button type="button" id="addJobRow" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm">+ Add Profile</button>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="sub-section-title !m-0"><i class="fas fa-briefcase text-green-600"></i> 2A. JOB-ROLE-WISE WORKFORCE DEMAND</div>
+            <button type="button" id="addJobRow" class="btn-success btn-sm">
+              <i class="fas fa-plus"></i> Add Profile
+            </button>
           </div>
           <div id="jobRows" class="space-y-4"></div>
         </div>
 
         <!-- 2B. APPRENTICESHIP / OJT -->
         <div class="mt-6">
-          <div class="flex items-center justify-between mb-3">
-            <div class="sub-section-title">2B. APPRENTICESHIP / OJT - OVERALL CANDIDATE REQUIREMENT</div>
-            <button type="button" id="addApprenticeshipRow" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-sm">+ Add</button>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="sub-section-title !m-0"><i class="fas fa-graduation-cap text-blue-600"></i> 2B. APPRENTICESHIP / OJT - OVERALL CANDIDATE REQUIREMENT</div>
+            <button type="button" id="addApprenticeshipRow" class="btn-primary btn-sm">
+              <i class="fas fa-plus"></i> Add
+            </button>
           </div>
           <div id="apprenticeshipRows" class="space-y-4"></div>
         </div>
 
         <!-- Demand Summary -->
-        <div class="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <h3 class="text-lg font-semibold mb-3">Demand Summary</h3>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-            <div><p class="text-slate-500">Current Openings</p><p id="total_current" class="text-xl font-bold">0</p></div>
-            <div><p class="text-slate-500">In 6 Months</p><p id="total_6_months" class="text-xl font-bold">0</p></div>
-            <div><p class="text-slate-500">In 12 Months</p><p id="total_12_months" class="text-xl font-bold">0</p></div>
-            <div><p class="text-slate-500">Total Future Demand</p><p id="total_future" class="text-xl font-bold text-purple-600">0</p></div>
+        <div class="summary-card mt-6">
+          <h3 class="text-base font-bold text-slate-800 mb-3"><i class="fas fa-chart-bar text-blue-600"></i> Demand Summary</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <p class="stat-label">Current Openings</p>
+              <p id="total_current" class="stat-value">0</p>
+            </div>
+            <div>
+              <p class="stat-label">In 6 Months</p>
+              <p id="total_6_months" class="stat-value orange">0</p>
+            </div>
+            <div>
+              <p class="stat-label">In 12 Months</p>
+              <p id="total_12_months" class="stat-value green">0</p>
+            </div>
+            <div>
+              <p class="stat-label">Total Future Demand</p>
+              <p id="total_future" class="stat-value purple">0</p>
+            </div>
           </div>
         </div>
       </section>
@@ -287,65 +831,59 @@
       <!-- 3. EMPLOYER PARTNERSHIP -->
       <!-- ========================================== -->
       <section>
-        <div class="flex items-center gap-3 border-b pb-2 mb-4">
-          <span class="bg-purple-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">3</span>
-          <h2 class="text-xl font-semibold">EMPLOYER PARTNERSHIP</h2>
+        <div class="flex items-center gap-3 border-b pb-3 mb-4">
+          <span class="bg-purple-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm flex-shrink-0">3</span>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-800">EMPLOYER PARTNERSHIP</h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Willingness to Hire Candidates via Placements</label>
-            <select name="placement_willingness" class="required-field w-full border rounded-lg px-3 py-2" required>
+            <label class="form-label">Willingness to Hire Candidates via Placements</label>
+            <select name="placement_willingness" class="form-select">
               <option value="">-- Select --</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
-            <p class="error-text hidden"></p>
           </div>
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Willingness to have Apprenticeship Candidates</label>
-            <select name="apprenticeship_willingness" class="required-field w-full border rounded-lg px-3 py-2" required>
+            <label class="form-label">Willingness to have Apprenticeship Candidates</label>
+            <select name="apprenticeship_willingness" class="form-select">
               <option value="">-- Select --</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
-            <p class="error-text hidden"></p>
           </div>
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Interested in Collaborating for Guest Lectures</label>
-            <select name="guest_lecture_interest" class="required-field w-full border rounded-lg px-3 py-2" required>
+            <label class="form-label">Interested in Collaborating for Guest Lectures</label>
+            <select name="guest_lecture_interest" class="form-select">
               <option value="">-- Select --</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
-            <p class="error-text hidden"></p>
           </div>
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Interested in Hosting Industrial Visits</label>
-            <select name="industrial_visit_interest" class="required-field w-full border rounded-lg px-3 py-2" required>
+            <label class="form-label">Interested in Hosting Industrial Visits</label>
+            <select name="industrial_visit_interest" class="form-select">
               <option value="">-- Select --</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
-            <p class="error-text hidden"></p>
           </div>
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">CSR Interest</label>
-            <select name="csr_interest" class="required-field w-full border rounded-lg px-3 py-2" required>
+            <label class="form-label">CSR Interest</label>
+            <select name="csr_interest" class="form-select">
               <option value="">-- Select --</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
-            <p class="error-text hidden"></p>
           </div>
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Willingness to have OJT / Internship Candidates</label>
-            <select name="ojt_internship_willingness" class="required-field w-full border rounded-lg px-3 py-2" required>
+            <label class="form-label">Willingness to have OJT / Internship Candidates</label>
+            <select name="ojt_internship_willingness" class="form-select">
               <option value="">-- Select --</option>
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
-            <p class="error-text hidden"></p>
           </div>
         </div>
       </section>
@@ -356,14 +894,14 @@
       <!-- 4. RECRUITMENT CHALLENGES & REMARKS -->
       <!-- ========================================== -->
       <section>
-        <div class="flex items-center gap-3 border-b pb-2 mb-4">
-          <span class="bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">4</span>
-          <h2 class="text-xl font-semibold">RECRUITMENT CHALLENGES &amp; REMARKS</h2>
+        <div class="flex items-center gap-3 border-b pb-3 mb-4">
+          <span class="bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm flex-shrink-0">4</span>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-800">RECRUITMENT CHALLENGES &amp; REMARKS</h2>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block font-medium mb-1 text-sm">Recruitment Challenges (Facing any difficulties in recruitment/hiring) (if any)</label>
+            <label class="form-label">Recruitment Challenges <span class="optional">(if any)</span></label>
             <div class="checkbox-group">
               <label><input type="checkbox" name="challenge_skilled" value="Lack of skilled / qualified candidates"> Lack of skilled / qualified candidates</label>
               <label><input type="checkbox" name="challenge_attrition" value="High attrition"> High attrition</label>
@@ -374,19 +912,19 @@
               <label><input type="checkbox" name="challenge_other" value="Other"> Other</label>
             </div>
             <div class="other-input" id="challenge_other_input">
-              <input type="text" name="recruitment_challenges_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
+              <input type="text" name="recruitment_challenges_other" class="form-input mt-1" placeholder="Please specify">
             </div>
             <input type="hidden" name="recruitment_challenges" id="recruitment_challenges">
           </div>
           <div>
-            <label class="block font-medium mb-1 text-sm">Additional Remarks / Suggestions</label>
-            <textarea name="additional_remarks" id="additional_remarks" rows="4" class="w-full border rounded-lg px-3 py-2" placeholder="Enter remarks"></textarea>
+            <label class="form-label">Additional Remarks / Suggestions</label>
+            <textarea name="additional_remarks" id="additional_remarks" rows="4" class="form-textarea" placeholder="Enter remarks"></textarea>
           </div>
         </div>
 
         <!-- Supporting Evidence -->
-        <div class="mt-4 border-t pt-4">
-          <label class="block font-medium mb-2 text-sm">Supporting Evidence Collected (if any):</label>
+        <div class="mt-6 border-t border-slate-200 pt-4">
+          <label class="form-label">Supporting Evidence Collected <span class="optional">(if any)</span></label>
           <div class="checkbox-group">
             <label><input type="checkbox" name="evidence_vacancy" value="Vacancy Note"> Vacancy Note</label>
             <label><input type="checkbox" name="evidence_hr" value="HR Plan"> HR Plan</label>
@@ -395,7 +933,7 @@
             <label><input type="checkbox" name="evidence_other" value="Other"> Other</label>
           </div>
           <div class="other-input" id="evidence_other_input">
-            <input type="text" name="supporting_evidence_other" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
+            <input type="text" name="supporting_evidence_other" class="form-input mt-1" placeholder="Please specify">
           </div>
           <input type="hidden" name="supporting_evidence" id="supporting_evidence">
         </div>
@@ -407,39 +945,51 @@
       <!-- FOOTER & SUBMISSION -->
       <!-- ========================================== -->
       <section>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label class="block font-medium mb-1 text-sm field-required">Submission Date</label>
-            <input type="date" name="submission_date" id="submission_date" class="required-field w-full border rounded-lg px-3 py-2" required>
-            <p class="error-text hidden"></p>
+            <label class="form-label">Submission Date</label>
+            <input type="date" name="submission_date" id="submission_date" class="form-input">
           </div>
           <div>
-            <label class="block font-medium mb-1 text-sm">Field Officer Name</label>
-            <input type="text" name="field_officer_name" id="field_officer_name" class="w-full border rounded-lg px-3 py-2" placeholder="Enter name">
+            <label class="form-label">Field Officer Name</label>
+            <input type="text" name="field_officer_name" id="field_officer_name" class="form-input" placeholder="Enter name">
           </div>
           <div>
-            <label class="block font-medium mb-1 text-sm">Field Officer Signature</label>
-            <input type="text" name="field_officer_signature" id="field_officer_signature" class="w-full border rounded-lg px-3 py-2" placeholder="Signature">
+            <label class="form-label">Field Officer Signature</label>
+            <input type="text" name="field_officer_signature" id="field_officer_signature" class="form-input" placeholder="Signature">
           </div>
         </div>
       </section>
 
       <div class="section-divider"></div>
 
-      <!-- FORM BUTTONS -->
+      <!-- ===== FORM BUTTONS ===== -->
       <div class="flex flex-wrap gap-3 justify-end pt-2">
-        <button type="button" id="previewBtn" class="bg-slate-700 hover:bg-slate-800 text-white px-6 py-2.5 rounded-lg">Preview Data</button>
-        <button type="reset" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2.5 rounded-lg">Reset Form</button>
-        <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg">Submit Survey</button>
+        <button type="button" id="previewBtn" class="btn-secondary">
+          <i class="fas fa-eye"></i> Preview Data
+        </button>
+        <button type="reset" class="btn-warning">
+          <i class="fas fa-undo"></i> Reset Form
+        </button>
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-paper-plane"></i> Submit Survey
+        </button>
       </div>
 
     </form>
   </div>
 
-  <!-- Preview Box -->
-  <div id="previewBox" class="hidden bg-white mt-6 p-6 rounded-2xl shadow-xl">
-    <h2 class="text-xl font-bold mb-4">Submitted Data Preview</h2>
-    <pre id="previewContent" class="bg-slate-900 text-green-300 p-4 rounded-xl overflow-x-auto text-sm max-h-96 overflow-y-auto"></pre>
+  <!-- ===== PREVIEW MODAL ===== -->
+  <div id="previewBox" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-file-alt text-blue-400"></i> Submitted Data Preview</h2>
+        <button class="modal-close" onclick="closePreview()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <pre id="previewContent" class="bg-slate-900 text-green-300 p-4 rounded-xl overflow-x-auto text-sm max-h-[60vh] overflow-y-auto"></pre>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -562,11 +1112,9 @@ function populateBlocks(district) {
     blockSelect.innerHTML = '<option value="">-- Select Block --</option>';
     if (district === 'Other') {
         document.getElementById('block_other').classList.add('active');
-        document.getElementById('block_other').querySelector('input').setAttribute('required', 'required');
         return;
     }
     document.getElementById('block_other').classList.remove('active');
-    document.getElementById('block_other').querySelector('input').removeAttribute('required');
     document.getElementById('block_other').querySelector('input').value = '';
     const blocks = districtBlockMap[district] || [];
     blocks.forEach(block => {
@@ -585,11 +1133,9 @@ districtSelect.addEventListener('change', function() {
     const district = this.value;
     if (district === 'Other') {
         document.getElementById('district_other').classList.add('active');
-        document.getElementById('district_other').querySelector('input').setAttribute('required', 'required');
         populateBlocks('Other');
     } else {
         document.getElementById('district_other').classList.remove('active');
-        document.getElementById('district_other').querySelector('input').removeAttribute('required');
         document.getElementById('district_other').querySelector('input').value = '';
         populateBlocks(district);
     }
@@ -604,13 +1150,10 @@ document.querySelectorAll('select').forEach(select => {
         if (otherDiv) {
             if (this.value === 'Other') {
                 otherDiv.classList.add('active');
-                const input = otherDiv.querySelector('input');
-                if (input) input.setAttribute('required', 'required');
             } else {
                 otherDiv.classList.remove('active');
                 const input = otherDiv.querySelector('input');
                 if (input) {
-                    input.removeAttribute('required');
                     input.value = '';
                 }
             }
@@ -619,33 +1162,17 @@ document.querySelectorAll('select').forEach(select => {
 });
 
 // ============================================
-// ORGANISATION TYPE
-// ============================================
-function updateOrgType() {
-    const selected = [];
-    document.querySelectorAll('input[name^="org_type_"]:checked').forEach(el => {
-        selected.push(el.value);
-    });
-    document.getElementById('organisation_type').value = selected.join(', ');
-    if (document.querySelector('input[name="org_type_other"]:checked')) {
-        document.getElementById('org_type_other_input').classList.add('active');
-    } else {
-        document.getElementById('org_type_other_input').classList.remove('active');
-    }
-}
-
-// ============================================
 // PRODUCT / SERVICE
 // ============================================
-function toggleProductService() {
-    const checked = document.querySelector('input[name="product_service"]:checked');
-    if (checked) {
-        document.getElementById('product_service_hidden').value = checked.value;
-        if (checked.value === 'Product' || checked.value === 'Service') {
-            document.getElementById('product_service_specify_div').classList.add('active');
-        }
+document.getElementById('product_service').addEventListener('change', function() {
+    const specifyDiv = document.getElementById('product_service_specify_div');
+    if (this.value === 'Product' || this.value === 'Service') {
+        specifyDiv.classList.add('active');
+    } else {
+        specifyDiv.classList.remove('active');
+        specifyDiv.querySelector('input').value = '';
     }
-}
+});
 
 // ============================================
 // WORKFORCE PROFILE
@@ -655,10 +1182,10 @@ document.getElementById('addWorkforceRow').addEventListener('click', function() 
     const tbody = document.getElementById('workforceTable');
     const tr = document.createElement('tr');
     tr.innerHTML = `
-        <td class="border border-slate-300 p-1"><input type="text" name="workforce_position_${workforceRowCount}" class="w-full border-0 px-2 py-1" placeholder="Position ${workforceRowCount}"></td>
-        <td class="border border-slate-300 p-1 text-center"><input type="number" name="workforce_onroll_${workforceRowCount}" class="w-16 border-0 px-1 py-1 text-center" min="0" value="0"></td>
-        <td class="border border-slate-300 p-1 text-center"><input type="number" name="workforce_contractual_${workforceRowCount}" class="w-16 border-0 px-1 py-1 text-center" min="0" value="0"></td>
-        <td class="border border-slate-300 p-1 text-center"><input type="number" name="workforce_apprentice_${workforceRowCount}" class="w-16 border-0 px-1 py-1 text-center" min="0" value="0"></td>
+        <td><input type="text" name="workforce_position_${workforceRowCount}" placeholder="Position ${workforceRowCount}"></td>
+        <td style="text-align:center;"><input type="number" name="workforce_onroll_${workforceRowCount}" min="0" value="0"></td>
+        <td style="text-align:center;"><input type="number" name="workforce_contractual_${workforceRowCount}" min="0" value="0"></td>
+        <td style="text-align:center;"><input type="number" name="workforce_apprentice_${workforceRowCount}" min="0" value="0"></td>
     `;
     tbody.appendChild(tr);
 });
@@ -666,108 +1193,107 @@ document.getElementById('addWorkforceRow').addEventListener('click', function() 
 // ============================================
 // ADD JOB ROW
 // ============================================
-function addJobRow() {
+function addJobRow(initial = false) {
     jobRowIndex++;
     const row = document.createElement('div');
-    row.className = 'job-row border border-slate-200 rounded-xl p-4 bg-slate-50';
+    row.className = 'job-row';
     row.setAttribute('data-index', jobRowIndex);
+
+    // If initial row, add a class to identify it
+    if (initial) {
+        row.classList.add('initial-job-row');
+    }
 
     row.innerHTML = `
         <div class="flex justify-between items-center mb-3">
-            <h3 class="font-semibold text-base">Profile #${jobRowIndex}</h3>
-            <button type="button" class="remove-job-row bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm">Remove</button>
+            <h3 class="font-semibold text-sm text-slate-700"><i class="fas fa-user-tie text-green-600"></i> Profile #${jobRowIndex}</h3>
+            <button type="button" class="remove-job-row text-red-600 hover:text-red-800 font-medium text-sm transition-colors ${initial ? 'hidden' : ''}">
+                <i class="fas fa-trash-alt"></i> Remove
+            </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Job Role / Position Title</label>
-                <input type="text" name="job_role[]" class="job-required w-full border rounded-lg px-3 py-2" placeholder="Enter job role" required>
-                <p class="error-text hidden"></p>
+                <label class="form-label text-xs">Job Role / Position Title</label>
+                <input type="text" name="job_role[]" class="form-input text-sm" placeholder="Enter job role">
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Sector</label>
-                <select name="job_sector[]" class="job-required w-full border rounded-lg px-3 py-2" required>
+                <label class="form-label text-xs">Sector</label>
+                <select name="job_sector[]" class="form-select text-sm">
                     <option value="">-- Select --</option>
                     ${createOptions(sectors, false)}
                 </select>
-                <p class="error-text hidden"></p>
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Qualifications</label>
-                <select name="qualification[]" class="job-required w-full border rounded-lg px-3 py-2" required>
+                <label class="form-label text-xs">Qualifications</label>
+                <select name="qualification[]" class="form-select text-sm">
                     <option value="">-- Select --</option>
                     ${createOptions(qualifications, false)}
                 </select>
                 <div class="other-input qual-other">
-                    <input type="text" name="qualification_other[]" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
+                    <input type="text" name="qualification_other[]" class="form-input text-sm mt-1" placeholder="Please specify">
                 </div>
-                <p class="error-text hidden"></p>
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Experience</label>
-                <select name="experience[]" class="job-required w-full border rounded-lg px-3 py-2" required>
+                <label class="form-label text-xs">Experience</label>
+                <select name="experience[]" class="form-select text-sm">
                     <option value="">-- Select --</option>
                     ${createOptions(experienceOptions, false)}
                 </select>
-                <p class="error-text hidden"></p>
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm">Certification (if required)</label>
-                <select name="certification[]" class="w-full border rounded-lg px-3 py-2">
+                <label class="form-label text-xs">Certification <span class="optional">(if required)</span></label>
+                <select name="certification[]" class="form-select text-sm">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                 </select>
                 <div class="other-input cert-other">
-                    <input type="text" name="certification_detail[]" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Specify certification">
+                    <input type="text" name="certification_detail[]" class="form-input text-sm mt-1" placeholder="Specify certification">
                 </div>
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Salary / Wage Offered</label>
-                <input type="text" name="salary_offered[]" class="job-required w-full border rounded-lg px-3 py-2" placeholder="e.g., ₹15000-₹20000" required>
-                <p class="error-text hidden"></p>
+                <label class="form-label text-xs">Salary / Wage Offered</label>
+                <input type="text" name="salary_offered[]" class="form-input text-sm" placeholder="e.g., ₹15000-₹20000">
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Current Openings</label>
-                <input type="number" name="current_openings[]" class="job-required demand-field current-openings w-full border rounded-lg px-3 py-2" min="0" value="0" required>
-                <p class="error-text hidden"></p>
+                <label class="form-label text-xs">Current Openings</label>
+                <input type="number" name="current_openings[]" class="form-input text-sm demand-field current-openings" min="0" value="0">
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">In 6 Months</label>
-                <input type="number" name="openings_6_months[]" class="job-required demand-field openings-6-months w-full border rounded-lg px-3 py-2" min="0" value="0" required>
-                <p class="error-text hidden"></p>
+                <label class="form-label text-xs">In 6 Months</label>
+                <input type="number" name="openings_6_months[]" class="form-input text-sm demand-field openings-6-months" min="0" value="0">
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">In 12 Months</label>
-                <input type="number" name="openings_12_months[]" class="job-required demand-field openings-12-months w-full border rounded-lg px-3 py-2" min="0" value="0" required>
-                <p class="error-text hidden"></p>
+                <label class="form-label text-xs">In 12 Months</label>
+                <input type="number" name="openings_12_months[]" class="form-input text-sm demand-field openings-12-months" min="0" value="0">
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm">Apprentice / OJT (if any)</label>
-                <select name="apprentice_ojt[]" class="w-full border rounded-lg px-3 py-2">
+                <label class="form-label text-xs">Apprentice / OJT <span class="optional">(if any)</span></label>
+                <select name="apprentice_ojt[]" class="form-select text-sm">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                 </select>
                 <div class="other-input app-other">
-                    <input type="text" name="apprentice_ojt_detail[]" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Specify details">
+                    <input type="text" name="apprentice_ojt_detail[]" class="form-input text-sm mt-1" placeholder="Specify details">
                 </div>
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm">Gender Suitability</label>
-                <select name="gender_suitability[]" class="w-full border rounded-lg px-3 py-2">
+                <label class="form-label text-xs">Gender Suitability</label>
+                <select name="gender_suitability[]" class="form-select text-sm">
                     ${createOptions(genderOptions, false)}
                 </select>
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm">PwD</label>
-                <select name="pwd[]" class="w-full border rounded-lg px-3 py-2">
+                <label class="form-label text-xs">PwD</label>
+                <select name="pwd[]" class="form-select text-sm">
                     <option value="NA">NA</option>
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
                 </select>
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm">Additional Remarks</label>
-                <input type="text" name="job_remarks[]" class="w-full border rounded-lg px-3 py-2" placeholder="Any remarks">
+                <label class="form-label text-xs">Additional Remarks</label>
+                <input type="text" name="job_remarks[]" class="form-input text-sm" placeholder="Any remarks">
             </div>
         </div>
     `;
@@ -783,13 +1309,10 @@ function addJobRow() {
             if (otherDiv) {
                 if (this.value === 'Other') {
                     otherDiv.classList.add('active');
-                    const input = otherDiv.querySelector('input');
-                    if (input) input.setAttribute('required', 'required');
                 } else {
                     otherDiv.classList.remove('active');
                     const input = otherDiv.querySelector('input');
                     if (input) {
-                        input.removeAttribute('required');
                         input.value = '';
                     }
                 }
@@ -825,72 +1348,71 @@ function addJobRow() {
 // ============================================
 // ADD APPRENTICESHIP ROW
 // ============================================
-function addApprenticeshipRow() {
+function addApprenticeshipRow(initial = false) {
     apprenticeshipRowIndex++;
     const row = document.createElement('div');
-    row.className = 'apprenticeship-row border border-slate-200 rounded-xl p-4 bg-green-50';
+    row.className = 'apprenticeship-row';
     row.setAttribute('data-index', apprenticeshipRowIndex);
+
+    if (initial) {
+        row.classList.add('initial-apprenticeship-row');
+    }
 
     row.innerHTML = `
         <div class="flex justify-between items-center mb-3">
-            <h3 class="font-semibold text-base">Apprenticeship/OJT #${apprenticeshipRowIndex}</h3>
-            <button type="button" class="remove-apprenticeship-row bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm">Remove</button>
+            <h3 class="font-semibold text-sm text-slate-700"><i class="fas fa-graduation-cap text-blue-600"></i> Apprenticeship/OJT #${apprenticeshipRowIndex}</h3>
+            <button type="button" class="remove-apprenticeship-row text-red-600 hover:text-red-800 font-medium text-sm transition-colors ${initial ? 'hidden' : ''}">
+                <i class="fas fa-trash-alt"></i> Remove
+            </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Job Role</label>
-                <input type="text" name="app_job_role[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" placeholder="Enter job role" required>
-                <p class="error-text hidden"></p>
+                <label class="form-label text-xs">Job Role</label>
+                <input type="text" name="app_job_role[]" class="form-input text-sm" placeholder="Enter job role">
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Opportunity Type</label>
-                <select name="app_opportunity_type[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" required>
+                <label class="form-label text-xs">Opportunity Type</label>
+                <select name="app_opportunity_type[]" class="form-select text-sm">
                     <option value="">-- Select --</option>
                     <option value="Apprenticeship">Apprenticeship</option>
                     <option value="OJT">OJT</option>
                     <option value="Internship">Internship</option>
                 </select>
-                <p class="error-text hidden"></p>
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Seats / Capacity</label>
-                <input type="number" name="app_seats[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" min="0" value="0" required>
-                <p class="error-text hidden"></p>
+                <label class="form-label text-xs">Seats / Capacity</label>
+                <input type="number" name="app_seats[]" class="form-input text-sm" min="0" value="0">
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Duration (Months)</label>
-                <input type="number" name="app_duration[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" min="0" value="0" required>
-                <p class="error-text hidden"></p>
+                <label class="form-label text-xs">Duration <span class="optional">(Months)</span></label>
+                <input type="number" name="app_duration[]" class="form-input text-sm" min="0" value="0">
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Monthly Stipend (INR)</label>
-                <input type="number" name="app_stipend[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" min="0" value="0" required>
-                <p class="error-text hidden"></p>
+                <label class="form-label text-xs">Monthly Stipend <span class="optional">(INR)</span></label>
+                <input type="number" name="app_stipend[]" class="form-input text-sm" min="0" value="0">
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm">Expected Start Month / Year</label>
-                <input type="month" name="app_start_month[]" class="w-full border rounded-lg px-3 py-2">
+                <label class="form-label text-xs">Expected Start Month / Year</label>
+                <input type="month" name="app_start_month[]" class="form-input text-sm">
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Minimum Qualification</label>
-                <select name="app_min_qualification[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" required>
+                <label class="form-label text-xs">Minimum Qualification</label>
+                <select name="app_min_qualification[]" class="form-select text-sm">
                     <option value="">-- Select --</option>
                     ${createOptions(qualifications, false)}
                 </select>
                 <div class="other-input app-qual-other">
-                    <input type="text" name="app_min_qualification_other[]" class="w-full border rounded-lg px-3 py-2 mt-1" placeholder="Please specify">
+                    <input type="text" name="app_min_qualification_other[]" class="form-input text-sm mt-1" placeholder="Please specify">
                 </div>
-                <p class="error-text hidden"></p>
             </div>
             <div>
-                <label class="block font-medium mb-1 text-sm field-required">Conversion to Employment</label>
-                <select name="app_conversion[]" class="apprenticeship-required w-full border rounded-lg px-3 py-2" required>
+                <label class="form-label text-xs">Conversion to Employment</label>
+                <select name="app_conversion[]" class="form-select text-sm">
                     <option value="">-- Select --</option>
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
                 </select>
-                <p class="error-text hidden"></p>
             </div>
         </div>
     `;
@@ -906,13 +1428,10 @@ function addApprenticeshipRow() {
             if (otherDiv) {
                 if (this.value === 'Other') {
                     otherDiv.classList.add('active');
-                    const input = otherDiv.querySelector('input');
-                    if (input) input.setAttribute('required', 'required');
                 } else {
                     otherDiv.classList.remove('active');
                     const input = otherDiv.querySelector('input');
                     if (input) {
-                        input.removeAttribute('required');
                         input.value = '';
                     }
                 }
@@ -920,6 +1439,7 @@ function addApprenticeshipRow() {
         });
     });
 }
+
 
 // ============================================
 // CALCULATE TOTALS
@@ -943,100 +1463,76 @@ function calculateTotals() {
 // ============================================
 // VALIDATION FUNCTIONS
 // ============================================
-function showError(field, message) {
-    field.classList.add('input-error');
-    const errorText = field.parentElement.querySelector('.error-text');
-    if (errorText) {
-        errorText.textContent = message;
-        errorText.classList.remove('hidden');
-    }
-}
-
-function clearError(field) {
-    field.classList.remove('input-error');
-    const errorText = field.parentElement.querySelector('.error-text');
-    if (errorText) {
-        errorText.textContent = '';
-        errorText.classList.add('hidden');
-    }
-}
-
-function validateRequiredFields() {
-    let isValid = true;
-    const requiredFields = document.querySelectorAll('.required-field, .job-required, .apprenticeship-required');
-
-    requiredFields.forEach(field => {
-        if (field.closest('.other-input') && !field.closest('.other-input').classList.contains('active')) {
-            return;
-        }
-        clearError(field);
-        if (!field.value.trim()) {
-            showError(field, 'This field is required.');
-            isValid = false;
-        }
-    });
-
-    return isValid;
-}
-
 function validateMobile() {
     const mobile = document.getElementById('contact_mobile');
+    const error = document.getElementById('mobile_error');
     const pattern = /^[6-9][0-9]{9}$/;
-    clearError(mobile);
-    if (!mobile.value.trim()) {
-        showError(mobile, 'Mobile number is required.');
+    if (mobile.value.trim() && !pattern.test(mobile.value.trim())) {
+        error.classList.add('show');
         return false;
     }
-    if (!pattern.test(mobile.value.trim())) {
-        showError(mobile, 'Enter a valid 10 digit Indian mobile number.');
-        return false;
-    }
+    error.classList.remove('show');
     return true;
 }
 
 function validateEmail() {
     const email = document.getElementById('contact_email');
+    const error = document.getElementById('email_error');
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    clearError(email);
-    if (!email.value.trim()) {
-        showError(email, 'Email ID is required.');
+    if (email.value.trim() && !pattern.test(email.value.trim())) {
+        error.classList.add('show');
         return false;
     }
-    if (!pattern.test(email.value.trim())) {
-        showError(email, 'Enter a valid email address.');
-        return false;
-    }
+    error.classList.remove('show');
     return true;
 }
 
-function validateAtLeastOneJobRow() {
-    if (document.querySelectorAll('.job-row').length === 0) {
-        alert('Please add at least one Job Profile.');
-        return false;
-    }
-    return true;
-}
-
+// ============================================
+// COLLECT FORM DATA
+// ============================================
 function collectFormData() {
     const formData = new FormData(form);
 
     // Organisation Type
-    const orgTypes = [];
-    document.querySelectorAll('input[name^="org_type_"]:checked').forEach(el => {
-        orgTypes.push(el.value);
-    });
-    if (document.querySelector('input[name="org_type_other"]:checked')) {
+    const orgType = document.getElementById('organisation_type').value;
+    let orgTypeValue = orgType;
+    if (orgType === 'Other') {
         const otherVal = document.querySelector('input[name="organisation_type_other"]')?.value || '';
-        if (otherVal) orgTypes.push(otherVal);
+        orgTypeValue = otherVal || 'Other';
     }
-    formData.set('organisation_type', orgTypes.join(', '));
+    formData.set('organisation_type', orgTypeValue);
 
     // Product/Service
-    const productService = document.querySelector('input[name="product_service"]:checked');
-    if (productService) {
-        formData.set('product_service', productService.value);
-        const specify = document.querySelector('input[name="product_service_specify"]')?.value || '';
-        formData.set('product_service_specify', specify);
+    const productService = document.getElementById('product_service').value;
+    formData.set('product_service', productService);
+    const specify = document.querySelector('input[name="product_service_specify"]')?.value || '';
+    formData.set('product_service_specify', specify);
+
+    // Operational Sector
+    const opSector = document.getElementById('operational_sector').value;
+    if (opSector === 'Other') {
+        const otherVal = document.querySelector('input[name="operational_sector_other"]')?.value || '';
+        formData.set('operational_sector', otherVal || 'Other');
+    } else {
+        formData.set('operational_sector', opSector);
+    }
+
+    // District
+    const district = document.getElementById('district').value;
+    if (district === 'Other') {
+        const otherVal = document.querySelector('input[name="district_other"]')?.value || '';
+        formData.set('district', otherVal || 'Other');
+    } else {
+        formData.set('district', district);
+    }
+
+    // Block
+    const block = document.getElementById('block').value;
+    if (block === 'Other') {
+        const otherVal = document.querySelector('input[name="block_other"]')?.value || '';
+        formData.set('block', otherVal || 'Other');
+    } else {
+        formData.set('block', block);
     }
 
     // Recruitment Challenges
@@ -1132,13 +1628,13 @@ function collectFormData() {
         organisation_type_other: formData.get('organisation_type_other'),
         product_service: formData.get('product_service'),
         product_service_specify: formData.get('product_service_specify'),
-        operational_sector: formData.get('operational_sector') === 'Other' ? formData.get('operational_sector_other') : formData.get('operational_sector'),
+        operational_sector: formData.get('operational_sector'),
         operational_sector_other: formData.get('operational_sector_other'),
         address: formData.get('address'),
         website: formData.get('website'),
-        district: formData.get('district') === 'Other' ? formData.get('district_other') : formData.get('district'),
+        district: formData.get('district'),
         district_other: formData.get('district_other'),
-        block: formData.get('block') === 'Other' ? formData.get('block_other') : formData.get('block'),
+        block: formData.get('block'),
         block_other: formData.get('block_other'),
         contact_name: formData.get('contact_name'),
         contact_mobile: formData.get('contact_mobile'),
@@ -1169,25 +1665,48 @@ function collectFormData() {
 addJobRowBtn.addEventListener('click', addJobRow);
 addApprenticeshipRowBtn.addEventListener('click', addApprenticeshipRow);
 
-// Remove job row
+// ============================================
+// REMOVE JOB ROW - At least 1 must remain
+// ============================================
 jobRowsContainer.addEventListener('click', function(event) {
-    if (event.target.classList.contains('remove-job-row')) {
-        if (document.querySelectorAll('.job-row').length === 1) {
-            alert('At least one Job Profile is required.');
-            return;
+    if (event.target.classList.contains('remove-job-row') || event.target.closest('.remove-job-row')) {
+        const btn = event.target.closest('.remove-job-row');
+        if (btn) {
+            const row = btn.closest('.job-row');
+            const totalRows = document.querySelectorAll('.job-row').length;
+            
+            // Don't remove if only 1 row remains
+            if (totalRows <= 1) {
+                alert('At least one Job Profile is required.');
+                return;
+            }
+            
+            row.remove();
+            calculateTotals();
         }
-        event.target.closest('.job-row').remove();
-        calculateTotals();
     }
 });
 
-// Remove apprenticeship row
+// ============================================
+// REMOVE APPRENTICESHIP ROW - At least 1 must remain
+// ============================================
 apprenticeshipRowsContainer.addEventListener('click', function(event) {
-    if (event.target.classList.contains('remove-apprenticeship-row')) {
-        event.target.closest('.apprenticeship-row').remove();
+    if (event.target.classList.contains('remove-apprenticeship-row') || event.target.closest('.remove-apprenticeship-row')) {
+        const btn = event.target.closest('.remove-apprenticeship-row');
+        if (btn) {
+            const row = btn.closest('.apprenticeship-row');
+            const totalRows = document.querySelectorAll('.apprenticeship-row').length;
+            
+            // Don't remove if only 1 row remains
+            if (totalRows <= 1) {
+                alert('At least one Apprenticeship/OJT entry is required.');
+                return;
+            }
+            
+            row.remove();
+        }
     }
 });
-
 // Auto-calculate totals
 jobRowsContainer.addEventListener('input', function(event) {
     if (event.target.classList.contains('demand-field')) {
@@ -1224,19 +1743,34 @@ document.querySelectorAll('input[name^="challenge_"]').forEach(cb => {
 // ============================================
 // PREVIEW BUTTON
 // ============================================
+function closePreview() {
+    previewBox.classList.remove('active');
+}
+
 previewBtn.addEventListener('click', function() {
     const completionTime = document.getElementById('completion_time');
     if (completionTime) completionTime.value = getCurrentDateTime();
 
-    if (!validateRequiredFields() || !validateMobile() || !validateEmail() || !validateAtLeastOneJobRow()) {
-        previewBox.classList.add('hidden');
-        return;
-    }
-
     const data = collectFormData();
     previewContent.textContent = JSON.stringify(data, null, 2);
-    previewBox.classList.remove('hidden');
-    window.scrollTo({ top: previewBox.offsetTop - 20, behavior: 'smooth' });
+    previewBox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+});
+
+// Close preview on outside click
+previewBox.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePreview();
+        document.body.style.overflow = '';
+    }
+});
+
+// Close preview on Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && previewBox.classList.contains('active')) {
+        closePreview();
+        document.body.style.overflow = '';
+    }
 });
 
 // ============================================
@@ -1248,14 +1782,17 @@ form.addEventListener('submit', function(event) {
     const completionTime = document.getElementById('completion_time');
     if (completionTime) completionTime.value = getCurrentDateTime();
 
-    if (!validateRequiredFields() || !validateMobile() || !validateEmail() || !validateAtLeastOneJobRow()) {
-        alert('Please fill all required fields before submitting.');
+    const data = collectFormData();
+
+    // Validate mobile and email only if filled
+    if (!validateMobile() || !validateEmail()) {
+        alert('Please fix the validation errors.');
         return;
     }
 
-    const data = collectFormData();
     previewContent.textContent = JSON.stringify(data, null, 2);
-    previewBox.classList.remove('hidden');
+    previewBox.classList.add('active');
+    document.body.style.overflow = 'hidden';
 
     fetch('/api/submit-survey/', {
         method: 'POST',
@@ -1274,7 +1811,8 @@ form.addEventListener('submit', function(event) {
                 apprenticeshipRowIndex = 0;
                 addJobRow();
                 calculateTotals();
-                previewBox.classList.add('hidden');
+                closePreview();
+                document.body.style.overflow = '';
                 document.getElementById('start_time').value = getCurrentDateTime();
                 document.getElementById('submission_date').value = getTodayDate();
             }, 100);
@@ -1299,21 +1837,43 @@ form.addEventListener('reset', function() {
         apprenticeshipRowIndex = 0;
         addJobRow();
         calculateTotals();
-        previewBox.classList.add('hidden');
+        closePreview();
+        document.body.style.overflow = '';
         document.getElementById('start_time').value = getCurrentDateTime();
         document.getElementById('submission_date').value = getTodayDate();
     }, 50);
 });
 
 // ============================================
-// INITIALIZE
+// INITIALIZE - Always show at least 1 row each
 // ============================================
 window.addEventListener('load', function() {
     populateDistricts();
     document.getElementById('start_time').value = getCurrentDateTime();
     document.getElementById('submission_date').value = getTodayDate();
-    addJobRow();
+    
+    // Always show at least 1 Job Row
+    if (document.querySelectorAll('.job-row').length === 0) {
+        addJobRow(true);
+    }
+    
+    // Always show at least 1 Apprenticeship Row
+    if (document.querySelectorAll('.apprenticeship-row').length === 0) {
+        addApprenticeshipRow(true);
+    }
 });
+
+// ============================================
+// ADD BUTTONS - Add extra rows
+// ============================================
+addJobRowBtn.addEventListener('click', function() {
+    addJobRow(false);
+});
+
+addApprenticeshipRowBtn.addEventListener('click', function() {
+    addApprenticeshipRow(false);
+});
+
 </script>
 
 </body>

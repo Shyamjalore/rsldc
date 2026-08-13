@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-60f^)&seznih9lrl5-&+z(uwjjb6(-2!ngf7+gr2ucl6%(-p&j'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['rsldc.onrender.com',
     '*', ]
@@ -144,7 +144,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / 'static',  # Project level static
+    BASE_DIR / 'demand' / 'static',  # App level static
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 

@@ -58,9 +58,14 @@ class Survey(models.Model):
     def __str__(self):
         return f"{self.company_code} - {self.company_name}"
     
+    # ===== PROPERTIES FOR DEMAND TOTALS =====
     @property
     def total_current_demand(self):
         return self.job_demands.aggregate(models.Sum('current_openings'))['current_openings__sum'] or 0
+    
+    @property
+    def total_future_demand(self):
+        return (self.total_demand_6_months + self.total_demand_12_months)
     
     @property
     def total_demand_6_months(self):
@@ -69,6 +74,10 @@ class Survey(models.Model):
     @property
     def total_demand_12_months(self):
         return self.job_demands.aggregate(models.Sum('openings_12_months'))['openings_12_months__sum'] or 0
+    
+    @property
+    def total_apprenticeship_demand(self):
+        return self.job_demands.filter(apprentice_ojt='Yes').count()
 
 
 class JobDemand(models.Model):
