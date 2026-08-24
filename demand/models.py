@@ -1,7 +1,8 @@
 from django.db import models
-from django.core.validators import MinValueValidator, RegexValidator
+from django.core.validators import MinValueValidator, RegexValidator, FileExtensionValidator
 from django.utils import timezone
 import re
+import os
 
 class Survey(models.Model):
     # System Fields
@@ -46,6 +47,17 @@ class Survey(models.Model):
     recruitment_challenges = models.TextField(blank=True, null=True)
     additional_remarks = models.TextField(blank=True, null=True)
     supporting_evidence = models.CharField(max_length=500, blank=True, null=True)
+    
+    # Supporting Document - File Upload
+    supporting_document = models.FileField(
+        upload_to='supporting_documents/',
+        blank=True,
+        null=True,
+        validators=[
+            FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp'])
+        ],
+        help_text='Upload PDF or Image (Max 50KB)'
+    )
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

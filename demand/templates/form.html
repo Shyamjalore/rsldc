@@ -174,6 +174,10 @@
     }
     .form-input:hover { border-color: #94a3b8; }
     .form-input::placeholder { color: #94a3b8; font-size: 13px; }
+    .form-input:read-only {
+      background: #f1f5f9;
+      cursor: not-allowed;
+    }
 
     .form-select {
       width: 100%;
@@ -230,6 +234,56 @@
       font-weight: 400;
       color: #94a3b8;
       font-size: 12px;
+    }
+
+    /* ===== FILE UPLOAD ===== */
+    .file-upload-wrapper {
+      position: relative;
+      border: 2px dashed #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: #fafbfc;
+    }
+    .file-upload-wrapper:hover {
+      border-color: #1e40af;
+      background: #f8fafc;
+    }
+    .file-upload-wrapper.dragover {
+      border-color: #1e40af;
+      background: #eff6ff;
+    }
+    .file-upload-wrapper input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .file-upload-wrapper .upload-icon {
+      font-size: 36px;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+    .file-upload-wrapper .upload-text {
+      font-size: 14px;
+      color: #64748b;
+    }
+    .file-upload-wrapper .upload-text strong {
+      color: #1e40af;
+    }
+    .file-upload-wrapper .file-name {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #059669;
+      font-weight: 500;
+    }
+    .file-upload-wrapper .file-size-error {
+      color: #dc2626;
+      font-size: 12px;
+      margin-top: 4px;
+      display: none;
     }
 
     /* ===== TABLE STYLES ===== */
@@ -591,14 +645,13 @@
       
         <!-- Right Logo - Govt of India -->
         <div class="logo-right">
-          
           <img src="{% static 'img/images.jpg.jpeg' %}" alt="Govt of India Logo" class="h-14 md:h-16 w-auto object-contain">
         </div>
       </div>
     </div>
 
     <!-- ===== FORM ===== -->
-    <form id="surveyForm" class="p-4 sm:p-6 md:p-8 space-y-6" novalidate>
+    <form id="surveyForm" class="p-4 sm:p-6 md:p-8 space-y-6" novalidate enctype="multipart/form-data">
 
       <!-- ========================================== -->
       <!-- 1. EMPLOYER DETAILS -->
@@ -611,10 +664,10 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- Company Code -->
+          <!-- Company Code - READ ONLY -->
           <div>
-            <label class="form-label">Company/Organisation Code <span class="optional">(To be filled by Field Officer)</span></label>
-            <input type="text" name="company_code" id="company_code" class="form-input" placeholder="Enter code">
+            <label class="form-label">Company/Organisation Code <span class="optional">(Auto-generated - Read Only)</span></label>
+            <input type="text" name="company_code" id="company_code" class="form-input" placeholder="Will be auto-generated" readonly>
           </div>
 
           <!-- Company Name -->
@@ -922,7 +975,7 @@
           </div>
         </div>
 
-        <!-- Supporting Evidence -->
+        <!-- Supporting Evidence - UPDATED with File Upload -->
         <div class="mt-6 border-t border-slate-200 pt-4">
           <label class="form-label">Supporting Evidence Collected <span class="optional">(if any)</span></label>
           <div class="checkbox-group">
@@ -936,34 +989,27 @@
             <input type="text" name="supporting_evidence_other" class="form-input mt-1" placeholder="Please specify">
           </div>
           <input type="hidden" name="supporting_evidence" id="supporting_evidence">
-        </div>
-      </section>
 
-      <div class="section-divider"></div>
-
-      <!-- ========================================== -->
-      <!-- FOOTER & SUBMISSION -->
-      <!-- ========================================== -->
-      <section>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label class="form-label">Submission Date</label>
-            <input type="date" name="submission_date" id="submission_date" class="form-input">
-          </div>
-          <div>
-            <label class="form-label">Field Officer Name</label>
-            <input type="text" name="field_officer_name" id="field_officer_name" class="form-input" placeholder="Enter name">
-          </div>
-          <div>
-            <label class="form-label">Field Officer Signature</label>
-            <input type="text" name="field_officer_signature" id="field_officer_signature" class="form-input" placeholder="Signature">
+          <!-- File Upload Section -->
+          <div class="mt-4">
+            <label class="form-label">Upload Supporting Document <span class="optional">(PDF or Image, Max 50KB)</span></label>
+            <div class="file-upload-wrapper" id="fileUploadWrapper">
+              <input type="file" name="supporting_document" id="supporting_document" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp">
+              <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+              <div class="upload-text">
+                <strong>Click to upload</strong> or drag and drop<br>
+                <span class="text-xs text-slate-400">PDF, JPG, PNG (Max 50KB)</span>
+              </div>
+              <div class="file-name" id="fileNameDisplay"></div>
+              <div class="file-size-error" id="fileSizeError">File size exceeds 50KB limit. Please select a smaller file.</div>
+            </div>
           </div>
         </div>
       </section>
 
       <div class="section-divider"></div>
 
-      <!-- ===== FORM BUTTONS ===== -->
+      <!-- ===== FORM BUTTONS - REMOVED submission date, field officer name, signature ===== -->
       <div class="flex flex-wrap gap-3 justify-end pt-2">
         <button type="button" id="previewBtn" class="btn-secondary">
           <i class="fas fa-eye"></i> Preview Data
@@ -1068,6 +1114,52 @@ const blockSelect = document.getElementById('block');
 let jobRowIndex = 0;
 let apprenticeshipRowIndex = 0;
 let workforceRowCount = 2;
+
+// ============================================
+// FILE UPLOAD HANDLING
+// ============================================
+document.getElementById('supporting_document').addEventListener('change', function() {
+    const file = this.files[0];
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const fileSizeError = document.getElementById('fileSizeError');
+    
+    if (file) {
+        // Check file size (50KB = 50 * 1024 bytes)
+        if (file.size > 50 * 1024) {
+            fileSizeError.style.display = 'block';
+            fileNameDisplay.textContent = '';
+            this.value = ''; // Reset file input
+            return;
+        }
+        fileSizeError.style.display = 'none';
+        fileNameDisplay.textContent = '📎 ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+    } else {
+        fileNameDisplay.textContent = '';
+        fileSizeError.style.display = 'none';
+    }
+});
+
+// Drag and drop support
+const fileUploadWrapper = document.getElementById('fileUploadWrapper');
+fileUploadWrapper.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+});
+fileUploadWrapper.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+});
+fileUploadWrapper.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        document.getElementById('supporting_document').files = files;
+        // Trigger change event
+        const event = new Event('change');
+        document.getElementById('supporting_document').dispatchEvent(event);
+    }
+});
 
 // ============================================
 // UTILITY FUNCTIONS
@@ -1199,7 +1291,6 @@ function addJobRow(initial = false) {
     row.className = 'job-row';
     row.setAttribute('data-index', jobRowIndex);
 
-    // If initial row, add a class to identify it
     if (initial) {
         row.classList.add('initial-job-row');
     }
@@ -1440,7 +1531,6 @@ function addApprenticeshipRow(initial = false) {
     });
 }
 
-
 // ============================================
 // CALCULATE TOTALS
 // ============================================
@@ -1484,6 +1574,19 @@ function validateEmail() {
         return false;
     }
     error.classList.remove('show');
+    return true;
+}
+
+function validateFile() {
+    const fileInput = document.getElementById('supporting_document');
+    const file = fileInput.files[0];
+    const fileSizeError = document.getElementById('fileSizeError');
+    
+    if (file && file.size > 50 * 1024) {
+        fileSizeError.style.display = 'block';
+        return false;
+    }
+    fileSizeError.style.display = 'none';
     return true;
 }
 
@@ -1649,11 +1752,6 @@ function collectFormData() {
         recruitment_challenges: formData.get('recruitment_challenges'),
         additional_remarks: formData.get('additional_remarks'),
         supporting_evidence: formData.get('supporting_evidence'),
-        start_time: formData.get('start_time'),
-        completion_time: formData.get('completion_time'),
-        submission_date: formData.get('submission_date'),
-        field_officer_name: formData.get('field_officer_name'),
-        field_officer_signature: formData.get('field_officer_signature'),
         job_demands: jobDemands,
         apprenticeships: apprenticeships
     };
@@ -1675,7 +1773,6 @@ jobRowsContainer.addEventListener('click', function(event) {
             const row = btn.closest('.job-row');
             const totalRows = document.querySelectorAll('.job-row').length;
             
-            // Don't remove if only 1 row remains
             if (totalRows <= 1) {
                 alert('At least one Job Profile is required.');
                 return;
@@ -1697,7 +1794,6 @@ apprenticeshipRowsContainer.addEventListener('click', function(event) {
             const row = btn.closest('.apprenticeship-row');
             const totalRows = document.querySelectorAll('.apprenticeship-row').length;
             
-            // Don't remove if only 1 row remains
             if (totalRows <= 1) {
                 alert('At least one Apprenticeship/OJT entry is required.');
                 return;
@@ -1707,6 +1803,7 @@ apprenticeshipRowsContainer.addEventListener('click', function(event) {
         }
     }
 });
+
 // Auto-calculate totals
 jobRowsContainer.addEventListener('input', function(event) {
     if (event.target.classList.contains('demand-field')) {
@@ -1748,10 +1845,25 @@ function closePreview() {
 }
 
 previewBtn.addEventListener('click', function() {
-    const completionTime = document.getElementById('completion_time');
-    if (completionTime) completionTime.value = getCurrentDateTime();
+    if (!validateFile()) {
+        alert('Please fix the file size error. File must be less than 50KB.');
+        return;
+    }
 
     const data = collectFormData();
+    // Add file info to preview
+    const fileInput = document.getElementById('supporting_document');
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        data.supporting_document = {
+            name: file.name,
+            size: file.size + ' bytes',
+            type: file.type
+        };
+    } else {
+        data.supporting_document = null;
+    }
+    
     previewContent.textContent = JSON.stringify(data, null, 2);
     previewBox.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -1779,15 +1891,25 @@ document.addEventListener('keydown', function(e) {
 form.addEventListener('submit', function(event) {
     event.preventDefault();
 
-    const completionTime = document.getElementById('completion_time');
-    if (completionTime) completionTime.value = getCurrentDateTime();
-
-    const data = collectFormData();
+    // Validate file before submission
+    if (!validateFile()) {
+        alert('Please fix the file size error. File must be less than 50KB.');
+        return;
+    }
 
     // Validate mobile and email only if filled
     if (!validateMobile() || !validateEmail()) {
         alert('Please fix the validation errors.');
         return;
+    }
+
+    const formData = new FormData(form);
+    const data = collectFormData();
+    
+    // Append file to FormData
+    const fileInput = document.getElementById('supporting_document');
+    if (fileInput.files.length > 0) {
+        formData.append('supporting_document', fileInput.files[0]);
     }
 
     previewContent.textContent = JSON.stringify(data, null, 2);
@@ -1796,8 +1918,8 @@ form.addEventListener('submit', function(event) {
 
     fetch('/api/submit-survey/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: formData,
+        // Don't set Content-Type header, let browser set it with boundary
     })
     .then(response => response.json())
     .then(result => {
@@ -1809,12 +1931,12 @@ form.addEventListener('submit', function(event) {
                 apprenticeshipRowsContainer.innerHTML = '';
                 jobRowIndex = 0;
                 apprenticeshipRowIndex = 0;
-                addJobRow();
+                addJobRow(true);
+                addApprenticeshipRow(true);
                 calculateTotals();
                 closePreview();
                 document.body.style.overflow = '';
-                document.getElementById('start_time').value = getCurrentDateTime();
-                document.getElementById('submission_date').value = getTodayDate();
+                document.getElementById('fileNameDisplay').textContent = '';
             }, 100);
         } else {
             alert('❌ ' + (result.message || 'Submission failed.'));
@@ -1835,12 +1957,12 @@ form.addEventListener('reset', function() {
         apprenticeshipRowsContainer.innerHTML = '';
         jobRowIndex = 0;
         apprenticeshipRowIndex = 0;
-        addJobRow();
+        addJobRow(true);
+        addApprenticeshipRow(true);
         calculateTotals();
         closePreview();
         document.body.style.overflow = '';
-        document.getElementById('start_time').value = getCurrentDateTime();
-        document.getElementById('submission_date').value = getTodayDate();
+        document.getElementById('fileNameDisplay').textContent = '';
     }, 50);
 });
 
@@ -1849,8 +1971,6 @@ form.addEventListener('reset', function() {
 // ============================================
 window.addEventListener('load', function() {
     populateDistricts();
-    document.getElementById('start_time').value = getCurrentDateTime();
-    document.getElementById('submission_date').value = getTodayDate();
     
     // Always show at least 1 Job Row
     if (document.querySelectorAll('.job-row').length === 0) {

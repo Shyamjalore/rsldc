@@ -3,6 +3,7 @@ import logging
 import traceback
 from datetime import datetime, timedelta
 import csv
+import os
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
@@ -13,6 +14,8 @@ from django.views.decorators.http import require_http_methods
 from django.db import transaction
 from django.db.models import Sum, Count, Max, Q
 from django.contrib import messages
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 from .models import Survey, JobDemand, ApprenticeshipOJT
 
@@ -34,8 +37,36 @@ def submit_survey(request):
     print("="*60)
     
     try:
-        data = json.loads(request.body)
-        print(f"✅ JSON Parsed Successfully")
+        # Check if request is multipart form data or JSON
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            # Handle form data with file
+            data = request.POST.dict()
+            files = request.FILES
+            
+            # Convert string values that might be JSON
+            if 'workforce_profile' in data and isinstance(data['workforce_profile'], str):
+                try:
+                    data['workforce_profile'] = json.loads(data['workforce_profile'])
+                except:
+                    pass
+            
+            if 'job_demands' in data:
+                try:
+                    data['job_demands'] = json.loads(data['job_demands'])
+                except:
+                    data['job_demands'] = []
+            
+            if 'apprenticeships' in data:
+                try:
+                    data['apprenticeships'] = json.loads(data['apprenticeships'])
+                except:
+                    data['apprenticeships'] = []
+        else:
+            # Handle JSON request
+            data = json.loads(request.body)
+            files = {}
+        
+        print(f"✅ Data Parsed Successfully")
         
         with transaction.atomic():
             survey = Survey.objects.create(
@@ -70,10 +101,33 @@ def submit_survey(request):
                 supporting_evidence=data.get('supporting_evidence', '').strip(),
             )
             
+            # Handle file upload
+            if 'supporting_document' in files:
+                uploaded_file = files['supporting_document']
+                # Check file size (50KB limit)
+                if uploaded_file.size > 50 * 1024:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'File size exceeds 50KB limit.'
+                    }, status=400)
+                
+                # Save file with unique name
+                file_name = f"survey_{survey.id}_{uploaded_file.name}"
+                saved_path = default_storage.save(
+                    os.path.join('supporting_documents', file_name),
+                    ContentFile(uploaded_file.read())
+                )
+                survey.supporting_document = saved_path
+                survey.save()
+            
             print(f"✅ Survey Created! ID: {survey.id}")
             
             # Job Demands
-            for idx, job_data in enumerate(data.get('job_demands', []), 1):
+            job_demands_data = data.get('job_demands', [])
+            if isinstance(job_demands_data, str):
+                job_demands_data = json.loads(job_demands_data)
+            
+            for idx, job_data in enumerate(job_demands_data, 1):
                 JobDemand.objects.create(
                     survey=survey,
                     row_no=idx,
@@ -97,7 +151,11 @@ def submit_survey(request):
                 print(f"  ✅ Job Demand #{idx} Created!")
             
             # Apprenticeships
-            for idx, app_data in enumerate(data.get('apprenticeships', []), 1):
+            apprenticeships_data = data.get('apprenticeships', [])
+            if isinstance(apprenticeships_data, str):
+                apprenticeships_data = json.loads(apprenticeships_data)
+            
+            for idx, app_data in enumerate(apprenticeships_data, 1):
                 ApprenticeshipOJT.objects.create(
                     survey=survey,
                     row_no=idx,
@@ -381,6 +439,10 @@ def delete_survey(request, survey_id):
     
     try:
         survey = Survey.objects.get(id=survey_id)
+        # Delete associated file if exists
+        if survey.supporting_document:
+            if default_storage.exists(survey.supporting_document.name):
+                default_storage.delete(survey.supporting_document.name)
         survey.delete()
         return JsonResponse({'status': 'success', 'message': 'Survey deleted successfully'})
     except Survey.DoesNotExist:
@@ -541,6 +603,7 @@ def get_survey_detail(request, survey_id):
             'recruitment_challenges': survey.recruitment_challenges or '',
             'additional_remarks': survey.additional_remarks or '',
             'supporting_evidence': survey.supporting_evidence or '',
+            'supporting_document_url': survey.supporting_document.url if survey.supporting_document else '',
             'created_at': survey.created_at.strftime('%d %b %Y, %I:%M %p'),
             'submission_date': survey.submission_date.strftime('%Y-%m-%d') if survey.submission_date else '',
             'field_officer_name': survey.field_officer_name or '',
@@ -600,7 +663,8 @@ def admin_export_full_csv(request):
         'Guest Lecture Interest', 'Industrial Visit Interest',
         'CSR Interest', 'OJT/Internship Willingness',
         'Recruitment Challenges', 'Additional Remarks', 
-        'Supporting Evidence', 'Submission Date', 'Created At'
+        'Supporting Evidence', 'Supporting Document',
+        'Submission Date', 'Created At'
     ]
     
     # ===== WORKFORCE PROFILE HEADERS =====
@@ -719,6 +783,7 @@ def admin_export_full_csv(request):
             survey.recruitment_challenges or '',
             survey.additional_remarks or '',
             survey.supporting_evidence or '',
+            survey.supporting_document.name if survey.supporting_document else '',
             survey.submission_date.strftime('%Y-%m-%d') if survey.submission_date else '',
             survey.created_at.strftime('%Y-%m-%d %H:%M:%S')
         ]

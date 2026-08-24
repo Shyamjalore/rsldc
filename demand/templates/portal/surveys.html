@@ -253,6 +253,18 @@
         .empty-state h4 { font-size: 20px; font-weight: 700; color: #0a1628; margin-bottom: 8px; }
         .empty-state p { color: #94a3b8; font-size: 15px; }
 
+        /* File link styling */
+        .file-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .file-link:hover { text-decoration: underline; color: #1d4ed8; }
+
         @media (max-width: 768px) {
             .sidebar-modern { width: 100%; min-height: auto; position: fixed; bottom: 0; left: 0; top: auto; height: auto; border-right: none; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(10,22,40,0.95); z-index: 100; }
             .sidebar-brand-modern { display: none; }
@@ -412,6 +424,7 @@
                             <th>Block</th>
                             <th>Jobs</th>
                             <th>Total Demand</th>
+                            <th>Doc</th>
                             <th>Date</th>
                             <th>Actions</th>
                         </tr>
@@ -441,6 +454,15 @@
                             </td>
                             <td><span class="font-bold text-emerald-600">{{ survey.total_current_demand|add:survey.total_future_demand }}</span></td>
                             <td>
+                                {% if survey.supporting_document %}
+                                    <a href="{{ survey.supporting_document.url }}" target="_blank" class="file-link">
+                                        <i class="fas fa-file-pdf"></i> View
+                                    </a>
+                                {% else %}
+                                    <span class="text-slate-400 text-xs">No file</span>
+                                {% endif %}
+                            </td>
+                            <td>
                                 <div class="text-sm">{{ survey.created_at|date:"d M Y" }}</div>
                                 <div class="text-xs text-slate-400">{{ survey.created_at|time:"h:i A" }}</div>
                             </td>
@@ -463,7 +485,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="10">
+                            <td colspan="11">
                                 <div class="empty-state">
                                     <i class="fas fa-inbox"></i>
                                     <h4>No Surveys Found</h4>
@@ -590,9 +612,11 @@
         const body = document.getElementById('modalBody');
         
         let jobRowsHtml = '';
-        data.job_demands.forEach(job => {
-            jobRowsHtml += `<tr><td>#${job.row_no}</td><td>${job.job_role}</td><td>${job.sector}</td><td>${job.qualification}</td><td>${job.experience}</td><td>${job.current_openings}</td><td>${job.openings_6_months}</td><td>${job.openings_12_months}</td><td>${job.salary_offered}</td></tr>`;
-        });
+        if (data.job_demands) {
+            data.job_demands.forEach(job => {
+                jobRowsHtml += `<tr><td>#${job.row_no}</td><td>${job.job_role}</td><td>${job.sector}</td><td>${job.qualification}</td><td>${job.experience}</td><td>${job.current_openings}</td><td>${job.openings_6_months}</td><td>${job.openings_12_months}</td><td>${job.salary_offered}</td></tr>`;
+            });
+        }
 
         let appRowsHtml = '';
         if (data.apprenticeships) {
@@ -608,6 +632,11 @@
             });
         }
 
+        // Document link
+        const docHtml = data.supporting_document_url 
+            ? `<a href="${data.supporting_document_url}" target="_blank" class="text-blue-600 hover:underline"><i class="fas fa-file-pdf"></i> View Document</a>`
+            : 'No document uploaded';
+
         body.innerHTML = `
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div><span class="text-slate-500 text-sm">Company Code</span><p class="font-semibold">${data.company_code || 'N/A'}</p></div>
@@ -622,12 +651,13 @@
                 <div><span class="text-slate-500 text-sm">Email</span><p>${data.contact_email}</p></div>
                 <div><span class="text-slate-500 text-sm">Submission Date</span><p>${data.submission_date}</p></div>
                 <div><span class="text-slate-500 text-sm">Field Officer</span><p>${data.field_officer_name || 'N/A'}</p></div>
+                <div class="col-span-2"><span class="text-slate-500 text-sm">Supporting Document</span><p>${docHtml}</p></div>
             </div>
 
             <h3 class="font-bold text-lg mt-6 mb-3"><i class="fas fa-briefcase text-blue-600"></i> Job Demands</h3>
             ${jobRowsHtml ? `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-slate-100"><th class="p-2 text-left">#</th><th class="p-2 text-left">Job Role</th><th class="p-2 text-left">Sector</th><th class="p-2 text-left">Qualification</th><th class="p-2 text-left">Experience</th><th class="p-2 text-left">Current</th><th class="p-2 text-left">6 Months</th><th class="p-2 text-left">12 Months</th><th class="p-2 text-left">Salary</th></tr></thead><tbody>${jobRowsHtml}</tbody></table></div>` : '<p class="text-slate-500">No job demands</p>'}
 
-            <h3 class="font-bold text-lg mt-6 mb-3"><i class="fas fa-graduation-cap text-green-600"></i> Workforce Profile</h3>
+            <h3 class="font-bold text-lg mt-6 mb-3"><i class="fas fa-users text-green-600"></i> Workforce Profile</h3>
             ${workforceHtml ? `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-slate-100"><th class="p-2 text-left">#</th><th class="p-2 text-left">Position</th><th class="p-2 text-left">On Roll</th><th class="p-2 text-left">Contractual</th><th class="p-2 text-left">Apprentice</th></tr></thead><tbody>${workforceHtml}</tbody></table></div>` : '<p class="text-slate-500">No workforce data</p>'}
 
             <h3 class="font-bold text-lg mt-6 mb-3"><i class="fas fa-user-graduate text-purple-600"></i> Apprenticeships/OJT</h3>
