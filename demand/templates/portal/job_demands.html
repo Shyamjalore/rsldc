@@ -374,7 +374,7 @@
         <header class="header-modern">
             <div class="header-title">
                 <h1>💼 Job Demand Records</h1>
-                <p>Complete list of all job demand entries</p>
+                <p>Complete list of all job demand entries with career progression details</p>
             </div>
             <div class="header-actions-modern">
                 <a href="{% url 'survey:admin_export_csv' %}" class="btn-modern btn-success-modern">
@@ -402,14 +402,14 @@
                 <div class="stat-icon green"><i class="fas fa-users"></i></div>
                 <div class="stat-info">
                     <p>Total Current Openings</p>
-                    <h3>{% with total=0 %}{% for job in job_demands %}{% with total=total|add:job.current_openings %}{% endwith %}{% endfor %}{{ total }}{% endwith %}</h3>
+                    <h3>{{ total_current|default:0 }}</h3>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon orange"><i class="fas fa-rocket"></i></div>
                 <div class="stat-info">
                     <p>Total Future Demand</p>
-                    <h3>{% with total=0 %}{% for job in job_demands %}{% with total=total|add:job.openings_6_months %}{% with total=total|add:job.openings_12_months %}{% endwith %}{% endwith %}{% endfor %}{{ total }}{% endwith %}</h3>
+                    <h3>{{ total_future|default:0 }}</h3>
                 </div>
             </div>
             <div class="stat-card">
@@ -444,6 +444,7 @@
                             <th>6 Months</th>
                             <th>12 Months</th>
                             <th>Salary</th>
+                            <th>Career Prog.</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -470,10 +471,22 @@
                             <td><span class="demand-badge future">{{ job.openings_6_months }}</span></td>
                             <td><span class="demand-badge future">{{ job.openings_12_months }}</span></td>
                             <td><span class="salary-range">₹{{ job.salary_offered }}</span></td>
+                            <td>
+                                {% if job.career_progression == 'Yes' %}
+                                    <span class="bg-green-50 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
+                                        Yes
+                                    </span>
+                                    <div class="text-xs text-slate-500">
+                                        {{ job.career_progression_years|default:"-" }} · {{ job.career_next_position|default:"-" }}
+                                    </div>
+                                {% else %}
+                                    <span class="text-slate-400 text-xs">No</span>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="10">
+                            <td colspan="11">
                                 <div class="empty-state">
                                     <i class="fas fa-briefcase-slash"></i>
                                     <h4>No Job Demands Found</h4>
@@ -546,7 +559,7 @@
         const timeStr = now.toLocaleString('en-IN', options);
         const headerP = document.querySelector('.header-title p');
         if (headerP) {
-            const baseText = 'Complete list of all job demand entries';
+            const baseText = 'Complete list of all job demand entries with career progression details';
             headerP.innerHTML = baseText + ' · <span class="text-indigo-600 font-semibold">' + timeStr + '</span>';
         }
     }

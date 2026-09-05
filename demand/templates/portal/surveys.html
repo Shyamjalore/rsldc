@@ -253,7 +253,6 @@
         .empty-state h4 { font-size: 20px; font-weight: 700; color: #0a1628; margin-bottom: 8px; }
         .empty-state p { color: #94a3b8; font-size: 15px; }
 
-        /* File link styling */
         .file-link {
             display: inline-flex;
             align-items: center;
@@ -420,6 +419,7 @@
                             <th>Code</th>
                             <th>Employer</th>
                             <th>Sector</th>
+                            <th>Size</th>
                             <th>District</th>
                             <th>Block</th>
                             <th>Jobs</th>
@@ -445,6 +445,11 @@
                             <td>
                                 <span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold">
                                     {{ survey.operational_sector }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="bg-purple-50 text-purple-700 px-2 py-1 rounded-full text-xs font-semibold">
+                                    {{ survey.company_size|default:"N/A" }}
                                 </span>
                             </td>
                             <td>{{ survey.district }}</td>
@@ -485,7 +490,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="11">
+                            <td colspan="12">
                                 <div class="empty-state">
                                     <i class="fas fa-inbox"></i>
                                     <h4>No Surveys Found</h4>
@@ -614,7 +619,7 @@
         let jobRowsHtml = '';
         if (data.job_demands) {
             data.job_demands.forEach(job => {
-                jobRowsHtml += `<tr><td>#${job.row_no}</td><td>${job.job_role}</td><td>${job.sector}</td><td>${job.qualification}</td><td>${job.experience}</td><td>${job.current_openings}</td><td>${job.openings_6_months}</td><td>${job.openings_12_months}</td><td>${job.salary_offered}</td></tr>`;
+                jobRowsHtml += `<tr><td>#${job.row_no}</td><td>${job.job_role}</td><td>${job.sector}</td><td>${job.qualification}</td><td>${job.experience}</td><td>${job.current_openings}</td><td>${job.openings_6_months}</td><td>${job.openings_12_months}</td><td>${job.salary_offered}</td><td>${job.career_progression}</td></tr>`;
             });
         }
 
@@ -632,7 +637,6 @@
             });
         }
 
-        // Document link
         const docHtml = data.supporting_document_url 
             ? `<a href="${data.supporting_document_url}" target="_blank" class="text-blue-600 hover:underline"><i class="fas fa-file-pdf"></i> View Document</a>`
             : 'No document uploaded';
@@ -643,6 +647,8 @@
                 <div><span class="text-slate-500 text-sm">Company Name</span><p class="font-semibold">${data.company_name}</p></div>
                 <div><span class="text-slate-500 text-sm">Organisation Type</span><p>${data.organisation_type}</p></div>
                 <div><span class="text-slate-500 text-sm">Operational Sector</span><p>${data.operational_sector}</p></div>
+                <div><span class="text-slate-500 text-sm">Company Size</span><p>${data.company_size || 'N/A'}</p></div>
+                <div><span class="text-slate-500 text-sm">Has HR</span><p>${data.has_hr}</p></div>
                 <div><span class="text-slate-500 text-sm">District</span><p>${data.district}</p></div>
                 <div><span class="text-slate-500 text-sm">Block</span><p>${data.block}</p></div>
                 <div class="col-span-2"><span class="text-slate-500 text-sm">Address</span><p>${data.address}</p></div>
@@ -655,7 +661,7 @@
             </div>
 
             <h3 class="font-bold text-lg mt-6 mb-3"><i class="fas fa-briefcase text-blue-600"></i> Job Demands</h3>
-            ${jobRowsHtml ? `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-slate-100"><th class="p-2 text-left">#</th><th class="p-2 text-left">Job Role</th><th class="p-2 text-left">Sector</th><th class="p-2 text-left">Qualification</th><th class="p-2 text-left">Experience</th><th class="p-2 text-left">Current</th><th class="p-2 text-left">6 Months</th><th class="p-2 text-left">12 Months</th><th class="p-2 text-left">Salary</th></tr></thead><tbody>${jobRowsHtml}</tbody></table></div>` : '<p class="text-slate-500">No job demands</p>'}
+            ${jobRowsHtml ? `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-slate-100"><th class="p-2 text-left">#</th><th class="p-2 text-left">Job Role</th><th class="p-2 text-left">Sector</th><th class="p-2 text-left">Qualification</th><th class="p-2 text-left">Experience</th><th class="p-2 text-left">Current</th><th class="p-2 text-left">6 Months</th><th class="p-2 text-left">12 Months</th><th class="p-2 text-left">Salary</th><th class="p-2 text-left">Career Progression</th></tr></thead><tbody>${jobRowsHtml}</tbody></table></div>` : '<p class="text-slate-500">No job demands</p>'}
 
             <h3 class="font-bold text-lg mt-6 mb-3"><i class="fas fa-users text-green-600"></i> Workforce Profile</h3>
             ${workforceHtml ? `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-slate-100"><th class="p-2 text-left">#</th><th class="p-2 text-left">Position</th><th class="p-2 text-left">On Roll</th><th class="p-2 text-left">Contractual</th><th class="p-2 text-left">Apprentice</th></tr></thead><tbody>${workforceHtml}</tbody></table></div>` : '<p class="text-slate-500">No workforce data</p>'}
@@ -697,6 +703,23 @@
                             <div>
                                 <label class="block text-sm font-medium text-slate-700">Contact Email</label>
                                 <input type="email" name="contact_email" value="${data.contact_email}" class="w-full border rounded-lg px-3 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700">Company Size</label>
+                                <select name="company_size" class="w-full border rounded-lg px-3 py-2">
+                                    <option value="">-- Select --</option>
+                                    <option value="Micro" ${data.company_size === 'Micro' ? 'selected' : ''}>Micro</option>
+                                    <option value="Small" ${data.company_size === 'Small' ? 'selected' : ''}>Small</option>
+                                    <option value="Medium" ${data.company_size === 'Medium' ? 'selected' : ''}>Medium</option>
+                                    <option value="Large" ${data.company_size === 'Large' ? 'selected' : ''}>Large</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700">Has HR</label>
+                                <select name="has_hr" class="w-full border rounded-lg px-3 py-2">
+                                    <option value="No" ${data.has_hr === 'No' ? 'selected' : ''}>No</option>
+                                    <option value="Yes" ${data.has_hr === 'Yes' ? 'selected' : ''}>Yes</option>
+                                </select>
                             </div>
                             <div class="col-span-2">
                                 <label class="block text-sm font-medium text-slate-700">Address</label>

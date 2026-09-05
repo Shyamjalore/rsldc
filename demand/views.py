@@ -16,7 +16,7 @@ from django.db.models import Sum, Count, Max, Q
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-
+from django.views.decorators.csrf import csrf_exempt
 from .models import Survey, JobDemand, ApprenticeshipOJT
 
 logger = logging.getLogger(__name__)
@@ -39,7 +39,6 @@ def submit_survey(request):
     try:
         # Check if request is multipart form data or JSON
         if request.content_type and 'multipart/form-data' in request.content_type:
-            # Handle form data with file
             data = request.POST.dict()
             files = request.FILES
             
@@ -62,7 +61,6 @@ def submit_survey(request):
                 except:
                     data['apprenticeships'] = []
         else:
-            # Handle JSON request
             data = json.loads(request.body)
             files = {}
         
@@ -82,6 +80,7 @@ def submit_survey(request):
                 product_service_specify=data.get('product_service_specify', '').strip(),
                 operational_sector=data.get('operational_sector', '').strip(),
                 operational_sector_other=data.get('operational_sector_other', '').strip(),
+                company_size=data.get('company_size', '').strip(),
                 address=data.get('address', '').strip(),
                 website=data.get('website', '').strip(),
                 district=data.get('district', '').strip(),
@@ -89,6 +88,7 @@ def submit_survey(request):
                 contact_name=data.get('contact_name', '').strip(),
                 contact_mobile=data.get('contact_mobile', '').strip(),
                 contact_email=data.get('contact_email', '').strip(),
+                has_hr=data.get('has_hr', 'No'),
                 workforce_profile=data.get('workforce_profile', '').strip(),
                 placement_willingness=data.get('placement_willingness', 'No'),
                 apprenticeship_willingness=data.get('apprenticeship_willingness', 'No'),
@@ -104,14 +104,12 @@ def submit_survey(request):
             # Handle file upload
             if 'supporting_document' in files:
                 uploaded_file = files['supporting_document']
-                # Check file size (50KB limit)
                 if uploaded_file.size > 50 * 1024:
                     return JsonResponse({
                         'status': 'error',
                         'message': 'File size exceeds 50KB limit.'
                     }, status=400)
                 
-                # Save file with unique name
                 file_name = f"survey_{survey.id}_{uploaded_file.name}"
                 saved_path = default_storage.save(
                     os.path.join('supporting_documents', file_name),
@@ -146,6 +144,10 @@ def submit_survey(request):
                     apprentice_ojt_detail=job_data.get('apprentice_ojt_detail', '').strip(),
                     gender_suitability=job_data.get('gender_suitability', 'Any / No Preference'),
                     pwd=job_data.get('pwd', 'NA'),
+                    career_progression=job_data.get('career_progression', 'No'),
+                    career_progression_years=job_data.get('career_progression_years', '').strip(),
+                    career_next_position=job_data.get('career_next_position', '').strip(),
+                    career_next_salary=job_data.get('career_next_salary', '').strip(),
                     additional_remarks=job_data.get('additional_remarks', '').strip()
                 )
                 print(f"  ✅ Job Demand #{idx} Created!")
@@ -244,10 +246,10 @@ def admin_dashboard(request):
         for survey in latest_surveys:
             latest_surveys_data.append({
                 'id': survey.id,
-                'company_name': survey.company_name,
+                'employer_name': survey.company_name,
                 'district': survey.district,
                 'block': survey.block,
-                'operational_sector': survey.operational_sector,
+                'primary_sector': survey.operational_sector,
                 'total_demand': survey.total_current_demand + survey.total_future_demand,
                 'created_at': survey.created_at.strftime('%d %b %Y, %I:%M %p')
             })
@@ -391,7 +393,6 @@ def admin_surveys(request):
     for survey in surveys:
         if isinstance(survey.workforce_profile, str):
             try:
-                import json
                 survey.workforce_profile = json.loads(survey.workforce_profile)
             except:
                 survey.workforce_profile = []
@@ -418,7 +419,6 @@ def update_survey(request, survey_id):
         data = json.loads(request.body)
         survey = Survey.objects.get(id=survey_id)
         
-        # Update fields
         for key, value in data.items():
             if hasattr(survey, key):
                 setattr(survey, key, value)
@@ -432,6 +432,7 @@ def update_survey(request, survey_id):
 
 
 @login_required
+@csrf_exempt 
 def delete_survey(request, survey_id):
     """Delete survey and related data"""
     if request.method != 'DELETE':
@@ -439,7 +440,6 @@ def delete_survey(request, survey_id):
     
     try:
         survey = Survey.objects.get(id=survey_id)
-        # Delete associated file if exists
         if survey.supporting_document:
             if default_storage.exists(survey.supporting_document.name):
                 default_storage.delete(survey.supporting_document.name)
@@ -475,6 +475,7 @@ def update_job_demand(request, job_id):
 
 
 @login_required
+@csrf_exempt 
 def delete_job_demand(request, job_id):
     """Delete job demand"""
     if request.method != 'DELETE':
@@ -514,6 +515,7 @@ def update_apprenticeship(request, app_id):
 
 
 @login_required
+@csrf_exempt 
 def delete_apprenticeship(request, app_id):
     """Delete apprenticeship/OJT"""
     if request.method != 'DELETE':
@@ -534,11 +536,17 @@ def admin_job_demands(request):
     """View all job demands with updated fields"""
     job_demands = JobDemand.objects.all().select_related('survey')
     
-    # Debug - print field names
-    for job in job_demands[:1]:
-        print("Job fields:", [f for f in dir(job) if not f.startswith('_')])
+    # Calculate totals for stats
+    total_current = job_demands.aggregate(total=Sum('current_openings'))['total'] or 0
+    total_future_6 = job_demands.aggregate(total=Sum('openings_6_months'))['total'] or 0
+    total_future_12 = job_demands.aggregate(total=Sum('openings_12_months'))['total'] or 0
+    total_future = total_future_6 + total_future_12
     
-    return render(request, 'portal/job_demands.html', {'job_demands': job_demands})
+    return render(request, 'portal/job_demands.html', {
+        'job_demands': job_demands,
+        'total_current': total_current,
+        'total_future': total_future,
+    })
 
 
 @login_required
@@ -578,14 +586,29 @@ def get_survey_detail(request, survey_id):
     try:
         survey = Survey.objects.get(id=survey_id)
         job_demands = survey.job_demands.all()
+        apprenticeships = survey.apprenticeships.all()
+        
+        # Parse workforce profile
+        workforce_list = []
+        try:
+            if isinstance(survey.workforce_profile, str):
+                workforce_list = json.loads(survey.workforce_profile) if survey.workforce_profile else []
+            elif isinstance(survey.workforce_profile, list):
+                workforce_list = survey.workforce_profile
+        except:
+            workforce_list = []
         
         data = {
             'id': survey.id,
             'company_code': survey.company_code or '',
             'company_name': survey.company_name,
             'organisation_type': survey.organisation_type,
+            'organisation_type_other': survey.organisation_type_other or '',
             'product_service': survey.product_service,
+            'product_service_specify': survey.product_service_specify or '',
             'operational_sector': survey.operational_sector,
+            'operational_sector_other': survey.operational_sector_other or '',
+            'company_size': survey.company_size or '',
             'district': survey.district,
             'block': survey.block,
             'address': survey.address,
@@ -593,7 +616,8 @@ def get_survey_detail(request, survey_id):
             'contact_name': survey.contact_name,
             'contact_mobile': survey.contact_mobile,
             'contact_email': survey.contact_email,
-            'workforce_profile': survey.workforce_profile or '',
+            'has_hr': survey.has_hr,
+            'workforce_profile': workforce_list,
             'placement_willingness': survey.placement_willingness,
             'apprenticeship_willingness': survey.apprenticeship_willingness,
             'guest_lecture_interest': survey.guest_lecture_interest,
@@ -614,17 +638,41 @@ def get_survey_detail(request, survey_id):
                     'job_role': job.job_role,
                     'sector': job.sector,
                     'qualification': job.qualification,
+                    'qualification_other': job.qualification_other or '',
                     'experience': job.experience,
+                    'certification': job.certification,
+                    'certification_detail': job.certification_detail or '',
                     'salary_offered': job.salary_offered,
                     'current_openings': job.current_openings,
                     'openings_6_months': job.openings_6_months,
                     'openings_12_months': job.openings_12_months,
                     'apprentice_ojt': job.apprentice_ojt,
+                    'apprentice_ojt_detail': job.apprentice_ojt_detail or '',
                     'gender_suitability': job.gender_suitability,
                     'pwd': job.pwd,
+                    'career_progression': job.career_progression,
+                    'career_progression_years': job.career_progression_years or '',
+                    'career_next_position': job.career_next_position or '',
+                    'career_next_salary': job.career_next_salary or '',
                     'additional_remarks': job.additional_remarks or ''
                 }
                 for job in job_demands
+            ],
+            
+            'apprenticeships': [
+                {
+                    'row_no': app.row_no,
+                    'job_role': app.job_role,
+                    'opportunity_type': app.opportunity_type,
+                    'seats_capacity': app.seats_capacity,
+                    'duration_months': app.duration_months,
+                    'monthly_stipend': app.monthly_stipend,
+                    'expected_start_month': app.expected_start_month or '',
+                    'minimum_qualification': app.minimum_qualification,
+                    'minimum_qualification_other': app.minimum_qualification_other or '',
+                    'conversion_to_employment': app.conversion_to_employment
+                }
+                for app in apprenticeships
             ],
             
             'totals': {
@@ -643,7 +691,7 @@ def get_survey_detail(request, survey_id):
 
 @login_required
 def admin_export_full_csv(request):
-    """Export complete survey data with all fields - FIXED"""
+    """Export complete survey data with all fields"""
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="survey_full_data_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
     
@@ -655,9 +703,11 @@ def admin_export_full_csv(request):
         'Organisation Type', 'Organisation Type (Other)',
         'Product / Service', 'Product / Service (Specify)',
         'Operational Sector', 'Operational Sector (Other)',
+        'Company Size',
         'District', 'Block',
         'Address', 'Website',
         'Contact Name', 'Contact Mobile', 'Contact Email',
+        'Has HR',
         'Field Officer Name', 'Field Officer Signature',
         'Placement Willingness', 'Apprenticeship Willingness',
         'Guest Lecture Interest', 'Industrial Visit Interest',
@@ -668,7 +718,6 @@ def admin_export_full_csv(request):
     ]
     
     # ===== WORKFORCE PROFILE HEADERS =====
-    import json
     max_workforce = 0
     for survey in Survey.objects.all():
         try:
@@ -711,6 +760,10 @@ def admin_export_full_csv(request):
             f'Job Demand-{i} (Apprentice/OJT Detail)',
             f'Job Demand-{i} (Gender Suitability)',
             f'Job Demand-{i} (PwD)',
+            f'Job Demand-{i} (Career Progression)',
+            f'Job Demand-{i} (Career Progression Years)',
+            f'Job Demand-{i} (Career Next Position)',
+            f'Job Demand-{i} (Career Next Salary)',
             f'Job Demand-{i} (Additional Remarks)'
         ])
     
@@ -765,6 +818,7 @@ def admin_export_full_csv(request):
             survey.product_service_specify or '',
             survey.operational_sector or '',
             survey.operational_sector_other or '',
+            survey.company_size or '',
             survey.district or '',
             survey.block or '',
             survey.address or '',
@@ -772,6 +826,7 @@ def admin_export_full_csv(request):
             survey.contact_name or '',
             survey.contact_mobile or '',
             survey.contact_email or '',
+            survey.has_hr or 'No',
             survey.field_officer_name or '',
             survey.field_officer_signature or '',
             survey.placement_willingness or '',
@@ -822,10 +877,14 @@ def admin_export_full_csv(request):
                     job.apprentice_ojt_detail or '',
                     job.gender_suitability,
                     job.pwd,
+                    job.career_progression,
+                    job.career_progression_years or '',
+                    job.career_next_position or '',
+                    job.career_next_salary or '',
                     job.additional_remarks or ''
                 ])
             else:
-                row.extend([''] * 16)
+                row.extend([''] * 20)
         
         # Add Apprenticeships data
         app_list = list(survey.apprenticeships.all())

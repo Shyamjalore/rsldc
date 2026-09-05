@@ -729,6 +729,18 @@
             </div>
           </div>
 
+          <!-- NEW: Company Size -->
+          <div>
+            <label class="form-label">Size of the Company</label>
+            <select name="company_size" id="company_size" class="form-select">
+              <option value="">-- Select Company Size --</option>
+              <option value="Micro">Micro</option>
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+            </select>
+          </div>
+
           <!-- Address -->
           <div class="sm:col-span-2">
             <label class="form-label">Complete Office / Unit Address</label>
@@ -767,7 +779,7 @@
         <!-- 1A. CONTACT DETAILS -->
         <div class="mt-6">
           <div class="sub-section-title"><i class="fas fa-address-card text-blue-600"></i> 1A. CONTACT DETAILS</div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label class="form-label">Name</label>
               <input type="text" name="contact_name" id="contact_name" class="form-input" placeholder="Enter name">
@@ -782,7 +794,17 @@
               <input type="email" name="contact_email" id="contact_email" class="form-input" placeholder="email@example.com">
               <p class="error-text" id="email_error">Enter a valid email address.</p>
             </div>
+            <!-- NEW: Do You have HR -->
+            
           </div>
+        </div>
+        <br>
+        <div>
+          <label class="form-label">Do You have HR</label>
+          <select name="has_hr" id="has_hr" class="form-select">
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+          </select>
         </div>
 
         <!-- 1B. CURRENT WORKFORCE PROFILE -->
@@ -975,7 +997,7 @@
           </div>
         </div>
 
-        <!-- Supporting Evidence - UPDATED with File Upload -->
+        <!-- Supporting Evidence -->
         <div class="mt-6 border-t border-slate-200 pt-4">
           <label class="form-label">Supporting Evidence Collected <span class="optional">(if any)</span></label>
           <div class="checkbox-group">
@@ -1009,7 +1031,7 @@
 
       <div class="section-divider"></div>
 
-      <!-- ===== FORM BUTTONS - REMOVED submission date, field officer name, signature ===== -->
+      <!-- ===== FORM BUTTONS ===== -->
       <div class="flex flex-wrap gap-3 justify-end pt-2">
         <button type="button" id="previewBtn" class="btn-secondary">
           <i class="fas fa-eye"></i> Preview Data
@@ -1124,11 +1146,10 @@ document.getElementById('supporting_document').addEventListener('change', functi
     const fileSizeError = document.getElementById('fileSizeError');
     
     if (file) {
-        // Check file size (50KB = 50 * 1024 bytes)
         if (file.size > 50 * 1024) {
             fileSizeError.style.display = 'block';
             fileNameDisplay.textContent = '';
-            this.value = ''; // Reset file input
+            this.value = '';
             return;
         }
         fileSizeError.style.display = 'none';
@@ -1139,7 +1160,6 @@ document.getElementById('supporting_document').addEventListener('change', functi
     }
 });
 
-// Drag and drop support
 const fileUploadWrapper = document.getElementById('fileUploadWrapper');
 fileUploadWrapper.addEventListener('dragover', function(e) {
     e.preventDefault();
@@ -1155,7 +1175,6 @@ fileUploadWrapper.addEventListener('drop', function(e) {
     const files = e.dataTransfer.files;
     if (files.length > 0) {
         document.getElementById('supporting_document').files = files;
-        // Trigger change event
         const event = new Event('change');
         document.getElementById('supporting_document').dispatchEvent(event);
     }
@@ -1308,13 +1327,7 @@ function addJobRow(initial = false) {
                 <label class="form-label text-xs">Job Role / Position Title</label>
                 <input type="text" name="job_role[]" class="form-input text-sm" placeholder="Enter job role">
             </div>
-            <div>
-                <label class="form-label text-xs">Sector</label>
-                <select name="job_sector[]" class="form-select text-sm">
-                    <option value="">-- Select --</option>
-                    ${createOptions(sectors, false)}
-                </select>
-            </div>
+            
             <div>
                 <label class="form-label text-xs">Qualifications</label>
                 <select name="qualification[]" class="form-select text-sm">
@@ -1381,6 +1394,26 @@ function addJobRow(initial = false) {
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
                 </select>
+            </div>
+            <!-- NEW: Career Progression Section -->
+            <div>
+                <label class="form-label text-xs">Career Progression</label>
+                <select name="career_progression[]" class="form-select text-sm">
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label text-xs">In Years</label>
+                <input type="text" name="career_progression_years[]" class="form-input text-sm" placeholder="e.g., 2 years">
+            </div>
+            <div>
+                <label class="form-label text-xs">Next Position</label>
+                <input type="text" name="career_next_position[]" class="form-input text-sm" placeholder="Next position title">
+            </div>
+            <div>
+                <label class="form-label text-xs">Next Salary</label>
+                <input type="text" name="career_next_salary[]" class="form-input text-sm" placeholder="e.g., ₹25000-₹30000">
             </div>
             <div>
                 <label class="form-label text-xs">Additional Remarks</label>
@@ -1620,6 +1653,12 @@ function collectFormData() {
         formData.set('operational_sector', opSector);
     }
 
+    // Company Size
+    formData.set('company_size', document.getElementById('company_size').value);
+
+    // HR
+    formData.set('has_hr', document.getElementById('has_hr').value);
+
     // District
     const district = document.getElementById('district').value;
     if (district === 'Other') {
@@ -1698,6 +1737,11 @@ function collectFormData() {
                 apprentice_ojt_detail: row.querySelector('[name="apprentice_ojt_detail[]"]')?.value || '',
                 gender_suitability: row.querySelector('[name="gender_suitability[]"]')?.value || 'Any / No Preference',
                 pwd: row.querySelector('[name="pwd[]"]')?.value || 'NA',
+                // NEW Career Progression
+                career_progression: row.querySelector('[name="career_progression[]"]')?.value || 'No',
+                career_progression_years: row.querySelector('[name="career_progression_years[]"]')?.value || '',
+                career_next_position: row.querySelector('[name="career_next_position[]"]')?.value || '',
+                career_next_salary: row.querySelector('[name="career_next_salary[]"]')?.value || '',
                 additional_remarks: row.querySelector('[name="job_remarks[]"]')?.value || ''
             });
         }
@@ -1733,6 +1777,7 @@ function collectFormData() {
         product_service_specify: formData.get('product_service_specify'),
         operational_sector: formData.get('operational_sector'),
         operational_sector_other: formData.get('operational_sector_other'),
+        company_size: formData.get('company_size'),
         address: formData.get('address'),
         website: formData.get('website'),
         district: formData.get('district'),
@@ -1742,6 +1787,7 @@ function collectFormData() {
         contact_name: formData.get('contact_name'),
         contact_mobile: formData.get('contact_mobile'),
         contact_email: formData.get('contact_email'),
+        has_hr: formData.get('has_hr'),
         workforce_profile: formData.get('workforce_profile'),
         placement_willingness: formData.get('placement_willingness'),
         apprenticeship_willingness: formData.get('apprenticeship_willingness'),
@@ -1851,7 +1897,6 @@ previewBtn.addEventListener('click', function() {
     }
 
     const data = collectFormData();
-    // Add file info to preview
     const fileInput = document.getElementById('supporting_document');
     if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
@@ -1891,13 +1936,11 @@ document.addEventListener('keydown', function(e) {
 form.addEventListener('submit', function(event) {
     event.preventDefault();
 
-    // Validate file before submission
     if (!validateFile()) {
         alert('Please fix the file size error. File must be less than 50KB.');
         return;
     }
 
-    // Validate mobile and email only if filled
     if (!validateMobile() || !validateEmail()) {
         alert('Please fix the validation errors.');
         return;
@@ -1906,7 +1949,10 @@ form.addEventListener('submit', function(event) {
     const formData = new FormData(form);
     const data = collectFormData();
     
-    // Append file to FormData
+    // Append job_demands and apprenticeships as JSON strings
+    formData.set('job_demands', JSON.stringify(data.job_demands));
+    formData.set('apprenticeships', JSON.stringify(data.apprenticeships));
+    
     const fileInput = document.getElementById('supporting_document');
     if (fileInput.files.length > 0) {
         formData.append('supporting_document', fileInput.files[0]);
@@ -1919,7 +1965,6 @@ form.addEventListener('submit', function(event) {
     fetch('/api/submit-survey/', {
         method: 'POST',
         body: formData,
-        // Don't set Content-Type header, let browser set it with boundary
     })
     .then(response => response.json())
     .then(result => {
@@ -1972,12 +2017,10 @@ form.addEventListener('reset', function() {
 window.addEventListener('load', function() {
     populateDistricts();
     
-    // Always show at least 1 Job Row
     if (document.querySelectorAll('.job-row').length === 0) {
         addJobRow(true);
     }
     
-    // Always show at least 1 Apprenticeship Row
     if (document.querySelectorAll('.apprenticeship-row').length === 0) {
         addApprenticeshipRow(true);
     }

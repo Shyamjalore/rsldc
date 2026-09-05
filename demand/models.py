@@ -22,6 +22,15 @@ class Survey(models.Model):
     product_service_specify = models.CharField(max_length=255, blank=True, null=True)
     operational_sector = models.CharField(max_length=100, blank=False, null=False)
     operational_sector_other = models.CharField(max_length=100, blank=True, null=True)
+    
+    # Company Size
+    company_size = models.CharField(max_length=20, blank=True, null=True, choices=[
+        ('Micro', 'Micro'),
+        ('Small', 'Small'),
+        ('Medium', 'Medium'),
+        ('Large', 'Large')
+    ])
+    
     address = models.TextField(blank=False, null=False)
     website = models.URLField(max_length=500, blank=True, null=True)
     district = models.CharField(max_length=100, blank=False, null=False)
@@ -31,6 +40,9 @@ class Survey(models.Model):
     contact_name = models.CharField(max_length=255, blank=False, null=False)
     contact_mobile = models.CharField(max_length=10, blank=False, null=False)
     contact_email = models.EmailField(blank=False, null=False)
+    
+    # HR Availability
+    has_hr = models.CharField(max_length=3, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
     
     # 1B. CURRENT WORKFORCE PROFILE (Stored as JSON)
     workforce_profile = models.JSONField(default=list, blank=True, null=True)
@@ -74,9 +86,7 @@ class Survey(models.Model):
     def save(self, *args, **kwargs):
         # Auto-generate company code if not provided
         if not self.company_code and self.district:
-            # Get district code (first 2 letters uppercase)
             district_code = ''.join(word[0].upper() for word in self.district.split())[:2]
-            # Count existing surveys in this district
             count = Survey.objects.filter(district=self.district).count() + 1
             self.company_code = f"{district_code}{str(count).zfill(3)}"
         super().save(*args, **kwargs)
@@ -122,6 +132,13 @@ class JobDemand(models.Model):
     apprentice_ojt_detail = models.CharField(max_length=255, blank=True, null=True)
     gender_suitability = models.CharField(max_length=50, default='Any / No Preference')
     pwd = models.CharField(max_length=10, default='NA', choices=[('Yes', 'Yes'), ('No', 'No'), ('NA', 'NA')])
+    
+    # Career Progression fields
+    career_progression = models.CharField(max_length=3, default='No', choices=[('Yes', 'Yes'), ('No', 'No')])
+    career_progression_years = models.CharField(max_length=50, blank=True, null=True)
+    career_next_position = models.CharField(max_length=255, blank=True, null=True)
+    career_next_salary = models.CharField(max_length=50, blank=True, null=True)
+    
     additional_remarks = models.CharField(max_length=255, blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
