@@ -17,7 +17,7 @@ from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
-from .models import Survey, JobDemand, ApprenticeshipOJT
+from .models import Survey, JobDemand, ApprenticeshipOJT, AssociationConsultation, AssociationJobRole, AssociationApprenticeship
 
 logger = logging.getLogger(__name__)
 
@@ -914,5 +914,430 @@ def admin_export_full_csv(request):
         ])
         
         writer.writerow(row)
+    
+    return response
+
+
+
+# ============================================
+# NEW ASSOCIATION VIEWS
+# ============================================
+
+def association_form(request):
+    """Render the association consultation form"""
+    return render(request, 'association_form.html')
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def submit_association(request):
+    """Submit association consultation form"""
+    print("="*60)
+    print("🔵 SUBMIT ASSOCIATION API CALLED")
+    print("="*60)
+    
+    try:
+        # Check if request is multipart form data
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            data = request.POST.dict()
+            files = request.FILES
+        else:
+            data = json.loads(request.body)
+            files = {}
+        
+        print(f"✅ Data Parsed Successfully")
+        
+        with transaction.atomic():
+            # Parse date fields
+            consultation_date = data.get('consultation_date')
+            if consultation_date:
+                consultation_date = datetime.strptime(consultation_date, '%Y-%m-%d').date()
+            else:
+                consultation_date = datetime.now().date()
+            
+            submission_date = data.get('submission_date')
+            if submission_date:
+                submission_date = datetime.strptime(submission_date, '%Y-%m-%d').date()
+            else:
+                submission_date = datetime.now().date()
+            
+            # Parse recruitment challenges from JSON string
+            recruitment_challenges = data.get('recruitment_challenges', '[]')
+            if isinstance(recruitment_challenges, str):
+                try:
+                    recruitment_challenges = json.loads(recruitment_challenges)
+                except:
+                    recruitment_challenges = []
+            
+            # Create consultation
+            consultation = AssociationConsultation.objects.create(
+                consultation_id=data.get('consultation_id', '').strip(),
+                district_region=data.get('district_region', '').strip(),
+                mode=data.get('mode', '').strip(),
+                mode_other=data.get('mode_other', '').strip(),
+                consultation_date=consultation_date,
+                surveyor_name=data.get('surveyor_name', '').strip(),
+                association_name=data.get('association_name', '').strip(),
+                association_type=data.get('association_type', '').strip(),
+                association_type_other=data.get('association_type_other', '').strip(),
+                primary_sector=data.get('primary_sector', '').strip(),
+                geographic_coverage=data.get('geographic_coverage', '').strip(),
+                geographic_specify=data.get('geographic_specify', '').strip(),
+                year_established=int(data.get('year_established', 0)) if data.get('year_established') else None,
+                total_members=int(data.get('total_members', 0)) if data.get('total_members') else None,
+                active_members=int(data.get('active_members', 0)) if data.get('active_members') else None,
+                comp_micro=int(data.get('comp_micro', 0)) if data.get('comp_micro') else None,
+                comp_small=int(data.get('comp_small', 0)) if data.get('comp_small') else None,
+                comp_medium=int(data.get('comp_medium', 0)) if data.get('comp_medium') else None,
+                comp_large=int(data.get('comp_large', 0)) if data.get('comp_large') else None,
+                key_clusters=data.get('key_clusters', '').strip(),
+                respondent_name=data.get('respondent_name', '').strip(),
+                respondent_mobile=data.get('respondent_mobile', '').strip(),
+                respondent_email=data.get('respondent_email', '').strip(),
+                major_products=data.get('major_products', '').strip(),
+                estimated_workforce=int(data.get('estimated_workforce', 0)) if data.get('estimated_workforce') else None,
+                business_trend=data.get('business_trend', '').strip(),
+                growth_drivers=data.get('growth_drivers', '').strip(),
+                upcoming_projects=data.get('upcoming_projects', '').strip(),
+                peak_hiring=data.get('peak_hiring', '').strip(),
+                member_employers_count=int(data.get('member_employers_count', 0)) if data.get('member_employers_count') else None,
+                member_list_attached=data.get('member_list_attached') == 'on' or data.get('member_list_attached') == 'true',
+                recruitment_challenges=recruitment_challenges,
+                difficult_roles=data.get('difficult_roles', '').strip(),
+                emerging_roles=data.get('emerging_roles', '').strip(),
+                changing_competencies=data.get('changing_competencies', '').strip(),
+                skill_gaps=data.get('skill_gaps', '').strip(),
+                high_demand_districts=data.get('high_demand_districts', '').strip(),
+                unfilled_reasons=data.get('unfilled_reasons', '').strip(),
+                mobilise_placements=data.get('mobilise_placements', '').strip(),
+                support_apprenticeship=data.get('support_apprenticeship', '').strip(),
+                support_guest_lectures=data.get('support_guest_lectures', '').strip(),
+                facilitate_visits=data.get('facilitate_visits', '').strip(),
+                demand_updates=data.get('demand_updates', '').strip(),
+                nodal_officer_name=data.get('nodal_officer_name', '').strip(),
+                nodal_officer_mobile=data.get('nodal_officer_mobile', '').strip(),
+                nodal_officer_email=data.get('nodal_officer_email', '').strip(),
+                survey_reviewed=data.get('survey_reviewed', '').strip(),
+                alignment_view=data.get('alignment_view', '').strip(),
+                priority_training=data.get('priority_training', '').strip(),
+                curriculum_changes=data.get('curriculum_changes', '').strip(),
+                placement_actions=data.get('placement_actions', '').strip(),
+                policy_support=data.get('policy_support', '').strip(),
+                additional_remarks=data.get('additional_remarks', '').strip(),
+                supporting_evidence=data.get('supporting_evidence', '').strip(),
+                demand_evidence_status=data.get('demand_evidence_status', '').strip(),
+                respondent_signature=data.get('respondent_signature', '').strip(),
+                facilitator_signature=data.get('facilitator_signature', '').strip(),
+                submission_date=submission_date,
+            )
+            
+            print(f"✅ Consultation Created! ID: {consultation.id}")
+            
+            # Handle file upload
+            if 'supporting_document' in files:
+                uploaded_file = files['supporting_document']
+                if uploaded_file.size > 50 * 1024:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'File size exceeds 50KB limit.'
+                    }, status=400)
+                
+                file_name = f"assoc_{consultation.id}_{uploaded_file.name}"
+                saved_path = default_storage.save(
+                    os.path.join('association_documents', file_name),
+                    ContentFile(uploaded_file.read())
+                )
+                consultation.supporting_document = saved_path
+                consultation.save()
+            
+            # Parse and create job roles
+            job_roles_data = data.get('job_demands', '[]')
+            if isinstance(job_roles_data, str):
+                try:
+                    job_roles_data = json.loads(job_roles_data)
+                except:
+                    job_roles_data = []
+            
+            for idx, job_data in enumerate(job_roles_data, 1):
+                # Parse mobility checkboxes
+                mobility = job_data.get('mobility', [])
+                if isinstance(mobility, str):
+                    try:
+                        mobility = json.loads(mobility)
+                    except:
+                        mobility = []
+                
+                AssociationJobRole.objects.create(
+                    consultation=consultation,
+                    row_no=idx,
+                    job_role=job_data.get('job_role', '').strip(),
+                    sector=job_data.get('sector', '').strip(),
+                    location=job_data.get('location', '').strip(),
+                    qualification=job_data.get('qualification', '').strip(),
+                    qualification_other=job_data.get('qualification_other', '').strip(),
+                    experience=job_data.get('experience', '').strip(),
+                    certification=job_data.get('certification', 'No'),
+                    certification_detail=job_data.get('certification_detail', '').strip(),
+                    salary=job_data.get('salary', '').strip(),
+                    salary_period=job_data.get('salary_period', '').strip(),
+                    employment_type=job_data.get('employment_type', '').strip(),
+                    current_openings=int(job_data.get('current_openings', 0)),
+                    openings_6_months=int(job_data.get('openings_6_months', 0)),
+                    openings_12_months=int(job_data.get('openings_12_months', 0)),
+                    tech_skills=job_data.get('tech_skills', '').strip(),
+                    employability_skills=job_data.get('employability_skills', '').strip(),
+                    women_suitable=job_data.get('women_suitable', 'Yes'),
+                    pwd=job_data.get('pwd', 'Yes'),
+                    mobility=mobility,
+                    apprentice_seats=int(job_data.get('apprentice_seats', 0)),
+                    ojt_seats=int(job_data.get('ojt_seats', 0)),
+                    internship_seats=int(job_data.get('internship_seats', 0)),
+                    reporting_employers=int(job_data.get('reporting_employers', 0)),
+                    employer_list_attached=job_data.get('employer_list_attached', False),
+                    remarks=job_data.get('remarks', '').strip()
+                )
+                print(f"  ✅ Job Role #{idx} Created!")
+            
+            # Parse and create apprenticeships
+            apprenticeships_data = data.get('apprenticeships', '[]')
+            if isinstance(apprenticeships_data, str):
+                try:
+                    apprenticeships_data = json.loads(apprenticeships_data)
+                except:
+                    apprenticeships_data = []
+            
+            for idx, app_data in enumerate(apprenticeships_data, 1):
+                AssociationApprenticeship.objects.create(
+                    consultation=consultation,
+                    row_no=idx,
+                    job_role=app_data.get('job_role', '').strip(),
+                    opportunity_type=app_data.get('opportunity_type', '').strip(),
+                    employers_interested=int(app_data.get('employers_interested', 0)),
+                    seats=int(app_data.get('seats', 0)),
+                    duration=int(app_data.get('duration', 0)),
+                    stipend=app_data.get('stipend', '').strip(),
+                    start_period=app_data.get('start_period', '').strip(),
+                    conversion=app_data.get('conversion', 'Not known'),
+                    employer_list=app_data.get('employer_list', 'No')
+                )
+                print(f"  ✅ Apprenticeship #{idx} Created!")
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Association consultation submitted successfully',
+            'consultation_id': consultation.id
+        }, status=201)
+        
+    except Exception as e:
+        print(f"❌ ERROR: {str(e)}")
+        traceback.print_exc()
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
+
+@login_required
+def admin_association_list(request):
+    """List all association consultations"""
+    consultations = AssociationConsultation.objects.all().prefetch_related('job_roles', 'apprenticeship_opportunities')
+    
+    context = {
+        'consultations': consultations,
+        'total_consultations': consultations.count(),
+        'total_job_roles': AssociationJobRole.objects.count(),
+        'total_apprenticeships': AssociationApprenticeship.objects.count(),
+    }
+    return render(request, 'portal/association_list.html', context)
+
+
+@login_required
+def get_association_detail(request, consultation_id):
+    """Get detailed association consultation data"""
+    try:
+        consultation = AssociationConsultation.objects.get(id=consultation_id)
+        job_roles = consultation.job_roles.all()
+        apprenticeships = consultation.apprenticeship_opportunities.all()
+        
+        data = {
+            'id': consultation.id,
+            'consultation_id': consultation.consultation_id or '',
+            'district_region': consultation.district_region,
+            'mode': consultation.mode,
+            'mode_other': consultation.mode_other or '',
+            'consultation_date': consultation.consultation_date.strftime('%Y-%m-%d') if consultation.consultation_date else '',
+            'surveyor_name': consultation.surveyor_name,
+            'association_name': consultation.association_name,
+            'association_type': consultation.association_type,
+            'association_type_other': consultation.association_type_other or '',
+            'primary_sector': consultation.primary_sector,
+            'geographic_coverage': consultation.geographic_coverage,
+            'geographic_specify': consultation.geographic_specify or '',
+            'year_established': consultation.year_established,
+            'total_members': consultation.total_members,
+            'active_members': consultation.active_members,
+            'comp_micro': consultation.comp_micro,
+            'comp_small': consultation.comp_small,
+            'comp_medium': consultation.comp_medium,
+            'comp_large': consultation.comp_large,
+            'key_clusters': consultation.key_clusters or '',
+            'respondent_name': consultation.respondent_name,
+            'respondent_mobile': consultation.respondent_mobile,
+            'respondent_email': consultation.respondent_email,
+            'major_products': consultation.major_products or '',
+            'estimated_workforce': consultation.estimated_workforce,
+            'business_trend': consultation.business_trend or '',
+            'growth_drivers': consultation.growth_drivers or '',
+            'upcoming_projects': consultation.upcoming_projects or '',
+            'peak_hiring': consultation.peak_hiring or '',
+            'member_employers_count': consultation.member_employers_count,
+            'member_list_attached': consultation.member_list_attached,
+            'recruitment_challenges': consultation.recruitment_challenges or [],
+            'difficult_roles': consultation.difficult_roles or '',
+            'emerging_roles': consultation.emerging_roles or '',
+            'changing_competencies': consultation.changing_competencies or '',
+            'skill_gaps': consultation.skill_gaps or '',
+            'high_demand_districts': consultation.high_demand_districts or '',
+            'unfilled_reasons': consultation.unfilled_reasons or '',
+            'mobilise_placements': consultation.mobilise_placements or '',
+            'support_apprenticeship': consultation.support_apprenticeship or '',
+            'support_guest_lectures': consultation.support_guest_lectures or '',
+            'facilitate_visits': consultation.facilitate_visits or '',
+            'demand_updates': consultation.demand_updates or '',
+            'nodal_officer_name': consultation.nodal_officer_name or '',
+            'nodal_officer_mobile': consultation.nodal_officer_mobile or '',
+            'nodal_officer_email': consultation.nodal_officer_email or '',
+            'survey_reviewed': consultation.survey_reviewed or '',
+            'alignment_view': consultation.alignment_view or '',
+            'priority_training': consultation.priority_training or '',
+            'curriculum_changes': consultation.curriculum_changes or '',
+            'placement_actions': consultation.placement_actions or '',
+            'policy_support': consultation.policy_support or '',
+            'additional_remarks': consultation.additional_remarks or '',
+            'supporting_evidence': consultation.supporting_evidence or '',
+            'demand_evidence_status': consultation.demand_evidence_status or '',
+            'respondent_signature': consultation.respondent_signature or '',
+            'facilitator_signature': consultation.facilitator_signature or '',
+            'submission_date': consultation.submission_date.strftime('%Y-%m-%d') if consultation.submission_date else '',
+            'supporting_document_url': consultation.supporting_document.url if consultation.supporting_document else '',
+            'created_at': consultation.created_at.strftime('%d %b %Y, %I:%M %p'),
+            'job_roles': [
+                {
+                    'row_no': job.row_no,
+                    'job_role': job.job_role,
+                    'sector': job.sector or '',
+                    'location': job.location or '',
+                    'qualification': job.qualification or '',
+                    'qualification_other': job.qualification_other or '',
+                    'experience': job.experience or '',
+                    'certification': job.certification,
+                    'certification_detail': job.certification_detail or '',
+                    'salary': job.salary or '',
+                    'salary_period': job.salary_period or '',
+                    'employment_type': job.employment_type or '',
+                    'current_openings': job.current_openings,
+                    'openings_6_months': job.openings_6_months,
+                    'openings_12_months': job.openings_12_months,
+                    'tech_skills': job.tech_skills or '',
+                    'employability_skills': job.employability_skills or '',
+                    'women_suitable': job.women_suitable,
+                    'pwd': job.pwd,
+                    'mobility': job.mobility or [],
+                    'apprentice_seats': job.apprentice_seats,
+                    'ojt_seats': job.ojt_seats,
+                    'internship_seats': job.internship_seats,
+                    'reporting_employers': job.reporting_employers,
+                    'employer_list_attached': job.employer_list_attached,
+                    'remarks': job.remarks or ''
+                }
+                for job in job_roles
+            ],
+            'apprenticeships': [
+                {
+                    'row_no': app.row_no,
+                    'job_role': app.job_role,
+                    'opportunity_type': app.opportunity_type,
+                    'employers_interested': app.employers_interested,
+                    'seats': app.seats,
+                    'duration': app.duration,
+                    'stipend': app.stipend or '',
+                    'start_period': app.start_period or '',
+                    'conversion': app.conversion,
+                    'employer_list': app.employer_list
+                }
+                for app in apprenticeships
+            ],
+            'totals': {
+                'total_job_roles': job_roles.count(),
+                'total_apprenticeships': apprenticeships.count(),
+                'total_current_demand': consultation.total_current_demand,
+                'total_future_demand': consultation.total_future_demand,
+            }
+        }
+        return JsonResponse({'status': 'success', 'data': data})
+    except AssociationConsultation.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Consultation not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@csrf_exempt
+def delete_association(request, consultation_id):
+    """Delete association consultation and related data"""
+    if request.method != 'DELETE':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    
+    try:
+        consultation = AssociationConsultation.objects.get(id=consultation_id)
+        if consultation.supporting_document:
+            if default_storage.exists(consultation.supporting_document.name):
+                default_storage.delete(consultation.supporting_document.name)
+        consultation.delete()
+        return JsonResponse({'status': 'success', 'message': 'Consultation deleted successfully'})
+    except AssociationConsultation.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Consultation not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+def admin_export_association_csv(request):
+    """Export association consultation data to CSV"""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="association_consultations_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+    
+    writer = csv.writer(response)
+    
+    # Headers
+    headers = [
+        'Consultation ID', 'Date', 'Association Name', 'Association Type', 'Primary Sector',
+        'District/Region', 'Surveyor Name', 'Respondent Name', 'Respondent Mobile',
+        'Total Members', 'Active Members', 'Business Trend', 'Total Job Roles',
+        'Total Current Demand', 'Total Future Demand', 'Total Apprenticeships',
+        'Created At'
+    ]
+    writer.writerow(headers)
+    
+    for consultation in AssociationConsultation.objects.all():
+        writer.writerow([
+            consultation.consultation_id or '',
+            consultation.consultation_date.strftime('%Y-%m-%d') if consultation.consultation_date else '',
+            consultation.association_name,
+            consultation.association_type,
+            consultation.primary_sector,
+            consultation.district_region,
+            consultation.surveyor_name,
+            consultation.respondent_name,
+            consultation.respondent_mobile,
+            consultation.total_members or 0,
+            consultation.active_members or 0,
+            consultation.business_trend or '',
+            consultation.total_job_roles,
+            consultation.total_current_demand,
+            consultation.total_future_demand,
+            consultation.total_apprenticeships,
+            consultation.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        ])
     
     return response

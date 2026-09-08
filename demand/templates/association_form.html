@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Industry Association Consultation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            background: #f0f4f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .form-container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+        .form-section {
+            background: #f9fbfd;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-section-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1a202c;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .form-section-title .badge {
+            background: #3182ce;
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 999px;
+            margin-left: 0.5rem;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+        .form-control, .form-select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            background: #fff;
+        }
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+        }
+        .form-control-sm {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+        }
+        .inline-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.5rem;
+            align-items: center;
+            padding-top: 0.3rem;
+        }
+        .inline-checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: #2d3748;
+            cursor: pointer;
+        }
+        .inline-checkbox-group input[type="checkbox"],
+        .inline-checkbox-group input[type="radio"] {
+            accent-color: #3182ce;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .job-demand-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            transition: 0.2s;
+        }
+        .job-demand-card:hover {
+            border-color: #bdd3eb;
+        }
+        .btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-primary {
+            background: #3182ce;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #2b6cb0;
+        }
+        .btn-success {
+            background: #38a169;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #2f855a;
+        }
+        .btn-danger {
+            background: #e53e3e;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #c53030;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            color: #4a5568;
+        }
+        .btn-outline:hover {
+            background: #f7fafc;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        .remove-btn {
+            color: #e53e3e;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0 0.3rem;
+        }
+        .remove-btn:hover {
+            color: #c53030;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+        .grid-6 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 0.75rem;
+        }
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4, .grid-6 {
+                grid-template-columns: 1fr;
+            }
+            .form-container {
+                padding: 1rem;
+                margin: 1rem;
+            }
+        }
+        .tag {
+            display: inline-block;
+            background: #ebf4ff;
+            color: #2b6cb0;
+            padding: 0.15rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .file-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #fafbfc;
+        }
+        .file-upload-area:hover {
+            border-color: #3182ce;
+            background: #f0f7ff;
+        }
+        .file-upload-area.dragover {
+            border-color: #3182ce;
+            background: #ebf4ff;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 500;
+            z-index: 9999;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            display: none;
+            max-width: 400px;
+        }
+        .toast-success { background: #38a169; }
+        .toast-error { background: #e53e3e; }
+        .toast-info { background: #3182ce; }
+        .toast.show { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .section-divider {
+            border: 0;
+            border-top: 2px dashed #e2e8f0;
+            margin: 1.5rem 0;
+        }
+        .required-star {
+            color: #e53e3e;
+            margin-left: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <div class="form-container">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-2">
+            <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-building text-blue-600"></i>
+                Industry Association Consultation
+            </h1>
+            <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                <i class="far fa-clock mr-1"></i> <span id="formTimer">00:00</span>
+            </span>
+        </div>
+        <p class="text-gray-600 text-sm mb-6 border-l-4 border-blue-500 pl-4">
+            <i class="fas fa-info-circle text-blue-500 mr-1"></i>
+            Capture sector- and cluster-level demand signals, validate employer survey findings and identify member employers.
+        </p>
+
+        <form id="associationForm" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- ============================================================ -->
+            <!-- A. CONSULTATION CONTROL -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-clipboard-list text-blue-600"></i> A. Consultation Control
+                    <span class="badge">Required</span>
+                </div>
+                <div class="grid-3">
+                    <div>
+                        <label class="form-label">Consultation ID <span class="required-star">*</span></label>
+                        <input type="text" class="form-control" id="consultationId" name="consultation_id" placeholder="e.g. ASSOC-2026-001" required />
+                    </div>
+                    <div>
+                        <label class="form-label">District / Region <span class="required-star">*</span></label>
+                        <input type="text" class="form-control" id="districtRegion" name="district_region" placeholder="e.g. Mumbai, Maharashtra" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Mode <span class="required-star">*</span></label>
+                        <select class="form-select" id="mode" name="mode" required>
+                            <option value="">Select Mode</option>
+                            <option value="In-person">In-person</option>
+                            <option value="Telephone">Telephone</option>
+                            <option value="Online">Online</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Date <span class="required-star">*</span></label>
+                        <input type="date" class="form-control" id="consultationDate" name="consultation_date" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Name of Surveyor / Facilitator <span class="required-star">*</span></label>
+                        <input type="text" class="form-control" id="surveyorName" name="surveyor_name" placeholder="Full name" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Mode Other (if selected)</label>
+                        <input type="text" class="form-control" id="modeOther" name="mode_other" placeholder="Specify other mode" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- B. ASSOCIATION PROFILE -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-users text-blue-600"></i> B. Association Profile
+                    <span class="badge">Required</span>
+                </div>
+                <div class="grid-3">
+                    <div>
+                        <label class="form-label">Association / Chamber Name <span class="required-star">*</span></label>
+                        <input type="text" class="form-control" id="associationName" name="association_name" placeholder="Full name" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Association Type <span class="required-star">*</span></label>
+                        <select class="form-select" id="associationType" name="association_type" required>
+                            <option value="">Select Type</option>
+                            <option value="State-level">State-level</option>
+                            <option value="District-level">District-level</option>
+                            <option value="Sector-specific">Sector-specific</option>
+                            <option value="Cluster-based">Cluster-based</option>
+                            <option value="Chamber">Chamber</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Primary Sector(s) Represented <span class="required-star">*</span></label>
+                        <input type="text" class="form-control" id="primarySector" name="primary_sector" placeholder="e.g. Textile, IT, Manufacturing" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Geographic Coverage <span class="required-star">*</span></label>
+                        <select class="form-select" id="geographicCoverage" name="geographic_coverage" required>
+                            <option value="">Select Coverage</option>
+                            <option value="Statewide">Statewide</option>
+                            <option value="Multi-district">Multi-district</option>
+                            <option value="District">District</option>
+                            <option value="Industrial cluster">Industrial cluster</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Geographic Coverage (Specify)</label>
+                        <input type="text" class="form-control" id="geographicSpecify" name="geographic_specify" placeholder="e.g. Hosur Industrial Cluster" />
+                    </div>
+                    <div>
+                        <label class="form-label">Year of Establishment</label>
+                        <input type="number" class="form-control" id="yearEstablished" name="year_established" placeholder="YYYY" min="1900" max="2026" />
+                    </div>
+                    <div>
+                        <label class="form-label">Total Member Establishments</label>
+                        <input type="number" class="form-control" id="totalMembers" name="total_members" placeholder="Number" min="0" />
+                    </div>
+                    <div>
+                        <label class="form-label">Active Member Establishments</label>
+                        <input type="number" class="form-control" id="activeMembers" name="active_members" placeholder="Number" min="0" />
+                    </div>
+                    <div>
+                        <label class="form-label">Key Industrial Clusters Represented</label>
+                        <input type="text" class="form-control" id="keyClusters" name="key_clusters" placeholder="e.g. Textile Park, IT Hub" />
+                    </div>
+                </div>
+
+                <!-- Member Composition -->
+                <div class="mt-3">
+                    <label class="form-label">Member Composition (by size)</label>
+                    <div class="grid-4">
+                        <div>
+                            <label class="form-label text-xs text-gray-500">Micro</label>
+                            <input type="number" class="form-control form-control-sm" id="compMicro" name="comp_micro" placeholder="0" min="0" />
+                        </div>
+                        <div>
+                            <label class="form-label text-xs text-gray-500">Small</label>
+                            <input type="number" class="form-control form-control-sm" id="compSmall" name="comp_small" placeholder="0" min="0" />
+                        </div>
+                        <div>
+                            <label class="form-label text-xs text-gray-500">Medium</label>
+                            <input type="number" class="form-control form-control-sm" id="compMedium" name="comp_medium" placeholder="0" min="0" />
+                        </div>
+                        <div>
+                            <label class="form-label text-xs text-gray-500">Large</label>
+                            <input type="number" class="form-control form-control-sm" id="compLarge" name="comp_large" placeholder="0" min="0" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Respondent Details -->
+                <div class="grid-3 mt-3">
+                    <div>
+                        <label class="form-label">Respondent Name and Designation <span class="required-star">*</span></label>
+                        <input type="text" class="form-control" id="respondentName" name="respondent_name" placeholder="Name, Designation" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Mobile Number <span class="required-star">*</span></label>
+                        <input type="tel" class="form-control" id="respondentMobile" name="respondent_mobile" placeholder="10-digit mobile" pattern="[0-9]{10}" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Email ID <span class="required-star">*</span></label>
+                        <input type="email" class="form-control" id="respondentEmail" name="respondent_email" placeholder="email@example.com" required />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- C. MEMBER AND SECTOR PROFILE -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-chart-pie text-blue-600"></i> C. Member and Sector Profile
+                </div>
+                <div class="grid-3">
+                    <div>
+                        <label class="form-label">Major Products / Services</label>
+                        <input type="text" class="form-control" id="majorProducts" name="major_products" placeholder="e.g. Garments, Software Development" />
+                    </div>
+                    <div>
+                        <label class="form-label">Estimated Workforce Represented</label>
+                        <input type="number" class="form-control" id="estimatedWorkforce" name="estimated_workforce" placeholder="Total employees" min="0" />
+                    </div>
+                    <div>
+                        <label class="form-label">Current Business Trend</label>
+                        <select class="form-select" id="businessTrend" name="business_trend">
+                            <option value="">Select Trend</option>
+                            <option value="Expanding">Expanding</option>
+                            <option value="Stable">Stable</option>
+                            <option value="Contracting">Contracting</option>
+                            <option value="Seasonal / cyclical">Seasonal / cyclical</option>
+                            <option value="Mixed">Mixed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Key Growth Drivers / Investments</label>
+                        <input type="text" class="form-control" id="growthDrivers" name="growth_drivers" placeholder="e.g. New plant, Technology upgrade" />
+                    </div>
+                    <div>
+                        <label class="form-label">Major Upcoming Projects / Expansions</label>
+                        <input type="text" class="form-control" id="upcomingProjects" name="upcoming_projects" placeholder="e.g. New facility in 2026" />
+                    </div>
+                    <div>
+                        <label class="form-label">Peak Hiring Months / Seasons</label>
+                        <input type="text" class="form-control" id="peakHiring" name="peak_hiring" placeholder="e.g. Jan-Mar, Aug-Sep" />
+                    </div>
+                </div>
+                <div class="grid-2 mt-3">
+                    <div>
+                        <label class="form-label">Member Employers Available for Direct Survey</label>
+                        <div class="flex items-center gap-4">
+                            <input type="number" class="form-control form-control-sm w-32" id="memberEmployersCount" name="member_employers_count" placeholder="Number" min="0" />
+                            <label class="flex items-center gap-2 text-sm">
+                                <input type="checkbox" id="memberListAttached" name="member_list_attached" />
+                                List attached
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- D. JOB ROLE / OCCUPATIONAL DEMAND -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-briefcase text-blue-600"></i> D. Sector and Cluster Demand
+                    <span class="badge">Add one or more</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-3">
+                    <i class="fas fa-info-circle"></i> Record demand only where the association has inputs from member employers.
+                </p>
+
+                <div id="jobDemandsContainer">
+                    <!-- Job Demand entries will be added here -->
+                </div>
+
+                <button type="button" class="btn btn-outline btn-sm mt-2" onclick="addJobDemand()">
+                    <i class="fas fa-plus"></i> Add Job Role
+                </button>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- E. AGGREGATE APPRENTICESHIP / OJT POTENTIAL -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-graduation-cap text-blue-600"></i> E. Aggregate Apprenticeship / OJT Potential
+                </div>
+                <div id="apprenticeshipsContainer">
+                    <!-- Apprenticeship entries will be added here -->
+                </div>
+                <button type="button" class="btn btn-outline btn-sm mt-2" onclick="addApprenticeship()">
+                    <i class="fas fa-plus"></i> Add Apprenticeship / OJT
+                </button>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- F. SECTOR-LEVEL RECRUITMENT AND SKILL ISSUES -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-exclamation-triangle text-blue-600"></i> F. Sector-Level Recruitment and Skill Issues
+                </div>
+                <div>
+                    <label class="form-label">Recurring Recruitment Challenges</label>
+                    <div class="inline-checkbox-group">
+                        <label><input type="checkbox" name="rec_challenges" value="Skilled candidate shortage" /> Skilled candidate shortage</label>
+                        <label><input type="checkbox" name="rec_challenges" value="Experience gap" /> Experience gap</label>
+                        <label><input type="checkbox" name="rec_challenges" value="Wage mismatch" /> Wage mismatch</label>
+                        <label><input type="checkbox" name="rec_challenges" value="High attrition" /> High attrition</label>
+                        <label><input type="checkbox" name="rec_challenges" value="Location / mobility" /> Location / mobility</label>
+                        <label><input type="checkbox" name="rec_challenges" value="Low applicant response" /> Low applicant response</label>
+                        <label><input type="checkbox" name="rec_challenges" value="Certification gap" /> Certification gap</label>
+                        <label><input type="checkbox" name="rec_challenges" value="Technology / competency change" /> Technology / competency change</label>
+                        <label><input type="checkbox" name="rec_challenges" value="Other" /> Other</label>
+                        <input type="text" class="form-control form-control-sm w-48" id="recChallengesOther" placeholder="Specify other" />
+                    </div>
+                </div>
+                <div class="grid-3 mt-3">
+                    <div>
+                        <label class="form-label">Most Difficult-to-Fill Job Roles</label>
+                        <input type="text" class="form-control" id="difficultRoles" name="difficult_roles" placeholder="e.g. CNC Operator, Data Scientist" />
+                    </div>
+                    <div>
+                        <label class="form-label">Emerging Job Roles</label>
+                        <input type="text" class="form-control" id="emergingRoles" name="emerging_roles" placeholder="e.g. AI Specialist, Green Energy Technician" />
+                    </div>
+                    <div>
+                        <label class="form-label">Changing Technical Competencies</label>
+                        <input type="text" class="form-control" id="changingCompetencies" name="changing_competencies" placeholder="e.g. Digital skills, Automation" />
+                    </div>
+                    <div>
+                        <label class="form-label">Employability Skill Gaps</label>
+                        <input type="text" class="form-control" id="skillGaps" name="skill_gaps" placeholder="e.g. Communication, Problem-solving" />
+                    </div>
+                    <div>
+                        <label class="form-label">Districts / Clusters with Highest Demand</label>
+                        <input type="text" class="form-control" id="highDemandDistricts" name="high_demand_districts" placeholder="e.g. Bangalore, Hosur" />
+                    </div>
+                    <div>
+                        <label class="form-label">Reasons for Unfilled Vacancies</label>
+                        <input type="text" class="form-control" id="unfilledReasons" name="unfilled_reasons" placeholder="e.g. Low pay, Remote location" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- G. INDUSTRY-TRAINING PARTNERSHIP -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-handshake text-blue-600"></i> G. Industry-Training Partnership
+                </div>
+                <div class="grid-3">
+                    <div>
+                        <label class="form-label">Mobilise Member Employers for Placements</label>
+                        <select class="form-select" id="mobilisePlacements" name="mobilise_placements">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="Conditional">Conditional</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Support Apprenticeship / OJT Mobilisation</label>
+                        <select class="form-select" id="supportApprenticeship" name="support_apprenticeship">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="Conditional">Conditional</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Support Guest Lectures / Assessments</label>
+                        <select class="form-select" id="supportGuestLectures" name="support_guest_lectures">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="Conditional">Conditional</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Facilitate Industrial Visits</label>
+                        <select class="form-select" id="facilitateVisits" name="facilitate_visits">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="Conditional">Conditional</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Share Periodic Demand Updates</label>
+                        <select class="form-select" id="demandUpdates" name="demand_updates">
+                            <option value="">Select</option>
+                            <option value="Monthly">Monthly</option>
+                            <option value="Quarterly">Quarterly</option>
+                            <option value="Half-yearly">Half-yearly</option>
+                            <option value="As required">As required</option>
+                            <option value="Not feasible">Not feasible</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-2 mt-3">
+                    <div>
+                        <label class="form-label">Nominate Association Nodal Officer</label>
+                        <input type="text" class="form-control" id="nodalOfficerName" name="nodal_officer_name" placeholder="Full name" />
+                    </div>
+                    <div class="grid-2 gap-2">
+                        <div>
+                            <label class="form-label text-xs text-gray-500">Mobile</label>
+                            <input type="tel" class="form-control form-control-sm" id="nodalOfficerMobile" name="nodal_officer_mobile" placeholder="Mobile" />
+                        </div>
+                        <div>
+                            <label class="form-label text-xs text-gray-500">Email</label>
+                            <input type="email" class="form-control form-control-sm" id="nodalOfficerEmail" name="nodal_officer_email" placeholder="Email" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- H. VALIDATION AND RECOMMENDATIONS -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-check-circle text-blue-600"></i> H. Validation and Recommendations
+                </div>
+                <div class="grid-3">
+                    <div>
+                        <label class="form-label">Employer Survey Findings Reviewed</label>
+                        <select class="form-select" id="surveyReviewed" name="survey_reviewed">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="Partly">Partly</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Alignment with Association View</label>
+                        <select class="form-select" id="alignmentView" name="alignment_view">
+                            <option value="">Select</option>
+                            <option value="Consistent">Consistent</option>
+                            <option value="Partly consistent">Partly consistent</option>
+                            <option value="Not consistent">Not consistent</option>
+                            <option value="Insufficient evidence">Insufficient evidence</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Priority Training Sectors / Job Roles</label>
+                        <input type="text" class="form-control" id="priorityTraining" name="priority_training" placeholder="e.g. Welding, IT Support" />
+                    </div>
+                    <div>
+                        <label class="form-label">Recommended Course / Curriculum Changes</label>
+                        <input type="text" class="form-control" id="curriculumChanges" name="curriculum_changes" placeholder="e.g. Add AI module" />
+                    </div>
+                    <div>
+                        <label class="form-label">Recommended Mobilisation / Placement Actions</label>
+                        <input type="text" class="form-control" id="placementActions" name="placement_actions" placeholder="e.g. Job fairs, Training camps" />
+                    </div>
+                    <div>
+                        <label class="form-label">Policy / Coordination Support Required</label>
+                        <input type="text" class="form-control" id="policySupport" name="policy_support" placeholder="e.g. Tax incentives, Subsidies" />
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label">Additional Remarks</label>
+                    <textarea class="form-control" id="additionalRemarks" name="additional_remarks" rows="2" placeholder="Any additional comments..."></textarea>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- I. EVIDENCE AND SUBMISSION -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-file-alt text-blue-600"></i> I. Evidence and Submission
+                </div>
+                <div class="grid-3">
+                    <div>
+                        <label class="form-label">Supporting Evidence</label>
+                        <select class="form-select" id="supportingEvidence" name="supporting_evidence">
+                            <option value="">Select</option>
+                            <option value="Member list">Member list</option>
+                            <option value="Vacancy compilation">Vacancy compilation</option>
+                            <option value="Survey / study">Survey / study</option>
+                            <option value="Minutes / resolution">Minutes / resolution</option>
+                            <option value="Employer letters">Employer letters</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Demand Evidence Status</label>
+                        <select class="form-select" id="demandEvidenceStatus" name="demand_evidence_status">
+                            <option value="">Select</option>
+                            <option value="Employer-wise list available">Employer-wise list available</option>
+                            <option value="Aggregate only">Aggregate only</option>
+                            <option value="Directional / expert view">Directional / expert view</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label">Upload Supporting Document</label>
+                    <div class="file-upload-area" id="fileDropArea">
+                        <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2 block"></i>
+                        <p class="text-sm text-gray-500">Drag & drop or click to upload</p>
+                        <p class="text-xs text-gray-400">PDF, JPG, PNG, GIF, BMP (Max 50KB)</p>
+                        <input type="file" id="supportingDocument" name="supporting_document" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp" />
+                    </div>
+                    <div id="fileInfo" class="text-sm text-gray-600 mt-1 hidden">
+                        <i class="fas fa-file mr-1"></i> <span id="fileName"></span>
+                        <button type="button" class="text-red-500 ml-2" onclick="clearFile()"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+
+                <div class="grid-2 mt-3">
+                    <div>
+                        <label class="form-label">Respondent Name / Signature</label>
+                        <input type="text" class="form-control" id="respondentSignature" name="respondent_signature" placeholder="Full name" />
+                    </div>
+                    <div>
+                        <label class="form-label">Surveyor / Facilitator Signature</label>
+                        <input type="text" class="form-control" id="facilitatorSignature" name="facilitator_signature" placeholder="Full name" />
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label">Submission Date</label>
+                    <input type="date" class="form-control w-48" id="submissionDate" name="submission_date" />
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- SUBMIT BUTTON -->
+            <!-- ============================================================ -->
+            <div class="flex items-center justify-between mt-6 gap-4 flex-wrap">
+                <div>
+                    <button type="button" class="btn btn-outline" onclick="resetForm()">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-success px-6" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Consultation
+                        <span id="submitSpinner" class="spinner hidden ml-2"></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- JOB DEMAND TEMPLATE -->
+    <!-- ============================================================ -->
+    <template id="jobDemandTemplate">
+        <div class="job-demand-card">
+            <div class="flex items-center justify-between mb-3">
+                <span class="font-semibold text-gray-700">
+                    <i class="fas fa-user-tie text-blue-500 mr-1"></i> Job Role <span class="job-number"></span>
+                </span>
+                <button type="button" class="remove-btn" onclick="this.closest('.job-demand-card').remove()">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            </div>
+            <div class="grid-3">
+                <div>
+                    <label class="form-label text-xs text-gray-500">Job Role / Position Title <span class="required-star">*</span></label>
+                    <input type="text" class="form-control form-control-sm" name="job_role[]" placeholder="e.g. Welder, Software Engineer" required />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Sector / Sub-sector</label>
+                    <input type="text" class="form-control form-control-sm" name="job_sector[]" placeholder="e.g. Manufacturing, IT" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">District(s) / Location(s)</label>
+                    <input type="text" class="form-control form-control-sm" name="job_location[]" placeholder="e.g. Mumbai, Pune" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Minimum Qualification</label>
+                    <select class="form-select form-control-sm" name="job_qualification[]">
+                        <option value="">Select</option>
+                        <option value="Below 10th">Below 10th</option>
+                        <option value="10th">10th</option>
+                        <option value="12th">12th</option>
+                        <option value="ITI">ITI</option>
+                        <option value="Diploma">Diploma</option>
+                        <option value="Graduate">Graduate</option>
+                        <option value="Postgraduate">Postgraduate</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Qualification Other</label>
+                    <input type="text" class="form-control form-control-sm" name="job_qualification_other[]" placeholder="Specify" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Experience Required</label>
+                    <select class="form-select form-control-sm" name="job_experience[]">
+                        <option value="">Select</option>
+                        <option value="Fresher">Fresher</option>
+                        <option value="0-1 year">0-1 year</option>
+                        <option value="1-3 years">1-3 years</option>
+                        <option value="3-5 years">3-5 years</option>
+                        <option value="5+ years">5+ years</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Certification / Licence</label>
+                    <select class="form-select form-control-sm" name="job_certification[]">
+                        <option value="No">Not required</option>
+                        <option value="Yes">Required</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Certification Detail</label>
+                    <input type="text" class="form-control form-control-sm" name="job_certification_detail[]" placeholder="Specify certification" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Indicative Wage / Salary</label>
+                    <div class="flex gap-1">
+                        <input type="text" class="form-control form-control-sm flex-1" name="job_salary[]" placeholder="e.g. 25000" />
+                        <select class="form-select form-control-sm w-24" name="job_salary_period[]">
+                            <option value="Month">Month</option>
+                            <option value="Day">Day</option>
+                            <option value="Hour">Hour</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Employment Type</label>
+                    <select class="form-select form-control-sm" name="job_employment_type[]">
+                        <option value="Permanent">Permanent</option>
+                        <option value="Fixed-term">Fixed-term</option>
+                        <option value="Contractual">Contractual</option>
+                        <option value="Seasonal">Seasonal</option>
+                        <option value="Gig / Task-based">Gig / Task-based</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Demand / Openings</label>
+                    <div class="grid-3 gap-1">
+                        <input type="number" class="form-control form-control-sm" name="job_current[]" placeholder="Current" min="0" />
+                        <input type="number" class="form-control form-control-sm" name="job_6months[]" placeholder="6 months" min="0" />
+                        <input type="number" class="form-control form-control-sm" name="job_12months[]" placeholder="12 months" min="0" />
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Key Technical Skills</label>
+                    <input type="text" class="form-control form-control-sm" name="job_tech_skills[]" placeholder="e.g. TIG Welding, Python" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Key Employability Skills</label>
+                    <input type="text" class="form-control form-control-sm" name="job_employability_skills[]" placeholder="e.g. Communication, Teamwork" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Women Suitability</label>
+                    <select class="form-select form-control-sm" name="job_women_suitable[]">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Depends">Depends</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">PwD Suitability</label>
+                    <select class="form-select form-control-sm" name="job_pwd[]">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Depends">Depends</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Mobility / Work Conditions</label>
+                    <div class="flex flex-wrap gap-1">
+                        <label class="text-xs flex items-center gap-1"><input type="checkbox" name="job_mobility_local[]" value="Local" /> Local</label>
+                        <label class="text-xs flex items-center gap-1"><input type="checkbox" name="job_mobility_interdist[]" value="Inter-district" /> Inter-district</label>
+                        <label class="text-xs flex items-center gap-1"><input type="checkbox" name="job_mobility_interstate[]" value="Inter-state" /> Inter-state</label>
+                        <label class="text-xs flex items-center gap-1"><input type="checkbox" name="job_mobility_shift[]" value="Shift work" /> Shift work</label>
+                        <label class="text-xs flex items-center gap-1"><input type="checkbox" name="job_mobility_travel[]" value="Travel" /> Travel</label>
+                        <label class="text-xs flex items-center gap-1"><input type="checkbox" name="job_mobility_accom[]" value="Accommodation available" /> Accommodation</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Apprenticeship / OJT Potential</label>
+                    <div class="grid-2 gap-1">
+                        <input type="number" class="form-control form-control-sm" name="job_apprentice_seats[]" placeholder="Apprenticeship" min="0" />
+                        <input type="number" class="form-control form-control-sm" name="job_ojt_seats[]" placeholder="OJT" min="0" />
+                        <input type="number" class="form-control form-control-sm" name="job_internship_seats[]" placeholder="Internship" min="0" />
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Source / Validation</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" class="form-control form-control-sm w-20" name="job_reporting_employers[]" placeholder="# Employers" min="0" />
+                        <label class="text-xs flex items-center gap-1"><input type="checkbox" name="job_employer_list_attached[]" /> List attached</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Remarks</label>
+                    <input type="text" class="form-control form-control-sm" name="job_remarks[]" placeholder="Any remarks" />
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- APPRENTICESHIP TEMPLATE -->
+    <!-- ============================================================ -->
+    <template id="apprenticeshipTemplate">
+        <div class="job-demand-card border-l-4 border-l-green-400">
+            <div class="flex items-center justify-between mb-3">
+                <span class="font-semibold text-gray-700">
+                    <i class="fas fa-graduation-cap text-green-500 mr-1"></i> Apprenticeship / OJT <span class="app-number"></span>
+                </span>
+                <button type="button" class="remove-btn" onclick="this.closest('.job-demand-card').remove()">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            </div>
+            <div class="grid-3">
+                <div>
+                    <label class="form-label text-xs text-gray-500">Priority Job Roles <span class="required-star">*</span></label>
+                    <input type="text" class="form-control form-control-sm" name="app_job_role[]" placeholder="e.g. Machinist, Developer" required />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Opportunity Type</label>
+                    <select class="form-select form-control-sm" name="app_opportunity_type[]">
+                        <option value="Apprenticeship">Apprenticeship</option>
+                        <option value="OJT">OJT</option>
+                        <option value="Internship">Internship</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Estimated Member Employers Interested</label>
+                    <input type="number" class="form-control form-control-sm" name="app_employers_interested[]" placeholder="Number" min="0" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Estimated Seats / Capacity</label>
+                    <input type="number" class="form-control form-control-sm" name="app_seats[]" placeholder="Number" min="0" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Typical Duration (months)</label>
+                    <input type="number" class="form-control form-control-sm" name="app_duration[]" placeholder="e.g. 6" min="1" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Indicative Stipend / Wage</label>
+                    <input type="text" class="form-control form-control-sm" name="app_stipend[]" placeholder="e.g. 15000" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Likely Start Period</label>
+                    <input type="text" class="form-control form-control-sm" name="app_start_period[]" placeholder="e.g. Q2 2026" />
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Potential Conversion to Employment</label>
+                    <select class="form-select form-control-sm" name="app_conversion[]">
+                        <option value="High">High</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="Low">Low</option>
+                        <option value="Not known">Not known</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label text-xs text-gray-500">Employer List Available</label>
+                    <select class="form-select form-control-sm" name="app_employer_list[]">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="To be compiled">To be compiled</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // ============================================================
+        // GLOBALS
+        // ============================================================
+        let jobCounter = 0;
+        let appCounter = 0;
+        let startTime = new Date();
+
+        // ============================================================
+        // DOM READY
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('consultationDate').value = today;
+            document.getElementById('submissionDate').value = today;
+
+            // Add first job demand and apprenticeship
+            addJobDemand();
+            addApprenticeship();
+
+            // Timer
+            setInterval(updateTimer, 1000);
+
+            // File upload handling
+            setupFileUpload();
+
+            // Form submit
+            document.getElementById('associationForm').addEventListener('submit', handleSubmit);
+        });
+
+        // ============================================================
+        // TIMER
+        // ============================================================
+        function updateTimer() {
+            const elapsed = Math.floor((new Date() - startTime) / 1000);
+            const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+            const secs = String(elapsed % 60).padStart(2, '0');
+            document.getElementById('formTimer').textContent = `${mins}:${secs}`;
+        }
+
+        // ============================================================
+        // JOB DEMAND FUNCTIONS
+        // ============================================================
+        function addJobDemand() {
+            const template = document.getElementById('jobDemandTemplate');
+            const clone = template.content.cloneNode(true);
+            jobCounter++;
+            const card = clone.querySelector('.job-demand-card');
+            card.querySelector('.job-number').textContent = `#${jobCounter}`;
+            document.getElementById('jobDemandsContainer').appendChild(card);
+        }
+
+        // ============================================================
+        // APPRENTICESHIP FUNCTIONS
+        // ============================================================
+        function addApprenticeship() {
+            const template = document.getElementById('apprenticeshipTemplate');
+            const clone = template.content.cloneNode(true);
+            appCounter++;
+            const card = clone.querySelector('.job-demand-card');
+            card.querySelector('.app-number').textContent = `#${appCounter}`;
+            document.getElementById('apprenticeshipsContainer').appendChild(card);
+        }
+
+        // ============================================================
+        // FILE UPLOAD
+        // ============================================================
+        function setupFileUpload() {
+            const dropArea = document.getElementById('fileDropArea');
+            const fileInput = document.getElementById('supportingDocument');
+
+            dropArea.addEventListener('click', () => fileInput.click());
+
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.classList.add('dragover');
+            });
+
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.classList.remove('dragover');
+            });
+
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelect(fileInput.files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) {
+                    handleFileSelect(fileInput.files[0]);
+                }
+            });
+        }
+
+        function handleFileSelect(file) {
+            const maxSize = 50 * 1024; // 50KB
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/bmp'];
+
+            if (!allowedTypes.includes(file.type)) {
+                showToast('Invalid file type. Only PDF and Images are allowed.', 'error');
+                clearFile();
+                return;
+            }
+
+            if (file.size > maxSize) {
+                showToast('File size exceeds 50KB limit.', 'error');
+                clearFile();
+                return;
+            }
+
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileInfo').classList.remove('hidden');
+            document.getElementById('fileDropArea').style.display = 'none';
+        }
+
+        function clearFile() {
+            document.getElementById('supportingDocument').value = '';
+            document.getElementById('fileInfo').classList.add('hidden');
+            document.getElementById('fileDropArea').style.display = 'block';
+        }
+
+        // ============================================================
+        // FORM SUBMIT
+        // ============================================================
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('submitSpinner');
+
+            // Validate required fields
+            const requiredFields = [
+                'consultationId', 'districtRegion', 'mode', 'consultationDate', 'surveyorName',
+                'associationName', 'associationType', 'primarySector', 'geographicCoverage',
+                'respondentName', 'respondentMobile', 'respondentEmail'
+            ];
+
+            for (const id of requiredFields) {
+                const el = document.getElementById(id);
+                if (!el.value.trim()) {
+                    showToast(`Please fill in: ${el.previousElementSibling?.textContent?.replace('*', '').trim() || id}`, 'error');
+                    el.focus();
+                    return;
+                }
+            }
+
+            // Validate at least one job demand
+            const jobCards = document.querySelectorAll('#jobDemandsContainer .job-demand-card');
+            if (jobCards.length === 0) {
+                showToast('Please add at least one Job Role demand.', 'error');
+                return;
+            }
+
+            // Collect all form data
+            const formData = new FormData(document.getElementById('associationForm'));
+
+            // Collect job demands
+            const jobDemands = [];
+            document.querySelectorAll('#jobDemandsContainer .job-demand-card').forEach(card => {
+                const getVal = (name) => {
+                    const el = card.querySelector(`[name="${name}"]`);
+                    return el ? el.value : '';
+                };
+                const getCheckboxVals = (name) => {
+                    const els = card.querySelectorAll(`[name="${name}"]:checked`);
+                    return Array.from(els).map(el => el.value);
+                };
+
+                jobDemands.push({
+                    job_role: getVal('job_role[]'),
+                    sector: getVal('job_sector[]'),
+                    location: getVal('job_location[]'),
+                    qualification: getVal('job_qualification[]'),
+                    qualification_other: getVal('job_qualification_other[]'),
+                    experience: getVal('job_experience[]'),
+                    certification: getVal('job_certification[]'),
+                    certification_detail: getVal('job_certification_detail[]'),
+                    salary: getVal('job_salary[]'),
+                    salary_period: getVal('job_salary_period[]'),
+                    employment_type: getVal('job_employment_type[]'),
+                    current_openings: parseInt(getVal('job_current[]')) || 0,
+                    openings_6_months: parseInt(getVal('job_6months[]')) || 0,
+                    openings_12_months: parseInt(getVal('job_12months[]')) || 0,
+                    tech_skills: getVal('job_tech_skills[]'),
+                    employability_skills: getVal('job_employability_skills[]'),
+                    women_suitable: getVal('job_women_suitable[]'),
+                    pwd: getVal('job_pwd[]'),
+                    mobility: getCheckboxVals('job_mobility_local[]').concat(
+                        getCheckboxVals('job_mobility_interdist[]'),
+                        getCheckboxVals('job_mobility_interstate[]'),
+                        getCheckboxVals('job_mobility_shift[]'),
+                        getCheckboxVals('job_mobility_travel[]'),
+                        getCheckboxVals('job_mobility_accom[]')
+                    ),
+                    apprentice_seats: parseInt(getVal('job_apprentice_seats[]')) || 0,
+                    ojt_seats: parseInt(getVal('job_ojt_seats[]')) || 0,
+                    internship_seats: parseInt(getVal('job_internship_seats[]')) || 0,
+                    reporting_employers: parseInt(getVal('job_reporting_employers[]')) || 0,
+                    employer_list_attached: card.querySelector('[name="job_employer_list_attached[]"]')?.checked || false,
+                    remarks: getVal('job_remarks[]')
+                });
+            });
+
+            formData.append('job_demands', JSON.stringify(jobDemands));
+
+            // Collect apprenticeships
+            const apprenticeships = [];
+            document.querySelectorAll('#apprenticeshipsContainer .job-demand-card').forEach(card => {
+                const getVal = (name) => {
+                    const el = card.querySelector(`[name="${name}"]`);
+                    return el ? el.value : '';
+                };
+                apprenticeships.push({
+                    job_role: getVal('app_job_role[]'),
+                    opportunity_type: getVal('app_opportunity_type[]'),
+                    employers_interested: parseInt(getVal('app_employers_interested[]')) || 0,
+                    seats: parseInt(getVal('app_seats[]')) || 0,
+                    duration: parseInt(getVal('app_duration[]')) || 0,
+                    stipend: getVal('app_stipend[]'),
+                    start_period: getVal('app_start_period[]'),
+                    conversion: getVal('app_conversion[]'),
+                    employer_list: getVal('app_employer_list[]')
+                });
+            });
+
+            formData.append('apprenticeships', JSON.stringify(apprenticeships));
+
+            // Collect recruitment challenges
+            const challenges = [];
+            document.querySelectorAll('[name="rec_challenges"]:checked').forEach(el => {
+                challenges.push(el.value);
+            });
+            const otherChallenge = document.getElementById('recChallengesOther').value.trim();
+            if (otherChallenge) {
+                challenges.push(otherChallenge);
+            }
+            formData.append('recruitment_challenges', JSON.stringify(challenges));
+
+            // Show loading
+            submitBtn.disabled = true;
+            spinner.classList.remove('hidden');
+            submitBtn.querySelector('span:not(.spinner)').textContent = 'Submitting...';
+
+            try {
+                const response = await fetch('/api/association/submit/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast('Consultation submitted successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/portal/dashboard/';
+                    }, 1500);
+                } else {
+                    showToast(result.message || 'Submission failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Submit error:', error);
+                showToast('Network error. Please check your connection.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                spinner.classList.add('hidden');
+                submitBtn.querySelector('span:not(.spinner)').textContent = 'Submit Consultation';
+            }
+        }
+
+        // ============================================================
+        // RESET FORM
+        // ============================================================
+        function resetForm() {
+            if (!confirm('Are you sure you want to reset the form? All data will be cleared.')) return;
+
+            document.getElementById('associationForm').reset();
+            document.getElementById('jobDemandsContainer').innerHTML = '';
+            document.getElementById('apprenticeshipsContainer').innerHTML = '';
+            document.getElementById('fileInfo').classList.add('hidden');
+            document.getElementById('fileDropArea').style.display = 'block';
+
+            jobCounter = 0;
+            appCounter = 0;
+            addJobDemand();
+            addApprenticeship();
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('consultationDate').value = today;
+            document.getElementById('submissionDate').value = today;
+
+            showToast('Form has been reset.', 'info');
+        }
+
+        // ============================================================
+        // TOAST NOTIFICATION
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast toast-${type} show`;
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+    </script>
+
+</body>
+</html>
