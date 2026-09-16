@@ -255,6 +255,32 @@
             color: #e53e3e;
             margin-left: 2px;
         }
+        /* Other specify input animation */
+        .other-specify-wrapper {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+            opacity: 0;
+            margin-top: 0;
+        }
+        .other-specify-wrapper.show {
+            max-height: 100px;
+            opacity: 1;
+            margin-top: 0.5rem;
+        }
+        .other-specify-wrapper input {
+            border-left: 3px solid #3182ce;
+            background: #f0f7ff;
+        }
+        .other-specify-label {
+            font-size: 0.75rem;
+            color: #3182ce;
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
     </style>
 </head>
 <body>
@@ -299,13 +325,17 @@
                     </div>
                     <div>
                         <label class="form-label">Mode <span class="required-star">*</span></label>
-                        <select class="form-select" id="mode" name="mode" required>
+                        <select class="form-select other-toggle" id="mode" name="mode" data-other-target="modeOtherWrapper" required>
                             <option value="">Select Mode</option>
                             <option value="In-person">In-person</option>
                             <option value="Telephone">Telephone</option>
                             <option value="Online">Online</option>
                             <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="modeOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Mode</label>
+                            <input type="text" class="form-control form-control-sm" id="modeOther" name="mode_other" placeholder="Specify other mode" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Date <span class="required-star">*</span></label>
@@ -314,10 +344,6 @@
                     <div>
                         <label class="form-label">Name of Surveyor / Facilitator <span class="required-star">*</span></label>
                         <input type="text" class="form-control" id="surveyorName" name="surveyor_name" placeholder="Full name" required />
-                    </div>
-                    <div>
-                        <label class="form-label">Mode Other (if selected)</label>
-                        <input type="text" class="form-control" id="modeOther" name="mode_other" placeholder="Specify other mode" />
                     </div>
                 </div>
             </div>
@@ -337,7 +363,7 @@
                     </div>
                     <div>
                         <label class="form-label">Association Type <span class="required-star">*</span></label>
-                        <select class="form-select" id="associationType" name="association_type" required>
+                        <select class="form-select other-toggle" id="associationType" name="association_type" data-other-target="associationTypeOtherWrapper" required>
                             <option value="">Select Type</option>
                             <option value="State-level">State-level</option>
                             <option value="District-level">District-level</option>
@@ -346,6 +372,10 @@
                             <option value="Chamber">Chamber</option>
                             <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="associationTypeOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Association Type</label>
+                            <input type="text" class="form-control form-control-sm" id="associationTypeOther" name="association_type_other" placeholder="Specify association type" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Primary Sector(s) Represented <span class="required-star">*</span></label>
@@ -353,17 +383,18 @@
                     </div>
                     <div>
                         <label class="form-label">Geographic Coverage <span class="required-star">*</span></label>
-                        <select class="form-select" id="geographicCoverage" name="geographic_coverage" required>
+                        <select class="form-select other-toggle" id="geographicCoverage" name="geographic_coverage" data-other-target="geographicOtherWrapper" required>
                             <option value="">Select Coverage</option>
                             <option value="Statewide">Statewide</option>
                             <option value="Multi-district">Multi-district</option>
                             <option value="District">District</option>
                             <option value="Industrial cluster">Industrial cluster</option>
+                            <option value="Other">Other</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="form-label">Geographic Coverage (Specify)</label>
-                        <input type="text" class="form-control" id="geographicSpecify" name="geographic_specify" placeholder="e.g. Hosur Industrial Cluster" />
+                        <div class="other-specify-wrapper" id="geographicOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Geographic Coverage</label>
+                            <input type="text" class="form-control form-control-sm" id="geographicSpecify" name="geographic_specify" placeholder="e.g. Hosur Industrial Cluster" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Year of Establishment</label>
@@ -441,14 +472,19 @@
                     </div>
                     <div>
                         <label class="form-label">Current Business Trend</label>
-                        <select class="form-select" id="businessTrend" name="business_trend">
+                        <select class="form-select other-toggle" id="businessTrend" name="business_trend" data-other-target="businessTrendOtherWrapper">
                             <option value="">Select Trend</option>
                             <option value="Expanding">Expanding</option>
                             <option value="Stable">Stable</option>
                             <option value="Contracting">Contracting</option>
                             <option value="Seasonal / cyclical">Seasonal / cyclical</option>
                             <option value="Mixed">Mixed</option>
+                            <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="businessTrendOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Business Trend</label>
+                            <input type="text" class="form-control form-control-sm" id="businessTrendOther" name="business_trend_other" placeholder="Specify business trend" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Key Growth Drivers / Investments</label>
@@ -531,8 +567,11 @@
                         <label><input type="checkbox" name="rec_challenges" value="Low applicant response" /> Low applicant response</label>
                         <label><input type="checkbox" name="rec_challenges" value="Certification gap" /> Certification gap</label>
                         <label><input type="checkbox" name="rec_challenges" value="Technology / competency change" /> Technology / competency change</label>
-                        <label><input type="checkbox" name="rec_challenges" value="Other" /> Other</label>
-                        <input type="text" class="form-control form-control-sm w-48" id="recChallengesOther" placeholder="Specify other" />
+                        <label><input type="checkbox" id="recChallengesOtherCheck" name="rec_challenges" value="Other" onchange="toggleRecChallengeOther(this)" /> Other</label>
+                    </div>
+                    <div class="other-specify-wrapper" id="recChallengesOtherWrapper">
+                        <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Other Challenge</label>
+                        <input type="text" class="form-control form-control-sm" id="recChallengesOther" placeholder="Specify other challenge" />
                     </div>
                 </div>
                 <div class="grid-3 mt-3">
@@ -573,50 +612,75 @@
                 <div class="grid-3">
                     <div>
                         <label class="form-label">Mobilise Member Employers for Placements</label>
-                        <select class="form-select" id="mobilisePlacements" name="mobilise_placements">
+                        <select class="form-select other-toggle" id="mobilisePlacements" name="mobilise_placements" data-other-target="mobilisePlacementsOtherWrapper">
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                             <option value="Conditional">Conditional</option>
+                            <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="mobilisePlacementsOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                            <input type="text" class="form-control form-control-sm" id="mobilisePlacementsOther" name="mobilise_placements_other" placeholder="Specify response" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Support Apprenticeship / OJT Mobilisation</label>
-                        <select class="form-select" id="supportApprenticeship" name="support_apprenticeship">
+                        <select class="form-select other-toggle" id="supportApprenticeship" name="support_apprenticeship" data-other-target="supportApprenticeshipOtherWrapper">
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                             <option value="Conditional">Conditional</option>
+                            <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="supportApprenticeshipOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                            <input type="text" class="form-control form-control-sm" id="supportApprenticeshipOther" name="support_apprenticeship_other" placeholder="Specify response" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Support Guest Lectures / Assessments</label>
-                        <select class="form-select" id="supportGuestLectures" name="support_guest_lectures">
+                        <select class="form-select other-toggle" id="supportGuestLectures" name="support_guest_lectures" data-other-target="supportGuestLecturesOtherWrapper">
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                             <option value="Conditional">Conditional</option>
+                            <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="supportGuestLecturesOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                            <input type="text" class="form-control form-control-sm" id="supportGuestLecturesOther" name="support_guest_lectures_other" placeholder="Specify response" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Facilitate Industrial Visits</label>
-                        <select class="form-select" id="facilitateVisits" name="facilitate_visits">
+                        <select class="form-select other-toggle" id="facilitateVisits" name="facilitate_visits" data-other-target="facilitateVisitsOtherWrapper">
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                             <option value="Conditional">Conditional</option>
+                            <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="facilitateVisitsOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                            <input type="text" class="form-control form-control-sm" id="facilitateVisitsOther" name="facilitate_visits_other" placeholder="Specify response" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Share Periodic Demand Updates</label>
-                        <select class="form-select" id="demandUpdates" name="demand_updates">
+                        <select class="form-select other-toggle" id="demandUpdates" name="demand_updates" data-other-target="demandUpdatesOtherWrapper">
                             <option value="">Select</option>
                             <option value="Monthly">Monthly</option>
                             <option value="Quarterly">Quarterly</option>
                             <option value="Half-yearly">Half-yearly</option>
                             <option value="As required">As required</option>
                             <option value="Not feasible">Not feasible</option>
+                            <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="demandUpdatesOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                            <input type="text" class="form-control form-control-sm" id="demandUpdatesOther" name="demand_updates_other" placeholder="Specify frequency" />
+                        </div>
                     </div>
                 </div>
                 <div class="grid-2 mt-3">
@@ -647,22 +711,32 @@
                 <div class="grid-3">
                     <div>
                         <label class="form-label">Employer Survey Findings Reviewed</label>
-                        <select class="form-select" id="surveyReviewed" name="survey_reviewed">
+                        <select class="form-select other-toggle" id="surveyReviewed" name="survey_reviewed" data-other-target="surveyReviewedOtherWrapper">
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                             <option value="Partly">Partly</option>
+                            <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="surveyReviewedOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                            <input type="text" class="form-control form-control-sm" id="surveyReviewedOther" name="survey_reviewed_other" placeholder="Specify response" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Alignment with Association View</label>
-                        <select class="form-select" id="alignmentView" name="alignment_view">
+                        <select class="form-select other-toggle" id="alignmentView" name="alignment_view" data-other-target="alignmentViewOtherWrapper">
                             <option value="">Select</option>
                             <option value="Consistent">Consistent</option>
                             <option value="Partly consistent">Partly consistent</option>
                             <option value="Not consistent">Not consistent</option>
                             <option value="Insufficient evidence">Insufficient evidence</option>
+                            <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="alignmentViewOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                            <input type="text" class="form-control form-control-sm" id="alignmentViewOther" name="alignment_view_other" placeholder="Specify alignment" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Priority Training Sectors / Job Roles</label>
@@ -697,7 +771,7 @@
                 <div class="grid-3">
                     <div>
                         <label class="form-label">Supporting Evidence</label>
-                        <select class="form-select" id="supportingEvidence" name="supporting_evidence">
+                        <select class="form-select other-toggle" id="supportingEvidence" name="supporting_evidence" data-other-target="supportingEvidenceOtherWrapper">
                             <option value="">Select</option>
                             <option value="Member list">Member list</option>
                             <option value="Vacancy compilation">Vacancy compilation</option>
@@ -706,15 +780,24 @@
                             <option value="Employer letters">Employer letters</option>
                             <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="supportingEvidenceOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Evidence</label>
+                            <input type="text" class="form-control form-control-sm" id="supportingEvidenceOther" name="supporting_evidence_other" placeholder="Specify evidence type" />
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Demand Evidence Status</label>
-                        <select class="form-select" id="demandEvidenceStatus" name="demand_evidence_status">
+                        <select class="form-select other-toggle" id="demandEvidenceStatus" name="demand_evidence_status" data-other-target="demandEvidenceStatusOtherWrapper">
                             <option value="">Select</option>
                             <option value="Employer-wise list available">Employer-wise list available</option>
                             <option value="Aggregate only">Aggregate only</option>
                             <option value="Directional / expert view">Directional / expert view</option>
+                            <option value="Other">Other</option>
                         </select>
+                        <div class="other-specify-wrapper" id="demandEvidenceStatusOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Status</label>
+                            <input type="text" class="form-control form-control-sm" id="demandEvidenceStatusOther" name="demand_evidence_status_other" placeholder="Specify status" />
+                        </div>
                     </div>
                 </div>
 
@@ -795,7 +878,7 @@
                 </div>
                 <div>
                     <label class="form-label text-xs text-gray-500">Minimum Qualification</label>
-                    <select class="form-select form-control-sm" name="job_qualification[]">
+                    <select class="form-select form-control-sm other-toggle" name="job_qualification[]" data-other-target="jobQualificationOtherWrapper">
                         <option value="">Select</option>
                         <option value="Below 10th">Below 10th</option>
                         <option value="10th">10th</option>
@@ -806,28 +889,38 @@
                         <option value="Postgraduate">Postgraduate</option>
                         <option value="Other">Other</option>
                     </select>
-                </div>
-                <div>
-                    <label class="form-label text-xs text-gray-500">Qualification Other</label>
-                    <input type="text" class="form-control form-control-sm" name="job_qualification_other[]" placeholder="Specify" />
+                    <div class="other-specify-wrapper" id="jobQualificationOtherWrapper">
+                        <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                        <input type="text" class="form-control form-control-sm" name="job_qualification_other[]" placeholder="Specify qualification" />
+                    </div>
                 </div>
                 <div>
                     <label class="form-label text-xs text-gray-500">Experience Required</label>
-                    <select class="form-select form-control-sm" name="job_experience[]">
+                    <select class="form-select form-control-sm other-toggle" name="job_experience[]" data-other-target="jobExperienceOtherWrapper">
                         <option value="">Select</option>
                         <option value="Fresher">Fresher</option>
                         <option value="0-1 year">0-1 year</option>
                         <option value="1-3 years">1-3 years</option>
                         <option value="3-5 years">3-5 years</option>
                         <option value="5+ years">5+ years</option>
+                        <option value="Other">Other</option>
                     </select>
+                    <div class="other-specify-wrapper" id="jobExperienceOtherWrapper">
+                        <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                        <input type="text" class="form-control form-control-sm" name="job_experience_other[]" placeholder="Specify experience" />
+                    </div>
                 </div>
                 <div>
                     <label class="form-label text-xs text-gray-500">Certification / Licence</label>
-                    <select class="form-select form-control-sm" name="job_certification[]">
+                    <select class="form-select form-control-sm other-toggle" name="job_certification[]" data-other-target="jobCertificationOtherWrapper">
                         <option value="No">Not required</option>
                         <option value="Yes">Required</option>
+                        <option value="Other">Other</option>
                     </select>
+                    <div class="other-specify-wrapper" id="jobCertificationOtherWrapper">
+                        <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                        <input type="text" class="form-control form-control-sm" name="job_certification_other[]" placeholder="Specify certification" />
+                    </div>
                 </div>
                 <div>
                     <label class="form-label text-xs text-gray-500">Certification Detail</label>
@@ -847,13 +940,18 @@
                 </div>
                 <div>
                     <label class="form-label text-xs text-gray-500">Employment Type</label>
-                    <select class="form-select form-control-sm" name="job_employment_type[]">
+                    <select class="form-select form-control-sm other-toggle" name="job_employment_type[]" data-other-target="jobEmploymentTypeOtherWrapper">
                         <option value="Permanent">Permanent</option>
                         <option value="Fixed-term">Fixed-term</option>
                         <option value="Contractual">Contractual</option>
                         <option value="Seasonal">Seasonal</option>
                         <option value="Gig / Task-based">Gig / Task-based</option>
+                        <option value="Other">Other</option>
                     </select>
+                    <div class="other-specify-wrapper" id="jobEmploymentTypeOtherWrapper">
+                        <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                        <input type="text" class="form-control form-control-sm" name="job_employment_type_other[]" placeholder="Specify type" />
+                    </div>
                 </div>
                 <div>
                     <label class="form-label text-xs text-gray-500">Demand / Openings</label>
@@ -941,11 +1039,16 @@
                 </div>
                 <div>
                     <label class="form-label text-xs text-gray-500">Opportunity Type</label>
-                    <select class="form-select form-control-sm" name="app_opportunity_type[]">
+                    <select class="form-select form-control-sm other-toggle" name="app_opportunity_type[]" data-other-target="appOpportunityTypeOtherWrapper">
                         <option value="Apprenticeship">Apprenticeship</option>
                         <option value="OJT">OJT</option>
                         <option value="Internship">Internship</option>
+                        <option value="Other">Other</option>
                     </select>
+                    <div class="other-specify-wrapper" id="appOpportunityTypeOtherWrapper">
+                        <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                        <input type="text" class="form-control form-control-sm" name="app_opportunity_type_other[]" placeholder="Specify opportunity type" />
+                    </div>
                 </div>
                 <div>
                     <label class="form-label text-xs text-gray-500">Estimated Member Employers Interested</label>
@@ -969,12 +1072,17 @@
                 </div>
                 <div>
                     <label class="form-label text-xs text-gray-500">Potential Conversion to Employment</label>
-                    <select class="form-select form-control-sm" name="app_conversion[]">
+                    <select class="form-select form-control-sm other-toggle" name="app_conversion[]" data-other-target="appConversionOtherWrapper">
                         <option value="High">High</option>
                         <option value="Moderate">Moderate</option>
                         <option value="Low">Low</option>
                         <option value="Not known">Not known</option>
+                        <option value="Other">Other</option>
                     </select>
+                    <div class="other-specify-wrapper" id="appConversionOtherWrapper">
+                        <label class="other-specify-label"><i class="fas fa-pen"></i> Specify</label>
+                        <input type="text" class="form-control form-control-sm" name="app_conversion_other[]" placeholder="Specify conversion" />
+                    </div>
                 </div>
                 <div>
                     <label class="form-label text-xs text-gray-500">Employer List Available</label>
@@ -1015,6 +1123,9 @@
             // File upload handling
             setupFileUpload();
 
+            // Setup other-toggle for all existing selects
+            setupOtherToggles();
+
             // Form submit
             document.getElementById('associationForm').addEventListener('submit', handleSubmit);
         });
@@ -1030,6 +1141,98 @@
         }
 
         // ============================================================
+        // OTHER TOGGLE HANDLING
+        // ============================================================
+        function setupOtherToggles() {
+            // For static selects with data-other-target
+            document.querySelectorAll('select.other-toggle[data-other-target]').forEach(function(select) {
+                // Remove existing listener to avoid duplicates
+                select.removeEventListener('change', handleOtherToggle);
+                select.addEventListener('change', handleOtherToggle);
+            });
+        }
+
+        function handleOtherToggle(e) {
+            const select = e.target;
+            const targetId = select.getAttribute('data-other-target');
+            if (!targetId) return;
+            
+            // Find the wrapper - could be in same card or document
+            let wrapper = document.getElementById(targetId);
+            if (!wrapper) {
+                // Try to find within the same parent card
+                const card = select.closest('.job-demand-card');
+                if (card) {
+                    wrapper = card.querySelector('#' + targetId);
+                }
+            }
+            
+            if (!wrapper) return;
+
+            if (select.value === 'Other') {
+                wrapper.classList.add('show');
+                const input = wrapper.querySelector('input');
+                if (input) {
+                    setTimeout(() => input.focus(), 100);
+                }
+            } else {
+                wrapper.classList.remove('show');
+                const input = wrapper.querySelector('input');
+                if (input) input.value = '';
+            }
+        }
+
+        // For templates, we need to setup after adding
+        function setupTemplateOtherToggles(card) {
+            card.querySelectorAll('select.other-toggle').forEach(function(select) {
+                select.addEventListener('change', function(e) {
+                    // Find the closest wrapper inside this card
+                    const wrapper = card.querySelector('.other-specify-wrapper');
+                    // We need to find the specific wrapper for this select
+                    // Since template might have multiple, we use a different approach
+                    // The wrapper is the next sibling of the select's parent div
+                    const parentDiv = select.closest('div');
+                    let wrapperEl = parentDiv ? parentDiv.querySelector('.other-specify-wrapper') : null;
+                    
+                    if (!wrapperEl) {
+                        // Fallback: find the next .other-specify-wrapper after this select
+                        wrapperEl = select.parentElement.querySelector('.other-specify-wrapper');
+                    }
+                    
+                    if (!wrapperEl) return;
+                    
+                    if (select.value === 'Other') {
+                        wrapperEl.classList.add('show');
+                        const input = wrapperEl.querySelector('input');
+                        if (input) {
+                            setTimeout(() => input.focus(), 100);
+                        }
+                    } else {
+                        wrapperEl.classList.remove('show');
+                        const input = wrapperEl.querySelector('input');
+                        if (input) input.value = '';
+                    }
+                });
+            });
+        }
+
+        // ============================================================
+        // RECRUITMENT CHALLENGES OTHER TOGGLE
+        // ============================================================
+        function toggleRecChallengeOther(checkbox) {
+            const wrapper = document.getElementById('recChallengesOtherWrapper');
+            if (checkbox.checked) {
+                wrapper.classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('recChallengesOther').focus();
+                }, 100);
+            } else {
+                wrapper.classList.remove('show');
+                document.getElementById('recChallengesOther').value = '';
+            }
+        }
+
+        // ============================================================
         // JOB DEMAND FUNCTIONS
         // ============================================================
         function addJobDemand() {
@@ -1038,6 +1241,10 @@
             jobCounter++;
             const card = clone.querySelector('.job-demand-card');
             card.querySelector('.job-number').textContent = `#${jobCounter}`;
+            
+            // Setup other toggles for this new card
+            setupTemplateOtherToggles(card);
+            
             document.getElementById('jobDemandsContainer').appendChild(card);
         }
 
@@ -1050,6 +1257,10 @@
             appCounter++;
             const card = clone.querySelector('.job-demand-card');
             card.querySelector('.app-number').textContent = `#${appCounter}`;
+            
+            // Setup other toggles for this new card
+            setupTemplateOtherToggles(card);
+            
             document.getElementById('apprenticeshipsContainer').appendChild(card);
         }
 
@@ -1133,7 +1344,7 @@
             for (const id of requiredFields) {
                 const el = document.getElementById(id);
                 if (!el.value.trim()) {
-                    showToast(`Please fill in: ${el.previousElementSibling?.textContent?.replace('*', '').trim() || id}`, 'error');
+                    showToast(`Please fill in the required field.`, 'error');
                     el.focus();
                     return;
                 }
@@ -1161,18 +1372,46 @@
                     return Array.from(els).map(el => el.value);
                 };
 
+                // Get qualification value - if Other, use the other field
+                let qualification = getVal('job_qualification[]');
+                const qualificationOther = getVal('job_qualification_other[]');
+                if (qualification === 'Other' && qualificationOther) {
+                    qualification = qualificationOther;
+                }
+
+                // Get experience value
+                let experience = getVal('job_experience[]');
+                const experienceOther = getVal('job_experience_other[]');
+                if (experience === 'Other' && experienceOther) {
+                    experience = experienceOther;
+                }
+
+                // Get certification
+                let certification = getVal('job_certification[]');
+                const certificationOther = getVal('job_certification_other[]');
+                if (certification === 'Other' && certificationOther) {
+                    certification = certificationOther;
+                }
+
+                // Get employment type
+                let employmentType = getVal('job_employment_type[]');
+                const employmentTypeOther = getVal('job_employment_type_other[]');
+                if (employmentType === 'Other' && employmentTypeOther) {
+                    employmentType = employmentTypeOther;
+                }
+
                 jobDemands.push({
                     job_role: getVal('job_role[]'),
                     sector: getVal('job_sector[]'),
                     location: getVal('job_location[]'),
-                    qualification: getVal('job_qualification[]'),
-                    qualification_other: getVal('job_qualification_other[]'),
-                    experience: getVal('job_experience[]'),
-                    certification: getVal('job_certification[]'),
+                    qualification: qualification,
+                    qualification_other: qualificationOther,
+                    experience: experience,
+                    certification: certification,
                     certification_detail: getVal('job_certification_detail[]'),
                     salary: getVal('job_salary[]'),
                     salary_period: getVal('job_salary_period[]'),
-                    employment_type: getVal('job_employment_type[]'),
+                    employment_type: employmentType,
                     current_openings: parseInt(getVal('job_current[]')) || 0,
                     openings_6_months: parseInt(getVal('job_6months[]')) || 0,
                     openings_12_months: parseInt(getVal('job_12months[]')) || 0,
@@ -1205,15 +1444,30 @@
                     const el = card.querySelector(`[name="${name}"]`);
                     return el ? el.value : '';
                 };
+
+                // Get opportunity type
+                let opportunityType = getVal('app_opportunity_type[]');
+                const opportunityTypeOther = getVal('app_opportunity_type_other[]');
+                if (opportunityType === 'Other' && opportunityTypeOther) {
+                    opportunityType = opportunityTypeOther;
+                }
+
+                // Get conversion
+                let conversion = getVal('app_conversion[]');
+                const conversionOther = getVal('app_conversion_other[]');
+                if (conversion === 'Other' && conversionOther) {
+                    conversion = conversionOther;
+                }
+
                 apprenticeships.push({
                     job_role: getVal('app_job_role[]'),
-                    opportunity_type: getVal('app_opportunity_type[]'),
+                    opportunity_type: opportunityType,
                     employers_interested: parseInt(getVal('app_employers_interested[]')) || 0,
                     seats: parseInt(getVal('app_seats[]')) || 0,
                     duration: parseInt(getVal('app_duration[]')) || 0,
                     stipend: getVal('app_stipend[]'),
                     start_period: getVal('app_start_period[]'),
-                    conversion: getVal('app_conversion[]'),
+                    conversion: conversion,
                     employer_list: getVal('app_employer_list[]')
                 });
             });
@@ -1223,7 +1477,9 @@
             // Collect recruitment challenges
             const challenges = [];
             document.querySelectorAll('[name="rec_challenges"]:checked').forEach(el => {
-                challenges.push(el.value);
+                if (el.value !== 'Other') {
+                    challenges.push(el.value);
+                }
             });
             const otherChallenge = document.getElementById('recChallengesOther').value.trim();
             if (otherChallenge) {
@@ -1276,6 +1532,11 @@
             document.getElementById('apprenticeshipsContainer').innerHTML = '';
             document.getElementById('fileInfo').classList.add('hidden');
             document.getElementById('fileDropArea').style.display = 'block';
+
+            // Hide all other-specify wrappers
+            document.querySelectorAll('.other-specify-wrapper').forEach(el => {
+                el.classList.remove('show');
+            });
 
             jobCounter = 0;
             appCounter = 0;

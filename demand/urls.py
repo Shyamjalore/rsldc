@@ -48,4 +48,16 @@ urlpatterns = [
     path('api/job-demand/<int:job_id>/delete/', views.delete_job_demand, name='delete_job_demand'),
     path('api/apprenticeship/<int:app_id>/update/', views.update_apprenticeship, name='update_apprenticeship'),
     path('api/apprenticeship/<int:app_id>/delete/', views.delete_apprenticeship, name='delete_apprenticeship'),
+    
+    # ============================================
+    # GOVERNMENT DEPARTMENT CONSULTATION
+    # ============================================
+    path('govt/', views.govt_form, name='govt_form'),
+    path('api/govt/submit/', views.submit_govt, name='submit_govt'),
+
+    # Admin: Government Consultations
+    path('admin/govt-departments/', views.admin_govt_list, name='admin_govt_list'),
+    path('admin/govt-department/<int:consultation_id>/', views.get_govt_detail, name='get_govt_detail'),
+    path('admin/govt-department/<int:consultation_id>/delete/', views.delete_govt, name='delete_govt'),
+    path('admin/export-govt-csv/', views.admin_export_govt_csv, name='admin_export_govt_csv'),
 ]

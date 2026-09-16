@@ -331,8 +331,12 @@
                 <span class="nav-icon-modern"><i class="fas fa-briefcase"></i></span>
                 <span>Job Demands</span>
             </a>
+            <a href="{% url 'survey:admin_govt_list' %}" class="nav-link-modern">
+                <span class="nav-icon-modern"><i class="fas fa-landmark"></i></span>
+                <span>Govt Departments</span>
+            </a>
             <div class="nav-label" style="margin-top:12px;">Tools</div>
-            <a href="{% url 'survey:admin_export_csv' %}" class="nav-link-modern">
+            <a href="#" class="nav-link-modern">
                 <span class="nav-icon-modern"><i class="fas fa-download"></i></span>
                 <span>Export CSV</span>
             </a>
@@ -358,7 +362,7 @@
                 <p>Manage all survey records with edit and delete options</p>
             </div>
             <div class="header-actions-modern">
-                <a href="{% url 'survey:admin_export_csv' %}" class="btn-modern btn-success-modern">
+                <a href="#" class="btn-modern btn-success-modern">
                     <i class="fas fa-file-export"></i> Export CSV
                 </a>
                 <button type="button" class="btn-modern btn-primary-modern" onclick="window.print()">

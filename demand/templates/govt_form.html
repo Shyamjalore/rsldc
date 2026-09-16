@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Government Department Consultation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            background: #f0f4f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .form-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+        .form-section {
+            background: #f9fbfd;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-section-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1a202c;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .form-section-title .badge {
+            background: #3182ce;
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 999px;
+            margin-left: 0.5rem;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+        .form-control, .form-select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            background: #fff;
+        }
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+        }
+        .form-control-sm {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+        }
+        .inline-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.5rem;
+            align-items: center;
+            padding-top: 0.3rem;
+        }
+        .inline-checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: #2d3748;
+            cursor: pointer;
+        }
+        .inline-checkbox-group input[type="checkbox"],
+        .inline-checkbox-group input[type="radio"] {
+            accent-color: #3182ce;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .dynamic-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            transition: 0.2s;
+        }
+        .dynamic-card:hover {
+            border-color: #bdd3eb;
+        }
+        .btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-primary { background: #3182ce; color: #fff; }
+        .btn-primary:hover { background: #2b6cb0; }
+        .btn-success { background: #38a169; color: #fff; }
+        .btn-success:hover { background: #2f855a; }
+        .btn-danger { background: #e53e3e; color: #fff; }
+        .btn-danger:hover { background: #c53030; }
+        .btn-outline { background: transparent; border: 1px solid #d1d5db; color: #4a5568; }
+        .btn-outline:hover { background: #f7fafc; }
+        .btn-sm { padding: 0.25rem 0.8rem; font-size: 0.8rem; }
+        .remove-btn {
+            color: #e53e3e;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0 0.3rem;
+        }
+        .remove-btn:hover { color: #c53030; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; }
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+            .form-container { padding: 1rem; margin: 1rem; }
+        }
+        .tag {
+            display: inline-block;
+            background: #ebf4ff;
+            color: #2b6cb0;
+            padding: 0.15rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .file-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #fafbfc;
+        }
+        .file-upload-area:hover { border-color: #3182ce; background: #f0f7ff; }
+        .file-upload-area.dragover { border-color: #3182ce; background: #ebf4ff; }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 500;
+            z-index: 9999;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            display: none;
+            max-width: 400px;
+        }
+        .toast-success { background: #38a169; }
+        .toast-error { background: #e53e3e; }
+        .toast-info { background: #3182ce; }
+        .toast.show { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .required-star { color: #e53e3e; margin-left: 2px; }
+        .other-specify-wrapper {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+            opacity: 0;
+            margin-top: 0;
+        }
+        .other-specify-wrapper.show {
+            max-height: 100px;
+            opacity: 1;
+            margin-top: 0.5rem;
+        }
+        .other-specify-wrapper input {
+            border-left: 3px solid #3182ce;
+            background: #f0f7ff;
+        }
+        .other-specify-label {
+            font-size: 0.75rem;
+            color: #3182ce;
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .sector-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .sector-table th {
+            background: #edf2f7;
+            padding: 0.75rem;
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .sector-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+        .sector-table tr:last-child td { border-bottom: none; }
+        .sector-table input, .sector-table select, .sector-table textarea {
+            width: 100%;
+            padding: 0.4rem 0.6rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: #fff;
+        }
+        .sector-table input:focus, .sector-table textarea:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.1);
+        }
+        .sector-table .remove-row {
+            color: #e53e3e;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.2rem;
+        }
+        .sector-table .remove-row:hover { color: #c53030; }
+        .table-responsive { overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <div class="form-container">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-2">
+            <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-landmark text-blue-600"></i>
+                Government Department Consultation
+            </h1>
+            <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                <i class="far fa-clock mr-1"></i> <span id="formTimer">00:00</span>
+            </span>
+        </div>
+        <p class="text-gray-600 text-sm mb-6 border-l-4 border-blue-500 pl-4">
+            <i class="fas fa-info-circle text-blue-500 mr-1"></i>
+            Rajasthan Skill Demand Aggregation Survey — Collect industrial, investment and workforce data from government departments.
+        </p>
+
+        <form id="govtForm" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- ============================================================ -->
+            <!-- A. CONSULTATION CONTROL -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-clipboard-list text-blue-600"></i> A. Consultation Control
+                    <span class="badge">Required</span>
+                </div>
+                <div class="grid-3">
+                    <div>
+                        <label class="form-label">Consultation ID <span class="required-star">*</span></label>
+                        <input type="text" class="form-control" id="consultationId" name="consultation_id" placeholder="e.g. GOVT-2026-014" required />
+                    </div>
+                    <div>
+                        <label class="form-label">District / Region <span class="required-star">*</span></label>
+                        <input type="text" class="form-control" id="districtRegion" name="district_region" placeholder="e.g. Alwar" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Mode of Consultation <span class="required-star">*</span></label>
+                        <select class="form-select other-toggle" id="mode" name="mode" data-other-target="modeOtherWrapper" required>
+                            <option value="">Select Mode</option>
+                            <option value="In-person">In-person</option>
+                            <option value="Telephone">Telephone</option>
+                            <option value="Video Call">Video Call</option>
+                            <option value="Written Submission">Written Submission</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="other-specify-wrapper" id="modeOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Mode</label>
+                            <input type="text" class="form-control form-control-sm" id="modeOther" name="mode_other" placeholder="Specify other mode" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Date <span class="required-star">*</span></label>
+                        <input type="date" class="form-control" id="consultationDate" name="consultation_date" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Name of Surveyor / Facilitator <span class="required-star">*</span></label>
+                        <input type="text" class="form-control" id="surveyorName" name="surveyor_name" placeholder="Full name" required />
+                    </div>
+                </div>
+
+                <!-- Department / Office Visited -->
+                <div class="mt-3">
+                    <label class="form-label">Department / Office Visited <span class="required-star">*</span></label>
+                    <div class="inline-checkbox-group">
+                        <label><input type="checkbox" name="office_visited" value="Department of Industries & Commerce" /> Department of Industries & Commerce</label>
+                        <label><input type="checkbox" name="office_visited" value="Bureau of Investment Promotion (BIP)" /> Bureau of Investment Promotion (BIP)</label>
+                        <label><input type="checkbox" name="office_visited" value="RIICO" /> RIICO</label>
+                        <label><input type="checkbox" name="office_visited" value="Bhiwadi Integrated Development Authority (BIDA)" /> Bhiwadi Integrated Development Authority (BIDA)</label>
+                        <label><input type="checkbox" name="office_visited" value="District Industries Centre (DIC)" /> District Industries Centre (DIC)</label>
+                        <label><input type="checkbox" name="office_visited" value="MSME Department / Commissionerate" /> MSME Department / Commissionerate</label>
+                        <label><input type="checkbox" name="office_visited" value="Employment Department" /> Employment Department</label>
+                        <label><input type="checkbox" name="office_visited" value="Skill / Labour Department" /> Skill / Labour Department</label>
+                        <label><input type="checkbox" name="office_visited" value="KVIC" /> KVIC</label>
+                        <label><input type="checkbox" name="office_visited" value="KVIB" /> KVIB</label>
+                        <label><input type="checkbox" name="office_visited" value="NABARD" /> NABARD</label>
+                        <label><input type="checkbox" id="officeVisitedOtherCheck" name="office_visited" value="Other" onchange="toggleOfficeVisitedOther(this)" /> Other</label>
+                    </div>
+                    <div class="other-specify-wrapper" id="officeVisitedOtherWrapper">
+                        <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Office</label>
+                        <input type="text" class="form-control form-control-sm" id="officeVisitedOther" name="office_visited_other" placeholder="Specify other office" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- B. DEPARTMENT / ORGANISATION PROFILE -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-building text-blue-600"></i> B. Department / Organisation Profile
+                    <span class="badge">Required</span>
+                </div>
+
+                <!-- Level / Type of Body -->
+                <div class="grid-2">
+                    <div>
+                        <label class="form-label">Level / Type of Body <span class="required-star">*</span></label>
+                        <div class="inline-checkbox-group">
+                            <label><input type="checkbox" name="body_type" value="State-level Department" /> State-level Department</label>
+                            <label><input type="checkbox" name="body_type" value="District-level Office" /> District-level Office</label>
+                            <label><input type="checkbox" name="body_type" value="Statutory Corporation / Board" /> Statutory Corporation / Board</label>
+                            <label><input type="checkbox" name="body_type" value="Development Authority" /> Development Authority</label>
+                            <label><input type="checkbox" name="body_type" value="Autonomous / Promotion Bureau" /> Autonomous / Promotion Bureau</label>
+                            <label><input type="checkbox" name="body_type" value="Financial Institution" /> Financial Institution</label>
+                            <label><input type="checkbox" id="bodyTypeOtherCheck" name="body_type" value="Other" onchange="toggleBodyTypeOther(this)" /> Other</label>
+                        </div>
+                        <div class="other-specify-wrapper" id="bodyTypeOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Body Type</label>
+                            <input type="text" class="form-control form-control-sm" id="bodyTypeOther" name="body_type_other" placeholder="Specify body type" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Jurisdiction / Area Covered <span class="required-star">*</span></label>
+                        <div class="inline-checkbox-group">
+                            <label><input type="checkbox" name="jurisdiction" value="Statewide" /> Statewide</label>
+                            <label><input type="checkbox" name="jurisdiction" value="Divisional" /> Divisional</label>
+                            <label><input type="checkbox" name="jurisdiction" value="District" /> District</label>
+                            <label><input type="checkbox" name="jurisdiction" value="Regional Authority" /> Regional Authority</label>
+                            <label><input type="checkbox" name="jurisdiction" value="Industrial Area / Estate-specific" /> Industrial Area / Estate-specific</label>
+                            <label><input type="checkbox" id="jurisdictionOtherCheck" name="jurisdiction" value="Other" onchange="toggleJurisdictionOther(this)" /> Other</label>
+                        </div>
+                        <div class="other-specify-wrapper" id="jurisdictionOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Jurisdiction</label>
+                            <input type="text" class="form-control form-control-sm" id="jurisdictionOther" name="jurisdiction_other" placeholder="Specify jurisdiction" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-3 mt-3">
+                    <div>
+                        <label class="form-label">Respondent Name & Designation <span class="required-star">*</span></label>
+                        <input type="text" class="form-control" id="respondentName" name="respondent_name" placeholder="Name, Designation" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Mobile Number <span class="required-star">*</span></label>
+                        <input type="tel" class="form-control" id="respondentMobile" name="respondent_mobile" placeholder="10-digit mobile" pattern="[0-9]{10}" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Official Email ID <span class="required-star">*</span></label>
+                        <input type="email" class="form-control" id="respondentEmail" name="respondent_email" placeholder="email@example.gov.in" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Office Address</label>
+                        <input type="text" class="form-control" id="officeAddress" name="office_address" placeholder="e.g. RIICO Bhawan, Bhiwadi" />
+                    </div>
+                    <div>
+                        <label class="form-label">Department Website / Portal (if any)</label>
+                        <input type="url" class="form-control" id="departmentWebsite" name="department_website" placeholder="https://example.gov.in" />
+                    </div>
+                    <div>
+                        <label class="form-label">Nodal Officer for Skill Initiatives</label>
+                        <input type="text" class="form-control" id="nodalOfficerName" name="nodal_officer_name" placeholder="Full name" />
+                    </div>
+                    <div>
+                        <label class="form-label">Nodal Officer Mobile</label>
+                        <input type="tel" class="form-control" id="nodalOfficerMobile" name="nodal_officer_mobile" placeholder="10-digit mobile" />
+                    </div>
+                    <div>
+                        <label class="form-label">Nodal Officer Email</label>
+                        <input type="email" class="form-control" id="nodalOfficerEmail" name="nodal_officer_email" placeholder="email@example.gov.in" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- C. INVESTMENT PIPELINE - SECTOR-WISE -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-chart-line text-blue-600"></i> C. Investment Pipeline — Sector-wise
+                    <span class="badge">Optional</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-3">
+                    <i class="fas fa-info-circle"></i> Relevant for RIICO / BIP / BIDA — leave blank if not applicable to this office.
+                </p>
+                <p class="font-semibold text-gray-700 mb-2">Projects Under Pipeline / MOUs Signed (Last 12 Months)</p>
+
+                <div class="table-responsive">
+                    <table class="sector-table" id="investmentPipelineTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Sector Classification</th>
+                                <th style="width: 20%;">Dominant / Key Existing Sectors</th>
+                                <th style="width: 20%;">Upcoming / High-Potential Emerging Sectors</th>
+                                <th style="width: 15%;">Approx. Investment (₹ Cr)</th>
+                                <th style="width: 15%;">Specific District (If Any)</th>
+                                <th style="width: 5%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="investmentPipelineBody">
+                            <!-- Rows will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm mt-2" onclick="addInvestmentPipelineRow()">
+                    <i class="fas fa-plus"></i> Add Row
+                </button>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- D. SECTORAL ANALYSIS & UPCOMING GROWTH -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-chart-pie text-blue-600"></i> D. Sectoral Analysis & Upcoming Growth
+                </div>
+
+                <div class="table-responsive">
+                    <table class="sector-table" id="sectoralAnalysisTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Sector Classification</th>
+                                <th style="width: 35%;">Dominant / Key Existing Sectors</th>
+                                <th style="width: 30%;">Upcoming / High-Potential Emerging Sectors</th>
+                                <th style="width: 5%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="sectoralAnalysisBody">
+                            <!-- Rows will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm mt-2" onclick="addSectoralAnalysisRow()">
+                    <i class="fas fa-plus"></i> Add Row
+                </button>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- E. WORKFORCE & SKILL DEMAND SIGNALS -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-users-cog text-blue-600"></i> E. Workforce & Skill Demand Signals
+                </div>
+
+                <!-- E.1 Broad Occupational Categories -->
+                <div class="mb-4">
+                    <p class="font-semibold text-gray-700 mb-2">E.1 Broad Occupational Categories in High Demand</p>
+                    <p class="text-xs text-gray-500 mb-2">Based on the department's aggregate assessment / administrative data — not individual establishment counts.</p>
+
+                    <div class="table-responsive">
+                        <table class="sector-table" id="occupationalCategoriesTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%;">Occupational Category / Role</th>
+                                    <th style="width: 15%;">Sector</th>
+                                    <th style="width: 15%;">Minimum Qualification</th>
+                                    <th style="width: 15%;">Est. Current Openings</th>
+                                    <th style="width: 15%;">Projected Demand (12 Mo)</th>
+                                    <th style="width: 15%;">Indicative Wage (₹/Month)</th>
+                                    <th style="width: 5%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="occupationalCategoriesBody">
+                                <!-- Rows will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm mt-2" onclick="addOccupationalCategoryRow()">
+                        <i class="fas fa-plus"></i> Add Row
+                    </button>
+                </div>
+
+                <!-- E.2 Upcoming Flagship Schemes -->
+                <div class="mb-4">
+                    <label class="form-label">E.2 Upcoming Flagship Schemes / Projects (Next 1–3 Years)</label>
+                    <textarea class="form-control" id="upcomingSchemes" name="upcoming_schemes" rows="2" placeholder="Specify project details & anticipated manpower requirement"></textarea>
+                </div>
+
+                <!-- E.3 Emerging Technologies -->
+                <div class="mb-4">
+                    <label class="form-label">E.3 Emerging Technologies / Processes Requiring Re-skilling</label>
+                    <textarea class="form-control" id="emergingTechnologies" name="emerging_technologies" rows="2" placeholder="e.g. Automation, EV manufacturing, solar installation"></textarea>
+                </div>
+
+                <!-- E.4 Apprenticeship / OJT / Internship Facilitation -->
+                <div>
+                    <p class="font-semibold text-gray-700 mb-2">E.4 Apprenticeship / OJT / Internship Facilitation</p>
+                    <div class="grid-2 mb-3">
+                        <div>
+                            <label class="form-label">Aware of Establishments with Active / Planned Apprenticeship, OJT or Internship Capacity</label>
+                            <div class="inline-checkbox-group">
+                                <label><input type="radio" name="aware_establishments" value="Yes" /> Yes</label>
+                                <label><input type="radio" name="aware_establishments" value="No" /> No</label>
+                                <label><input type="radio" name="aware_establishments" value="Not Sure" /> Not Sure</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label">Can Facilitate Introduction / Share Contact List</label>
+                            <div class="inline-checkbox-group">
+                                <label><input type="radio" name="can_facilitate" value="Yes" /> Yes</label>
+                                <label><input type="radio" name="can_facilitate" value="No" /> No</label>
+                                <label><input type="radio" name="can_facilitate" value="Conditional" /> Conditional</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-3 mb-3">
+                        <div>
+                            <label class="form-label">Approx. No. of Such Establishments (If Known)</label>
+                            <input type="number" class="form-control form-control-sm" id="awareEstablishmentsCount" name="aware_establishments_count" placeholder="Number" min="0" />
+                        </div>
+                        <div>
+                            <label class="form-label">Sectors / Industrial Areas Where This Is Concentrated</label>
+                            <input type="text" class="form-control form-control-sm" id="concentrationSectors" name="concentration_sectors" placeholder="e.g. Bhiwadi, Neemrana" />
+                        </div>
+                        <div>
+                            <label class="form-label">Known Flagship Employers (If Willing to Share)</label>
+                            <input type="text" class="form-control form-control-sm" id="knownEmployers" name="known_employers" placeholder="Company name(s)" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Preferred Mode of Facilitation</label>
+                        <div class="inline-checkbox-group">
+                            <label><input type="checkbox" name="facilitation_mode" value="Direct Introduction Letter" /> Direct Introduction Letter</label>
+                            <label><input type="checkbox" name="facilitation_mode" value="Shared Contact List" /> Shared Contact List</label>
+                            <label><input type="checkbox" name="facilitation_mode" value="Joint Meeting / Coordination Call" /> Joint Meeting / Coordination Call</label>
+                            <label><input type="checkbox" id="facilitationModeOtherCheck" name="facilitation_mode" value="Other" onchange="toggleFacilitationModeOther(this)" /> Other</label>
+                        </div>
+                        <div class="other-specify-wrapper" id="facilitationModeOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Mode</label>
+                            <input type="text" class="form-control form-control-sm" id="facilitationModeOther" name="facilitation_mode_other" placeholder="Specify mode" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- F. RECRUITMENT, SKILL GAPS & OPERATIONAL CHALLENGES -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-exclamation-triangle text-blue-600"></i> F. Recruitment, Skill Gaps & Operational Challenges
+                </div>
+
+                <div>
+                    <label class="form-label">Recurring Recruitment Challenges</label>
+                    <div class="inline-checkbox-group">
+                        <label><input type="checkbox" name="recruitment_challenges" value="Skilled candidate shortage" /> Skilled candidate shortage</label>
+                        <label><input type="checkbox" name="recruitment_challenges" value="Experience gap" /> Experience gap</label>
+                        <label><input type="checkbox" name="recruitment_challenges" value="Wage mismatch" /> Wage mismatch</label>
+                        <label><input type="checkbox" name="recruitment_challenges" value="High attrition" /> High attrition</label>
+                        <label><input type="checkbox" name="recruitment_challenges" value="Location / mobility" /> Location / mobility</label>
+                        <label><input type="checkbox" name="recruitment_challenges" value="Low applicant response" /> Low applicant response</label>
+                        <label><input type="checkbox" name="recruitment_challenges" value="Certification gap" /> Certification gap</label>
+                        <label><input type="checkbox" name="recruitment_challenges" value="Technology / competency change" /> Technology / competency change</label>
+                        <label><input type="checkbox" id="recruitmentOtherCheck" name="recruitment_challenges" value="Other" onchange="toggleRecruitmentOther(this)" /> Other</label>
+                    </div>
+                    <div class="other-specify-wrapper" id="recruitmentOtherWrapper">
+                        <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Other Challenge</label>
+                        <input type="text" class="form-control form-control-sm" id="recruitmentOther" name="recruitment_challenges_other" placeholder="Specify other challenge" />
+                    </div>
+                </div>
+
+                <div class="grid-3 mt-3">
+                    <div>
+                        <label class="form-label">Most Difficult-to-Fill Job Roles</label>
+                        <input type="text" class="form-control" id="difficultRoles" name="difficult_roles" placeholder="e.g. CNC Operator, Data Scientist" />
+                    </div>
+                    <div>
+                        <label class="form-label">Emerging Job Roles</label>
+                        <input type="text" class="form-control" id="emergingRoles" name="emerging_roles" placeholder="e.g. Solar Technician, EV Fitter" />
+                    </div>
+                    <div>
+                        <label class="form-label">Changing Technical Competencies</label>
+                        <input type="text" class="form-control" id="changingCompetencies" name="changing_competencies" placeholder="e.g. Automation, Digital skills" />
+                    </div>
+                    <div>
+                        <label class="form-label">Employability Skill Gaps</label>
+                        <input type="text" class="form-control" id="skillGaps" name="skill_gaps" placeholder="e.g. Communication, Problem-solving" />
+                    </div>
+                    <div>
+                        <label class="form-label">Districts / Clusters with Highest Demand</label>
+                        <input type="text" class="form-control" id="highDemandDistricts" name="high_demand_districts" placeholder="e.g. Bhiwadi, Neemrana" />
+                    </div>
+                    <div>
+                        <label class="form-label">Reasons for Unfilled Vacancies</label>
+                        <input type="text" class="form-control" id="unfilledReasons" name="unfilled_reasons" placeholder="e.g. Low pay, Remote location" />
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label">Manpower & Operational Challenges (Industrial Bottlenecks)</label>
+                    <textarea class="form-control" id="operationalChallenges" name="operational_challenges" rows="2" placeholder="e.g. Power supply, logistics, land availability"></textarea>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- G. DEPARTMENT SUPPORT & INSTITUTIONAL PARTNERSHIP -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-handshake text-blue-600"></i> G. Department Support & Institutional Partnership
+                </div>
+                <div class="grid-3">
+                    <div>
+                        <label class="form-label">Facilitate Employer-Level Surveys</label>
+                        <div class="inline-checkbox-group">
+                            <label><input type="radio" name="facilitate_surveys" value="Yes" /> Yes</label>
+                            <label><input type="radio" name="facilitate_surveys" value="No" /> No</label>
+                            <label><input type="radio" name="facilitate_surveys" value="Conditional" /> Conditional</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Share Registration / Allotment Data (Udyam, RIICO, DIC)</label>
+                        <div class="inline-checkbox-group">
+                            <label><input type="radio" name="share_registration_data" value="Yes" /> Yes</label>
+                            <label><input type="radio" name="share_registration_data" value="No" /> No</label>
+                            <label><input type="radio" name="share_registration_data" value="Conditional" /> Conditional</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Participate in Industry-Institute Coordination Committees / Skill Councils</label>
+                        <div class="inline-checkbox-group">
+                            <label><input type="radio" name="participate_coordination" value="Yes" /> Yes</label>
+                            <label><input type="radio" name="participate_coordination" value="No" /> No</label>
+                            <label><input type="radio" name="participate_coordination" value="Conditional" /> Conditional</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label">Share Periodic Demand Updates</label>
+                    <div class="inline-checkbox-group">
+                        <label><input type="radio" name="share_demand_updates" value="Monthly" /> Monthly</label>
+                        <label><input type="radio" name="share_demand_updates" value="Quarterly" /> Quarterly</label>
+                        <label><input type="radio" name="share_demand_updates" value="Half-yearly" /> Half-yearly</label>
+                        <label><input type="radio" name="share_demand_updates" value="As required" /> As required</label>
+                        <label><input type="radio" name="share_demand_updates" value="Not feasible" /> Not feasible</label>
+                    </div>
+                </div>
+
+                <div class="grid-3 mt-3">
+                    <div>
+                        <label class="form-label">Nominate Department Nodal Officer</label>
+                        <input type="text" class="form-control" id="deptNodalOfficerName" name="dept_nodal_officer_name" placeholder="Full name" />
+                    </div>
+                    <div>
+                        <label class="form-label">Nodal Officer Mobile</label>
+                        <input type="tel" class="form-control" id="deptNodalOfficerMobile" name="dept_nodal_officer_mobile" placeholder="10-digit mobile" />
+                    </div>
+                    <div>
+                        <label class="form-label">Nodal Officer Email</label>
+                        <input type="email" class="form-control" id="deptNodalOfficerEmail" name="dept_nodal_officer_email" placeholder="email@example.gov.in" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- H. EVIDENCE & SUBMISSION -->
+            <!-- ============================================================ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-file-alt text-blue-600"></i> H. Evidence & Submission
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <label class="form-label">Supporting Evidence</label>
+                        <div class="inline-checkbox-group">
+                            <label><input type="checkbox" name="supporting_evidence" value="Udyam / RIICO Data Extract" /> Udyam / RIICO Data Extract</label>
+                            <label><input type="checkbox" name="supporting_evidence" value="Investment / MOU List" /> Investment / MOU List</label>
+                            <label><input type="checkbox" name="supporting_evidence" value="Manpower or Vacancy Report" /> Manpower or Vacancy Report</label>
+                            <label><input type="checkbox" name="supporting_evidence" value="Minutes / Resolution" /> Minutes / Resolution</label>
+                            <label><input type="checkbox" name="supporting_evidence" value="Official Letter" /> Official Letter</label>
+                            <label><input type="checkbox" id="evidenceOtherCheck" name="supporting_evidence" value="Other" onchange="toggleEvidenceOther(this)" /> Other</label>
+                        </div>
+                        <div class="other-specify-wrapper" id="evidenceOtherWrapper">
+                            <label class="other-specify-label"><i class="fas fa-pen"></i> Specify Evidence</label>
+                            <input type="text" class="form-control form-control-sm" id="evidenceOther" name="supporting_evidence_other" placeholder="Specify evidence" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Demand Evidence Status</label>
+                        <div class="inline-checkbox-group">
+                            <label><input type="radio" name="demand_evidence_status" value="Department Data Available" /> Department Data Available</label>
+                            <label><input type="radio" name="demand_evidence_status" value="Aggregate / Estimated Only" /> Aggregate / Estimated Only</label>
+                            <label><input type="radio" name="demand_evidence_status" value="Directional / Expert View" /> Directional / Expert View</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label">Upload Supporting Document</label>
+                    <div class="file-upload-area" id="fileDropArea">
+                        <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2 block"></i>
+                        <p class="text-sm text-gray-500">Drag & drop or click to upload</p>
+                        <p class="text-xs text-gray-400">PDF, JPG, PNG, GIF, BMP (Max 50KB)</p>
+                        <input type="file" id="supportingDocument" name="supporting_document" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp" />
+                    </div>
+                    <div id="fileInfo" class="text-sm text-gray-600 mt-1 hidden">
+                        <i class="fas fa-file mr-1"></i> <span id="fileName"></span>
+                        <button type="button" class="text-red-500 ml-2" onclick="clearFile()"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+
+                <div class="grid-3 mt-3">
+                    <div>
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" id="submissionDate" name="submission_date" />
+                    </div>
+                    <div>
+                        <label class="form-label">Place</label>
+                        <input type="text" class="form-control" id="place" name="place" placeholder="e.g. Jaipur" />
+                    </div>
+                </div>
+
+                <div class="grid-2 mt-3">
+                    <div>
+                        <label class="form-label">Authorized Signature, Name & Designation</label>
+                        <input type="text" class="form-control" id="authorizedSignature" name="authorized_signature" placeholder="Name, Designation" />
+                    </div>
+                    <div>
+                        <label class="form-label">Respondent Name / Signature</label>
+                        <input type="text" class="form-control" id="respondentSignature" name="respondent_signature" placeholder="Full name" />
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="flex items-center gap-2 text-sm">
+                        <input type="checkbox" id="officialStamp" name="official_stamp" />
+                        Official Stamp (digital confirmation)
+                    </label>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- SUBMIT BUTTON -->
+            <!-- ============================================================ -->
+            <div class="flex items-center justify-between mt-6 gap-4 flex-wrap">
+                <div>
+                    <button type="button" class="btn btn-outline" onclick="resetForm()">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-success px-6" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Consultation
+                        <span id="submitSpinner" class="spinner hidden ml-2"></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // ============================================================
+        // GLOBALS
+        // ============================================================
+        let startTime = new Date();
+        let investmentRowCounter = 0;
+        let sectoralRowCounter = 0;
+        let occupationalRowCounter = 0;
+
+        // ============================================================
+        // DOM READY
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('consultationDate').value = today;
+            document.getElementById('submissionDate').value = today;
+
+            // Add initial rows
+            addInvestmentPipelineRow();
+            addSectoralAnalysisRow();
+            addOccupationalCategoryRow();
+
+            setInterval(updateTimer, 1000);
+            setupFileUpload();
+            setupOtherToggles();
+
+            document.getElementById('govtForm').addEventListener('submit', handleSubmit);
+        });
+
+        // ============================================================
+        // TIMER
+        // ============================================================
+        function updateTimer() {
+            const elapsed = Math.floor((new Date() - startTime) / 1000);
+            const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+            const secs = String(elapsed % 60).padStart(2, '0');
+            document.getElementById('formTimer').textContent = `${mins}:${secs}`;
+        }
+
+        // ============================================================
+        // OTHER TOGGLE (for static selects)
+        // ============================================================
+        function setupOtherToggles() {
+            document.querySelectorAll('select.other-toggle[data-other-target]').forEach(function(select) {
+                select.removeEventListener('change', handleOtherToggle);
+                select.addEventListener('change', handleOtherToggle);
+            });
+        }
+
+        function handleOtherToggle(e) {
+            const select = e.target;
+            const targetId = select.getAttribute('data-other-target');
+            if (!targetId) return;
+            const wrapper = document.getElementById(targetId);
+            if (!wrapper) return;
+
+            if (select.value === 'Other') {
+                wrapper.classList.add('show');
+                const input = wrapper.querySelector('input');
+                if (input) setTimeout(() => input.focus(), 100);
+            } else {
+                wrapper.classList.remove('show');
+                const input = wrapper.querySelector('input');
+                if (input) input.value = '';
+            }
+        }
+
+        // ============================================================
+        // CHECKBOX OTHER TOGGLES
+        // ============================================================
+        function toggleOfficeVisitedOther(cb) {
+            const w = document.getElementById('officeVisitedOtherWrapper');
+            cb.checked ? w.classList.add('show') : w.classList.remove('show');
+            if (!cb.checked) document.getElementById('officeVisitedOther').value = '';
+        }
+        function toggleBodyTypeOther(cb) {
+            const w = document.getElementById('bodyTypeOtherWrapper');
+            cb.checked ? w.classList.add('show') : w.classList.remove('show');
+            if (!cb.checked) document.getElementById('bodyTypeOther').value = '';
+        }
+        function toggleJurisdictionOther(cb) {
+            const w = document.getElementById('jurisdictionOtherWrapper');
+            cb.checked ? w.classList.add('show') : w.classList.remove('show');
+            if (!cb.checked) document.getElementById('jurisdictionOther').value = '';
+        }
+        function toggleFacilitationModeOther(cb) {
+            const w = document.getElementById('facilitationModeOtherWrapper');
+            cb.checked ? w.classList.add('show') : w.classList.remove('show');
+            if (!cb.checked) document.getElementById('facilitationModeOther').value = '';
+        }
+        function toggleRecruitmentOther(cb) {
+            const w = document.getElementById('recruitmentOtherWrapper');
+            cb.checked ? w.classList.add('show') : w.classList.remove('show');
+            if (!cb.checked) document.getElementById('recruitmentOther').value = '';
+        }
+        function toggleEvidenceOther(cb) {
+            const w = document.getElementById('evidenceOtherWrapper');
+            cb.checked ? w.classList.add('show') : w.classList.remove('show');
+            if (!cb.checked) document.getElementById('evidenceOther').value = '';
+        }
+
+        // ============================================================
+        // INVESTMENT PIPELINE TABLE
+        // ============================================================
+        function addInvestmentPipelineRow() {
+            investmentRowCounter++;
+            const tbody = document.getElementById('investmentPipelineBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" name="inv_sector[]" placeholder="e.g. Manufacturing & Heavy Engineering" /></td>
+                <td><input type="text" name="inv_dominant[]" placeholder="Dominant existing sectors" /></td>
+                <td><input type="text" name="inv_emerging[]" placeholder="Emerging sectors" /></td>
+                <td><input type="text" name="inv_investment[]" placeholder="e.g. 250" /></td>
+                <td><input type="text" name="inv_district[]" placeholder="e.g. Bhiwadi" /></td>
+                <td class="text-center"><button type="button" class="remove-row" onclick="this.closest('tr').remove()"><i class="fas fa-times-circle"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        // ============================================================
+        // SECTORAL ANALYSIS TABLE
+        // ============================================================
+        function addSectoralAnalysisRow() {
+            sectoralRowCounter++;
+            const tbody = document.getElementById('sectoralAnalysisBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" name="sector_classification[]" placeholder="e.g. Textile, Handloom & Leather" /></td>
+                <td><input type="text" name="sector_dominant[]" placeholder="Dominant existing activity" /></td>
+                <td><input type="text" name="sector_emerging[]" placeholder="Emerging activity" /></td>
+                <td class="text-center"><button type="button" class="remove-row" onclick="this.closest('tr').remove()"><i class="fas fa-times-circle"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        // ============================================================
+        // OCCUPATIONAL CATEGORIES TABLE
+        // ============================================================
+        function addOccupationalCategoryRow() {
+            occupationalRowCounter++;
+            const tbody = document.getElementById('occupationalCategoriesBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" name="occ_category[]" placeholder="e.g. Welder, Electrician" /></td>
+                <td><input type="text" name="occ_sector[]" placeholder="e.g. Manufacturing" /></td>
+                <td>
+                    <select name="occ_qualification[]">
+                        <option value="">Select</option>
+                        <option value="Below 10th">Below 10th</option>
+                        <option value="10th">10th</option>
+                        <option value="12th">12th</option>
+                        <option value="ITI">ITI</option>
+                        <option value="Diploma">Diploma</option>
+                        <option value="Graduate">Graduate</option>
+                        <option value="Postgraduate">Postgraduate</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </td>
+                <td><input type="number" name="occ_current[]" placeholder="0" min="0" /></td>
+                <td><input type="number" name="occ_projected[]" placeholder="0" min="0" /></td>
+                <td><input type="text" name="occ_wage[]" placeholder="e.g. 15000-25000" /></td>
+                <td class="text-center"><button type="button" class="remove-row" onclick="this.closest('tr').remove()"><i class="fas fa-times-circle"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        // ============================================================
+        // FILE UPLOAD
+        // ============================================================
+        function setupFileUpload() {
+            const dropArea = document.getElementById('fileDropArea');
+            const fileInput = document.getElementById('supportingDocument');
+
+            dropArea.addEventListener('click', () => fileInput.click());
+            dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('dragover'); });
+            dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelect(fileInput.files[0]);
+                }
+            });
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) handleFileSelect(fileInput.files[0]);
+            });
+        }
+
+        function handleFileSelect(file) {
+            const maxSize = 50 * 1024;
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/bmp'];
+            if (!allowedTypes.includes(file.type)) {
+                showToast('Invalid file type. Only PDF and Images are allowed.', 'error');
+                clearFile(); return;
+            }
+            if (file.size > maxSize) {
+                showToast('File size exceeds 50KB limit.', 'error');
+                clearFile(); return;
+            }
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileInfo').classList.remove('hidden');
+            document.getElementById('fileDropArea').style.display = 'none';
+        }
+
+        function clearFile() {
+            document.getElementById('supportingDocument').value = '';
+            document.getElementById('fileInfo').classList.add('hidden');
+            document.getElementById('fileDropArea').style.display = 'block';
+        }
+
+        // ============================================================
+        // HELPER: get checked values
+        // ============================================================
+        function getCheckedValues(name) {
+            const vals = [];
+            document.querySelectorAll(`input[name="${name}"]:checked`).forEach(el => {
+                if (el.value !== 'Other') vals.push(el.value);
+            });
+            return vals;
+        }
+
+        function getRadioValue(name) {
+            const el = document.querySelector(`input[name="${name}"]:checked`);
+            return el ? el.value : '';
+        }
+
+        // ============================================================
+        // FORM SUBMIT
+        // ============================================================
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('submitSpinner');
+
+            // Validate required
+            const requiredFields = [
+                'consultationId', 'districtRegion', 'mode', 'consultationDate', 'surveyorName',
+                'respondentName', 'respondentMobile', 'respondentEmail'
+            ];
+            for (const id of requiredFields) {
+                const el = document.getElementById(id);
+                if (!el.value.trim()) {
+                    showToast('Please fill in all required fields.', 'error');
+                    el.focus(); return;
+                }
+            }
+
+            // Validate office visited
+            if (getCheckedValues('office_visited').length === 0 &&
+                !document.getElementById('officeVisitedOtherCheck').checked) {
+                showToast('Please select at least one Department / Office Visited.', 'error');
+                return;
+            }
+
+            // Validate body type & jurisdiction
+            if (getCheckedValues('body_type').length === 0 &&
+                !document.getElementById('bodyTypeOtherCheck').checked) {
+                showToast('Please select Level / Type of Body.', 'error');
+                return;
+            }
+            if (getCheckedValues('jurisdiction').length === 0 &&
+                !document.getElementById('jurisdictionOtherCheck').checked) {
+                showToast('Please select Jurisdiction / Area Covered.', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+
+            // A. Consultation Control
+            formData.append('consultation_id', document.getElementById('consultationId').value.trim());
+            formData.append('district_region', document.getElementById('districtRegion').value.trim());
+            formData.append('mode', document.getElementById('mode').value);
+            formData.append('mode_other', document.getElementById('modeOther').value.trim());
+            formData.append('consultation_date', document.getElementById('consultationDate').value);
+            formData.append('surveyor_name', document.getElementById('surveyorName').value.trim());
+
+            // Office visited
+            const officesVisited = getCheckedValues('office_visited');
+            if (document.getElementById('officeVisitedOtherCheck').checked) {
+                const other = document.getElementById('officeVisitedOther').value.trim();
+                if (other) officesVisited.push(other);
+            }
+            formData.append('office_visited', JSON.stringify(officesVisited));
+
+            // B. Department Profile
+            const bodyTypes = getCheckedValues('body_type');
+            if (document.getElementById('bodyTypeOtherCheck').checked) {
+                const other = document.getElementById('bodyTypeOther').value.trim();
+                if (other) bodyTypes.push(other);
+            }
+            formData.append('body_type', JSON.stringify(bodyTypes));
+
+            const jurisdictions = getCheckedValues('jurisdiction');
+            if (document.getElementById('jurisdictionOtherCheck').checked) {
+                const other = document.getElementById('jurisdictionOther').value.trim();
+                if (other) jurisdictions.push(other);
+            }
+            formData.append('jurisdiction', JSON.stringify(jurisdictions));
+
+            formData.append('respondent_name', document.getElementById('respondentName').value.trim());
+            formData.append('respondent_mobile', document.getElementById('respondentMobile').value.trim());
+            formData.append('respondent_email', document.getElementById('respondentEmail').value.trim());
+            formData.append('office_address', document.getElementById('officeAddress').value.trim());
+            formData.append('department_website', document.getElementById('departmentWebsite').value.trim());
+            formData.append('nodal_officer_name', document.getElementById('nodalOfficerName').value.trim());
+            formData.append('nodal_officer_mobile', document.getElementById('nodalOfficerMobile').value.trim());
+            formData.append('nodal_officer_email', document.getElementById('nodalOfficerEmail').value.trim());
+
+            // C. Investment Pipeline
+            const investmentPipeline = [];
+            document.querySelectorAll('#investmentPipelineBody tr').forEach(tr => {
+                const row = {
+                    sector_classification: tr.querySelector('[name="inv_sector[]"]').value.trim(),
+                    dominant_sectors: tr.querySelector('[name="inv_dominant[]"]').value.trim(),
+                    emerging_sectors: tr.querySelector('[name="inv_emerging[]"]').value.trim(),
+                    approx_investment: tr.querySelector('[name="inv_investment[]"]').value.trim(),
+                    specific_district: tr.querySelector('[name="inv_district[]"]').value.trim()
+                };
+                if (row.sector_classification || row.dominant_sectors || row.emerging_sectors ||
+                    row.approx_investment || row.specific_district) {
+                    investmentPipeline.push(row);
+                }
+            });
+            formData.append('investment_pipeline', JSON.stringify(investmentPipeline));
+
+            // D. Sectoral Analysis
+            const sectoralAnalysis = [];
+            document.querySelectorAll('#sectoralAnalysisBody tr').forEach(tr => {
+                const row = {
+                    sector_classification: tr.querySelector('[name="sector_classification[]"]').value.trim(),
+                    dominant_sectors: tr.querySelector('[name="sector_dominant[]"]').value.trim(),
+                    emerging_sectors: tr.querySelector('[name="sector_emerging[]"]').value.trim()
+                };
+                if (row.sector_classification || row.dominant_sectors || row.emerging_sectors) {
+                    sectoralAnalysis.push(row);
+                }
+            });
+            formData.append('sectoral_analysis', JSON.stringify(sectoralAnalysis));
+
+            // E.1 Occupational Categories
+            const occupationalCategories = [];
+            document.querySelectorAll('#occupationalCategoriesBody tr').forEach(tr => {
+                const row = {
+                    category: tr.querySelector('[name="occ_category[]"]').value.trim(),
+                    sector: tr.querySelector('[name="occ_sector[]"]').value.trim(),
+                    qualification: tr.querySelector('[name="occ_qualification[]"]').value,
+                    current_openings: parseInt(tr.querySelector('[name="occ_current[]"]').value) || 0,
+                    projected_demand: parseInt(tr.querySelector('[name="occ_projected[]"]').value) || 0,
+                    wage_range: tr.querySelector('[name="occ_wage[]"]').value.trim()
+                };
+                if (row.category || row.sector) occupationalCategories.push(row);
+            });
+            formData.append('occupational_categories', JSON.stringify(occupationalCategories));
+
+            // E.2, E.3
+            formData.append('upcoming_schemes', document.getElementById('upcomingSchemes').value.trim());
+            formData.append('emerging_technologies', document.getElementById('emergingTechnologies').value.trim());
+
+            // E.4
+            formData.append('aware_establishments', getRadioValue('aware_establishments'));
+            formData.append('can_facilitate', getRadioValue('can_facilitate'));
+            formData.append('aware_establishments_count', document.getElementById('awareEstablishmentsCount').value);
+            formData.append('concentration_sectors', document.getElementById('concentrationSectors').value.trim());
+            formData.append('known_employers', document.getElementById('knownEmployers').value.trim());
+
+            const facilitationModes = getCheckedValues('facilitation_mode');
+            if (document.getElementById('facilitationModeOtherCheck').checked) {
+                const other = document.getElementById('facilitationModeOther').value.trim();
+                if (other) facilitationModes.push(other);
+            }
+            formData.append('facilitation_mode', JSON.stringify(facilitationModes));
+
+            // F. Recruitment Challenges
+            const recruitmentChallenges = getCheckedValues('recruitment_challenges');
+            if (document.getElementById('recruitmentOtherCheck').checked) {
+                const other = document.getElementById('recruitmentOther').value.trim();
+                if (other) recruitmentChallenges.push(other);
+            }
+            formData.append('recruitment_challenges', JSON.stringify(recruitmentChallenges));
+
+            formData.append('difficult_roles', document.getElementById('difficultRoles').value.trim());
+            formData.append('emerging_roles', document.getElementById('emergingRoles').value.trim());
+            formData.append('changing_competencies', document.getElementById('changingCompetencies').value.trim());
+            formData.append('skill_gaps', document.getElementById('skillGaps').value.trim());
+            formData.append('high_demand_districts', document.getElementById('highDemandDistricts').value.trim());
+            formData.append('unfilled_reasons', document.getElementById('unfilledReasons').value.trim());
+            formData.append('operational_challenges', document.getElementById('operationalChallenges').value.trim());
+
+            // G. Department Support
+            formData.append('facilitate_surveys', getRadioValue('facilitate_surveys'));
+            formData.append('share_registration_data', getRadioValue('share_registration_data'));
+            formData.append('participate_coordination', getRadioValue('participate_coordination'));
+            formData.append('share_demand_updates', getRadioValue('share_demand_updates'));
+            formData.append('dept_nodal_officer_name', document.getElementById('deptNodalOfficerName').value.trim());
+            formData.append('dept_nodal_officer_mobile', document.getElementById('deptNodalOfficerMobile').value.trim());
+            formData.append('dept_nodal_officer_email', document.getElementById('deptNodalOfficerEmail').value.trim());
+
+            // H. Evidence
+            const supportingEvidence = getCheckedValues('supporting_evidence');
+            if (document.getElementById('evidenceOtherCheck').checked) {
+                const other = document.getElementById('evidenceOther').value.trim();
+                if (other) supportingEvidence.push(other);
+            }
+            formData.append('supporting_evidence', JSON.stringify(supportingEvidence));
+            formData.append('demand_evidence_status', getRadioValue('demand_evidence_status'));
+            formData.append('submission_date', document.getElementById('submissionDate').value);
+            formData.append('place', document.getElementById('place').value.trim());
+            formData.append('authorized_signature', document.getElementById('authorizedSignature').value.trim());
+            formData.append('respondent_signature', document.getElementById('respondentSignature').value.trim());
+            formData.append('official_stamp', document.getElementById('officialStamp').checked ? 'true' : 'false');
+
+            // Supporting document
+            const fileInput = document.getElementById('supportingDocument');
+            if (fileInput.files.length) {
+                formData.append('supporting_document', fileInput.files[0]);
+            }
+
+            // CSRF
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name="csrfmiddlewaretoken"]').value);
+
+            // Show loading
+            submitBtn.disabled = true;
+            spinner.classList.remove('hidden');
+            submitBtn.querySelector('span:not(.spinner)').textContent = 'Submitting...';
+
+            try {
+                const response = await fetch('/api/govt/submit/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                    }
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast('Consultation submitted successfully!', 'success');
+                    setTimeout(() => { window.location.href = '/portal/govt-departments/'; }, 1500);
+                } else {
+                    showToast(result.message || 'Submission failed.', 'error');
+                }
+            } catch (error) {
+                console.error('Submit error:', error);
+                showToast('Network error. Please check your connection.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                spinner.classList.add('hidden');
+                submitBtn.querySelector('span:not(.spinner)').textContent = 'Submit Consultation';
+            }
+        }
+
+        // ============================================================
+        // RESET
+        // ============================================================
+        function resetForm() {
+            if (!confirm('Are you sure you want to reset the form? All data will be cleared.')) return;
+            document.getElementById('govtForm').reset();
+            document.getElementById('investmentPipelineBody').innerHTML = '';
+            document.getElementById('sectoralAnalysisBody').innerHTML = '';
+            document.getElementById('occupationalCategoriesBody').innerHTML = '';
+            document.getElementById('fileInfo').classList.add('hidden');
+            document.getElementById('fileDropArea').style.display = 'block';
+            document.querySelectorAll('.other-specify-wrapper').forEach(el => el.classList.remove('show'));
+            investmentRowCounter = 0;
+            sectoralRowCounter = 0;
+            occupationalRowCounter = 0;
+            addInvestmentPipelineRow();
+            addSectoralAnalysisRow();
+            addOccupationalCategoryRow();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('consultationDate').value = today;
+            document.getElementById('submissionDate').value = today;
+            showToast('Form has been reset.', 'info');
+        }
+
+        // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast toast-${type} show`;
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+    </script>
+
+</body>
+</html>

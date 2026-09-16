@@ -54,6 +54,9 @@
                 <a href="{% url 'survey:admin_association_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'admin_association_list' %}active{% endif %}">
                     <i class="fas fa-building"></i> Associations
                 </a>
+                <a href="{% url 'survey:admin_govt_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'admin_govt_list' %}active{% endif %}">
+                    <i class="fas fa-landmark"></i> Govt Departments
+                </a>
                 <a href="{% url 'survey:admin_logout' %}" class="sidebar-link text-red-500 hover:text-red-700 hover:bg-red-50 mt-4">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>

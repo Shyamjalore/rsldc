@@ -350,8 +350,12 @@
                 <span>Job Demands</span>
                 <span class="nav-badge">{{ job_demands|length }}</span>
             </a>
+            <a href="{% url 'survey:admin_govt_list' %}" class="nav-link-modern">
+                <span class="nav-icon-modern"><i class="fas fa-landmark"></i></span>
+                <span>Govt Departments</span>
+            </a>
             <div class="nav-label" style="margin-top:12px;">Tools</div>
-            <a href="{% url 'survey:admin_export_csv' %}" class="nav-link-modern">
+            <a href="#" class="nav-link-modern">
                 <span class="nav-icon-modern"><i class="fas fa-download"></i></span>
                 <span>Export CSV</span>
             </a>
@@ -377,7 +381,7 @@
                 <p>Complete list of all job demand entries with career progression details</p>
             </div>
             <div class="header-actions-modern">
-                <a href="{% url 'survey:admin_export_csv' %}" class="btn-modern btn-success-modern">
+                <a href="#" class="btn-modern btn-success-modern">
                     <i class="fas fa-file-export"></i> Export CSV
                 </a>
                 <button type="button" class="btn-modern btn-primary-modern" onclick="window.print()">

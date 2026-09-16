@@ -717,3 +717,190 @@ class AssociationApprenticeship(models.Model):
     
     def __str__(self):
         return f"{self.consultation.consultation_id} - {self.job_role}"
+    
+    
+    
+    
+# ============================================================
+# NEW MODELS FOR GOVERNMENT DEPARTMENT CONSULTATION
+# ============================================================
+
+class GovtConsultation(models.Model):
+    """Model for Government Department Consultation Questionnaire"""
+
+    # A. Consultation Control
+    consultation_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    district_region = models.CharField(max_length=255, blank=False, null=False)
+    mode = models.CharField(max_length=50, blank=False, null=False, choices=[
+        ('In-person', 'In-person'),
+        ('Telephone', 'Telephone'),
+        ('Video Call', 'Video Call'),
+        ('Written Submission', 'Written Submission'),
+        ('Other', 'Other'),
+    ])
+    mode_other = models.CharField(max_length=100, blank=True, null=True)
+    consultation_date = models.DateField(blank=False, null=False)
+    surveyor_name = models.CharField(max_length=255, blank=False, null=False)
+    office_visited = models.JSONField(default=list, blank=True, null=True)
+    office_visited_other = models.CharField(max_length=255, blank=True, null=True)
+
+    # B. Department / Organisation Profile
+    body_type = models.JSONField(default=list, blank=True, null=True)
+    body_type_other = models.CharField(max_length=255, blank=True, null=True)
+    jurisdiction = models.JSONField(default=list, blank=True, null=True)
+    jurisdiction_other = models.CharField(max_length=255, blank=True, null=True)
+    respondent_name = models.CharField(max_length=255, blank=False, null=False)
+    respondent_mobile = models.CharField(max_length=10, blank=False, null=False)
+    respondent_email = models.EmailField(blank=False, null=False)
+    office_address = models.CharField(max_length=500, blank=True, null=True)
+    department_website = models.URLField(max_length=500, blank=True, null=True)
+    nodal_officer_name = models.CharField(max_length=255, blank=True, null=True)
+    nodal_officer_mobile = models.CharField(max_length=10, blank=True, null=True)
+    nodal_officer_email = models.EmailField(blank=True, null=True)
+
+    # C. Investment Pipeline (stored as JSON list of dicts)
+    investment_pipeline = models.JSONField(default=list, blank=True, null=True)
+
+    # D. Sectoral Analysis (stored as JSON list of dicts)
+    sectoral_analysis = models.JSONField(default=list, blank=True, null=True)
+
+    # E.1 Broad Occupational Categories (stored as JSON list of dicts)
+    occupational_categories = models.JSONField(default=list, blank=True, null=True)
+
+    # E.2 Upcoming Flagship Schemes
+    upcoming_schemes = models.TextField(blank=True, null=True)
+
+    # E.3 Emerging Technologies
+    emerging_technologies = models.TextField(blank=True, null=True)
+
+    # E.4 Apprenticeship / OJT / Internship Facilitation
+    aware_establishments = models.CharField(max_length=20, blank=True, null=True, choices=[
+        ('Yes', 'Yes'),
+        ('No', 'No'),
+        ('Not Sure', 'Not Sure'),
+    ])
+    can_facilitate = models.CharField(max_length=20, blank=True, null=True, choices=[
+        ('Yes', 'Yes'),
+        ('No', 'No'),
+        ('Conditional', 'Conditional'),
+    ])
+    aware_establishments_count = models.IntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
+    concentration_sectors = models.CharField(max_length=500, blank=True, null=True)
+    known_employers = models.CharField(max_length=500, blank=True, null=True)
+    facilitation_mode = models.JSONField(default=list, blank=True, null=True)
+
+    # F. Recruitment, Skill Gaps & Operational Challenges
+    recruitment_challenges = models.JSONField(default=list, blank=True, null=True)
+    difficult_roles = models.CharField(max_length=500, blank=True, null=True)
+    emerging_roles = models.CharField(max_length=500, blank=True, null=True)
+    changing_competencies = models.CharField(max_length=500, blank=True, null=True)
+    skill_gaps = models.CharField(max_length=500, blank=True, null=True)
+    high_demand_districts = models.CharField(max_length=500, blank=True, null=True)
+    unfilled_reasons = models.CharField(max_length=500, blank=True, null=True)
+    operational_challenges = models.TextField(blank=True, null=True)
+
+    # G. Department Support & Institutional Partnership
+    facilitate_surveys = models.CharField(max_length=20, blank=True, null=True, choices=[
+        ('Yes', 'Yes'),
+        ('No', 'No'),
+        ('Conditional', 'Conditional'),
+    ])
+    share_registration_data = models.CharField(max_length=20, blank=True, null=True, choices=[
+        ('Yes', 'Yes'),
+        ('No', 'No'),
+        ('Conditional', 'Conditional'),
+    ])
+    participate_coordination = models.CharField(max_length=20, blank=True, null=True, choices=[
+        ('Yes', 'Yes'),
+        ('No', 'No'),
+        ('Conditional', 'Conditional'),
+    ])
+    share_demand_updates = models.CharField(max_length=50, blank=True, null=True, choices=[
+        ('Monthly', 'Monthly'),
+        ('Quarterly', 'Quarterly'),
+        ('Half-yearly', 'Half-yearly'),
+        ('As required', 'As required'),
+        ('Not feasible', 'Not feasible'),
+    ])
+    dept_nodal_officer_name = models.CharField(max_length=255, blank=True, null=True)
+    dept_nodal_officer_mobile = models.CharField(max_length=10, blank=True, null=True)
+    dept_nodal_officer_email = models.EmailField(blank=True, null=True)
+
+    # H. Evidence & Submission
+    supporting_evidence = models.JSONField(default=list, blank=True, null=True)
+    demand_evidence_status = models.CharField(max_length=50, blank=True, null=True, choices=[
+        ('Department Data Available', 'Department Data Available'),
+        ('Aggregate / Estimated Only', 'Aggregate / Estimated Only'),
+        ('Directional / Expert View', 'Directional / Expert View'),
+    ])
+    submission_date = models.DateField(blank=True, null=True)
+    place = models.CharField(max_length=255, blank=True, null=True)
+    authorized_signature = models.CharField(max_length=255, blank=True, null=True)
+    respondent_signature = models.CharField(max_length=255, blank=True, null=True)
+    official_stamp = models.BooleanField(default=False)
+
+    # Supporting Document
+    supporting_document = models.FileField(
+        upload_to='govt_documents/',
+        blank=True,
+        null=True,
+        validators=[
+            FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp'])
+        ],
+        help_text='Upload PDF or Image (Max 50KB)'
+    )
+
+    # System Fields
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'govt_consultations'
+        ordering = ['-created_at']
+        verbose_name = 'Government Consultation'
+        verbose_name_plural = 'Government Consultations'
+
+    def __str__(self):
+        return f"{self.consultation_id or 'Draft'} - {self.respondent_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.consultation_id:
+            year = self.consultation_date.year if self.consultation_date else timezone.now().year
+            count = GovtConsultation.objects.filter(
+                consultation_date__year=year
+            ).count() + 1
+            self.consultation_id = f"GOVT-{year}-{str(count).zfill(4)}"
+        super().save(*args, **kwargs)
+
+    @property
+    def total_investment_pipeline(self):
+        total = 0
+        if isinstance(self.investment_pipeline, list):
+            for row in self.investment_pipeline:
+                try:
+                    total += float(row.get('approx_investment', 0) or 0)
+                except (ValueError, TypeError):
+                    pass
+        return total
+
+    @property
+    def total_occupational_demand(self):
+        total = 0
+        if isinstance(self.occupational_categories, list):
+            for row in self.occupational_categories:
+                try:
+                    total += int(row.get('projected_demand', 0) or 0)
+                except (ValueError, TypeError):
+                    pass
+        return total
+
+    @property
+    def total_current_openings(self):
+        total = 0
+        if isinstance(self.occupational_categories, list):
+            for row in self.occupational_categories:
+                try:
+                    total += int(row.get('current_openings', 0) or 0)
+                except (ValueError, TypeError):
+                    pass
+        return total

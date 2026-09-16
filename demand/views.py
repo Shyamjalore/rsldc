@@ -17,7 +17,7 @@ from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
-from .models import Survey, JobDemand, ApprenticeshipOJT, AssociationConsultation, AssociationJobRole, AssociationApprenticeship
+from .models import Survey, JobDemand, ApprenticeshipOJT, AssociationConsultation, AssociationJobRole, AssociationApprenticeship, GovtConsultation
 
 logger = logging.getLogger(__name__)
 
@@ -1340,4 +1340,350 @@ def admin_export_association_csv(request):
             consultation.created_at.strftime('%Y-%m-%d %H:%M:%S')
         ])
     
+    return response
+
+
+# ============================================================
+# GOVERNMENT DEPARTMENT CONSULTATION VIEWS
+# ============================================================
+
+def govt_form(request):
+    """Render the government department consultation form"""
+    return render(request, 'govt_form.html')
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def submit_govt(request):
+    """Submit government department consultation form"""
+    print("=" * 60)
+    print("🔵 SUBMIT GOVT CONSULTATION API CALLED")
+    print("=" * 60)
+
+    try:
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            data = request.POST.dict()
+            files = request.FILES
+        else:
+            data = json.loads(request.body)
+            files = {}
+
+        print(f"✅ Data Parsed Successfully")
+
+        # Helper to parse JSON fields safely
+        def parse_json_field(field_name, default=None):
+            if default is None:
+                default = []
+            val = data.get(field_name, default)
+            if isinstance(val, str):
+                try:
+                    return json.loads(val)
+                except:
+                    return default
+            return val
+
+        with transaction.atomic():
+            # Parse dates
+            consultation_date = data.get('consultation_date')
+            if consultation_date:
+                consultation_date = datetime.strptime(consultation_date, '%Y-%m-%d').date()
+            else:
+                consultation_date = datetime.now().date()
+
+            submission_date = data.get('submission_date')
+            if submission_date:
+                submission_date = datetime.strptime(submission_date, '%Y-%m-%d').date()
+            else:
+                submission_date = datetime.now().date()
+
+            # Parse JSON fields
+            office_visited = parse_json_field('office_visited')
+            body_type = parse_json_field('body_type')
+            jurisdiction = parse_json_field('jurisdiction')
+            investment_pipeline = parse_json_field('investment_pipeline')
+            sectoral_analysis = parse_json_field('sectoral_analysis')
+            occupational_categories = parse_json_field('occupational_categories')
+            facilitation_mode = parse_json_field('facilitation_mode')
+            recruitment_challenges = parse_json_field('recruitment_challenges')
+            supporting_evidence = parse_json_field('supporting_evidence')
+
+            # Parse integer field
+            aware_count = data.get('aware_establishments_count', '').strip()
+            try:
+                aware_count = int(aware_count) if aware_count else None
+            except (ValueError, TypeError):
+                aware_count = None
+
+            # Create consultation
+            consultation = GovtConsultation.objects.create(
+                consultation_id=data.get('consultation_id', '').strip(),
+                district_region=data.get('district_region', '').strip(),
+                mode=data.get('mode', '').strip(),
+                mode_other=data.get('mode_other', '').strip(),
+                consultation_date=consultation_date,
+                surveyor_name=data.get('surveyor_name', '').strip(),
+                office_visited=office_visited,
+                office_visited_other=data.get('office_visited_other', '').strip(),
+                body_type=body_type,
+                body_type_other=data.get('body_type_other', '').strip(),
+                jurisdiction=jurisdiction,
+                jurisdiction_other=data.get('jurisdiction_other', '').strip(),
+                respondent_name=data.get('respondent_name', '').strip(),
+                respondent_mobile=data.get('respondent_mobile', '').strip(),
+                respondent_email=data.get('respondent_email', '').strip(),
+                office_address=data.get('office_address', '').strip(),
+                department_website=data.get('department_website', '').strip(),
+                nodal_officer_name=data.get('nodal_officer_name', '').strip(),
+                nodal_officer_mobile=data.get('nodal_officer_mobile', '').strip(),
+                nodal_officer_email=data.get('nodal_officer_email', '').strip(),
+                investment_pipeline=investment_pipeline,
+                sectoral_analysis=sectoral_analysis,
+                occupational_categories=occupational_categories,
+                upcoming_schemes=data.get('upcoming_schemes', '').strip(),
+                emerging_technologies=data.get('emerging_technologies', '').strip(),
+                aware_establishments=data.get('aware_establishments', '').strip(),
+                can_facilitate=data.get('can_facilitate', '').strip(),
+                aware_establishments_count=aware_count,
+                concentration_sectors=data.get('concentration_sectors', '').strip(),
+                known_employers=data.get('known_employers', '').strip(),
+                facilitation_mode=facilitation_mode,
+                recruitment_challenges=recruitment_challenges,
+                difficult_roles=data.get('difficult_roles', '').strip(),
+                emerging_roles=data.get('emerging_roles', '').strip(),
+                changing_competencies=data.get('changing_competencies', '').strip(),
+                skill_gaps=data.get('skill_gaps', '').strip(),
+                high_demand_districts=data.get('high_demand_districts', '').strip(),
+                unfilled_reasons=data.get('unfilled_reasons', '').strip(),
+                operational_challenges=data.get('operational_challenges', '').strip(),
+                facilitate_surveys=data.get('facilitate_surveys', '').strip(),
+                share_registration_data=data.get('share_registration_data', '').strip(),
+                participate_coordination=data.get('participate_coordination', '').strip(),
+                share_demand_updates=data.get('share_demand_updates', '').strip(),
+                dept_nodal_officer_name=data.get('dept_nodal_officer_name', '').strip(),
+                dept_nodal_officer_mobile=data.get('dept_nodal_officer_mobile', '').strip(),
+                dept_nodal_officer_email=data.get('dept_nodal_officer_email', '').strip(),
+                supporting_evidence=supporting_evidence,
+                demand_evidence_status=data.get('demand_evidence_status', '').strip(),
+                submission_date=submission_date,
+                place=data.get('place', '').strip(),
+                authorized_signature=data.get('authorized_signature', '').strip(),
+                respondent_signature=data.get('respondent_signature', '').strip(),
+                official_stamp=(data.get('official_stamp') == 'true' or data.get('official_stamp') == 'on'),
+            )
+
+            print(f"✅ Govt Consultation Created! ID: {consultation.id}")
+
+            # Handle file upload
+            if 'supporting_document' in files:
+                uploaded_file = files['supporting_document']
+                if uploaded_file.size > 50 * 1024:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'File size exceeds 50KB limit.'
+                    }, status=400)
+
+                file_name = f"govt_{consultation.id}_{uploaded_file.name}"
+                saved_path = default_storage.save(
+                    os.path.join('govt_documents', file_name),
+                    ContentFile(uploaded_file.read())
+                )
+                consultation.supporting_document = saved_path
+                consultation.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Government consultation submitted successfully',
+            'consultation_id': consultation.id
+        }, status=201)
+
+    except Exception as e:
+        print(f"❌ ERROR: {str(e)}")
+        traceback.print_exc()
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
+
+@login_required
+def admin_govt_list(request):
+    """List all government consultations"""
+    consultations = GovtConsultation.objects.all()
+
+    context = {
+        'consultations': consultations,
+        'total_consultations': consultations.count(),
+        'total_investment': sum(c.total_investment_pipeline for c in consultations),
+        'total_current_openings': sum(c.total_current_openings for c in consultations),
+        'total_projected_demand': sum(c.total_occupational_demand for c in consultations),
+    }
+    return render(request, 'portal/govt_list.html', context)
+
+
+@login_required
+def get_govt_detail(request, consultation_id):
+    """Get detailed government consultation data"""
+    try:
+        consultation = GovtConsultation.objects.get(id=consultation_id)
+
+        def ensure_list(val):
+            if isinstance(val, list):
+                return val
+            if isinstance(val, str):
+                try:
+                    return json.loads(val)
+                except:
+                    return []
+            return []
+
+        data = {
+            'id': consultation.id,
+            'consultation_id': consultation.consultation_id or '',
+            'district_region': consultation.district_region,
+            'mode': consultation.mode,
+            'mode_other': consultation.mode_other or '',
+            'consultation_date': consultation.consultation_date.strftime('%Y-%m-%d') if consultation.consultation_date else '',
+            'surveyor_name': consultation.surveyor_name,
+            'office_visited': ensure_list(consultation.office_visited),
+            'office_visited_other': consultation.office_visited_other or '',
+            'body_type': ensure_list(consultation.body_type),
+            'body_type_other': consultation.body_type_other or '',
+            'jurisdiction': ensure_list(consultation.jurisdiction),
+            'jurisdiction_other': consultation.jurisdiction_other or '',
+            'respondent_name': consultation.respondent_name,
+            'respondent_mobile': consultation.respondent_mobile,
+            'respondent_email': consultation.respondent_email,
+            'office_address': consultation.office_address or '',
+            'department_website': consultation.department_website or '',
+            'nodal_officer_name': consultation.nodal_officer_name or '',
+            'nodal_officer_mobile': consultation.nodal_officer_mobile or '',
+            'nodal_officer_email': consultation.nodal_officer_email or '',
+            'investment_pipeline': ensure_list(consultation.investment_pipeline),
+            'sectoral_analysis': ensure_list(consultation.sectoral_analysis),
+            'occupational_categories': ensure_list(consultation.occupational_categories),
+            'upcoming_schemes': consultation.upcoming_schemes or '',
+            'emerging_technologies': consultation.emerging_technologies or '',
+            'aware_establishments': consultation.aware_establishments or '',
+            'can_facilitate': consultation.can_facilitate or '',
+            'aware_establishments_count': consultation.aware_establishments_count,
+            'concentration_sectors': consultation.concentration_sectors or '',
+            'known_employers': consultation.known_employers or '',
+            'facilitation_mode': ensure_list(consultation.facilitation_mode),
+            'recruitment_challenges': ensure_list(consultation.recruitment_challenges),
+            'difficult_roles': consultation.difficult_roles or '',
+            'emerging_roles': consultation.emerging_roles or '',
+            'changing_competencies': consultation.changing_competencies or '',
+            'skill_gaps': consultation.skill_gaps or '',
+            'high_demand_districts': consultation.high_demand_districts or '',
+            'unfilled_reasons': consultation.unfilled_reasons or '',
+            'operational_challenges': consultation.operational_challenges or '',
+            'facilitate_surveys': consultation.facilitate_surveys or '',
+            'share_registration_data': consultation.share_registration_data or '',
+            'participate_coordination': consultation.participate_coordination or '',
+            'share_demand_updates': consultation.share_demand_updates or '',
+            'dept_nodal_officer_name': consultation.dept_nodal_officer_name or '',
+            'dept_nodal_officer_mobile': consultation.dept_nodal_officer_mobile or '',
+            'dept_nodal_officer_email': consultation.dept_nodal_officer_email or '',
+            'supporting_evidence': ensure_list(consultation.supporting_evidence),
+            'demand_evidence_status': consultation.demand_evidence_status or '',
+            'submission_date': consultation.submission_date.strftime('%Y-%m-%d') if consultation.submission_date else '',
+            'place': consultation.place or '',
+            'authorized_signature': consultation.authorized_signature or '',
+            'respondent_signature': consultation.respondent_signature or '',
+            'official_stamp': consultation.official_stamp,
+            'supporting_document_url': consultation.supporting_document.url if consultation.supporting_document else '',
+            'created_at': consultation.created_at.strftime('%d %b %Y, %I:%M %p'),
+            'totals': {
+                'investment_pipeline': consultation.total_investment_pipeline,
+                'current_openings': consultation.total_current_openings,
+                'projected_demand': consultation.total_occupational_demand,
+            }
+        }
+        return JsonResponse({'status': 'success', 'data': data})
+    except GovtConsultation.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Consultation not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@csrf_exempt
+def delete_govt(request, consultation_id):
+    """Delete government consultation and related data"""
+    if request.method != 'DELETE':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+    try:
+        consultation = GovtConsultation.objects.get(id=consultation_id)
+        if consultation.supporting_document:
+            if default_storage.exists(consultation.supporting_document.name):
+                default_storage.delete(consultation.supporting_document.name)
+        consultation.delete()
+        return JsonResponse({'status': 'success', 'message': 'Consultation deleted successfully'})
+    except GovtConsultation.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Consultation not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+def admin_export_govt_csv(request):
+    """Export government consultation data to CSV"""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="govt_consultations_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+
+    writer = csv.writer(response)
+
+    headers = [
+        'Consultation ID', 'Date', 'District/Region', 'Mode', 'Surveyor Name',
+        'Office Visited', 'Body Type', 'Jurisdiction',
+        'Respondent Name', 'Respondent Mobile', 'Respondent Email',
+        'Office Address', 'Department Website',
+        'Nodal Officer Name', 'Nodal Officer Mobile', 'Nodal Officer Email',
+        'Total Investment Pipeline (₹ Cr)', 'Total Current Openings',
+        'Total Projected Demand', 'Aware of Establishments',
+        'Can Facilitate', 'Facilitate Surveys', 'Share Registration Data',
+        'Participate Coordination', 'Share Demand Updates',
+        'Demand Evidence Status', 'Place', 'Official Stamp', 'Created At'
+    ]
+    writer.writerow(headers)
+
+    for c in GovtConsultation.objects.all():
+        def safe_list(val):
+            if isinstance(val, list):
+                return ', '.join(str(v) for v in val)
+            return str(val or '')
+
+        writer.writerow([
+            c.consultation_id or '',
+            c.consultation_date.strftime('%Y-%m-%d') if c.consultation_date else '',
+            c.district_region or '',
+            c.mode or '',
+            c.surveyor_name or '',
+            safe_list(c.office_visited),
+            safe_list(c.body_type),
+            safe_list(c.jurisdiction),
+            c.respondent_name or '',
+            c.respondent_mobile or '',
+            c.respondent_email or '',
+            c.office_address or '',
+            c.department_website or '',
+            c.nodal_officer_name or '',
+            c.nodal_officer_mobile or '',
+            c.nodal_officer_email or '',
+            c.total_investment_pipeline,
+            c.total_current_openings,
+            c.total_occupational_demand,
+            c.aware_establishments or '',
+            c.can_facilitate or '',
+            c.facilitate_surveys or '',
+            c.share_registration_data or '',
+            c.participate_coordination or '',
+            c.share_demand_updates or '',
+            c.demand_evidence_status or '',
+            c.place or '',
+            'Yes' if c.official_stamp else 'No',
+            c.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        ])
+
     return response

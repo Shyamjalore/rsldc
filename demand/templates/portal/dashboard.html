@@ -453,8 +453,14 @@
                 <span>Job Demands</span>
                 <span class="nav-badge">{{ total_jobs|default:0 }}</span>
             </a>
+            <a href="{% url 'survey:admin_govt_list' %}" class="nav-link-modern">
+                <span class="nav-icon-modern"><i class="fas fa-landmark"></i></span>
+                <span>Govt Departments</span>
+                <span class="nav-badge">{{ total_govt_departments|default:0 }}</span>
+            </a>
+           
             <div class="nav-label" style="margin-top:12px;">Tools</div>
-            <a href="{% url 'survey:admin_export_csv' %}" class="nav-link-modern">
+            <a href="#" class="nav-link-modern">
                 <span class="nav-icon-modern"><i class="fas fa-download"></i></span>
                 <span>Export CSV</span>
             </a>
@@ -480,7 +486,7 @@
                 <p>Rajasthan Skill Demand Aggregation Portal · <span id="liveTime" class="text-blue-600 font-semibold"></span></p>
             </div>
             <div class="header-actions-modern">
-                <a href="{% url 'survey:admin_export_csv' %}" class="btn-modern btn-success-modern">
+                <a href="#" class="btn-modern btn-success-modern">
                     <i class="fas fa-file-export"></i> Export CSV
                 </a>
                 <button type="button" class="btn-modern btn-primary-modern" onclick="window.print()">
@@ -657,7 +663,7 @@
                     <a href="{% url 'survey:admin_job_demands' %}">
                         <i class="fas fa-briefcase"></i> View Job Demands
                     </a>
-                    <a href="{% url 'survey:admin_export_csv' %}">
+                    <a href="#">
                         <i class="fas fa-file-csv"></i> Download CSV
                     </a>
                     <a href="#" onclick="window.print()">
