@@ -1349,28 +1349,73 @@ def admin_export_association_csv(request):
 
 def govt_form(request):
     """Render the government department consultation form"""
+    print("=" * 60)
+    print("🟢 GOVT FORM VIEW CALLED")
+    print("=" * 60)
     return render(request, 'govt_form.html')
 
 
 @csrf_exempt
-@require_http_methods(["POST"])
+@require_http_methods(["POST", "OPTIONS"])
 def submit_govt(request):
     """Submit government department consultation form"""
     print("=" * 60)
     print("🔵 SUBMIT GOVT CONSULTATION API CALLED")
+    print(f"   Method: {request.method}")
+    print(f"   Content-Type: {request.content_type}")
+    print(f"   Has POST data: {bool(request.POST)}")
+    print(f"   Has FILES: {bool(request.FILES)}")
     print("=" * 60)
 
+    # Handle OPTIONS preflight (CORS)
+    if request.method == "OPTIONS":
+        return JsonResponse({'status': 'ok'}, status=200)
+
     try:
-        if request.content_type and 'multipart/form-data' in request.content_type:
+        # ------------------------------------------------------------
+        # STEP 1: Parse request data
+        # ------------------------------------------------------------
+        files = {}
+        content_type = (request.content_type or '').lower()
+
+        if 'multipart/form-data' in content_type:
             data = request.POST.dict()
             files = request.FILES
+            print("📦 Parsed as multipart/form-data")
+            print(f"   Fields received: {list(data.keys())}")
+            print(f"   Files received: {list(files.keys())}")
+        elif 'application/json' in content_type:
+            try:
+                data = json.loads(request.body)
+                print("📦 Parsed as application/json")
+            except Exception as je:
+                print(f"❌ JSON parse error: {je}")
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f'Invalid JSON: {je}'
+                }, status=400)
         else:
-            data = json.loads(request.body)
-            files = {}
+            # Fallback: try POST first, then JSON
+            if request.POST:
+                data = request.POST.dict()
+                files = request.FILES
+                print("📦 Parsed as urlencoded form")
+            else:
+                try:
+                    data = json.loads(request.body or b'{}')
+                    print("📦 Parsed as raw JSON fallback")
+                except Exception as fe:
+                    print(f"❌ Unable to parse body: {fe}")
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'Unsupported or malformed request body.'
+                    }, status=400)
 
-        print(f"✅ Data Parsed Successfully")
+        print(f"✅ Data parsed. Keys: {list(data.keys())[:30]}")
 
-        # Helper to parse JSON fields safely
+        # ------------------------------------------------------------
+        # STEP 2: Helper to parse JSON list fields
+        # ------------------------------------------------------------
         def parse_json_field(field_name, default=None):
             if default is None:
                 default = []
@@ -1378,43 +1423,89 @@ def submit_govt(request):
             if isinstance(val, str):
                 try:
                     return json.loads(val)
-                except:
+                except Exception as pe:
+                    print(f"⚠️ Could not parse JSON field '{field_name}': {pe}. Raw: {val[:120]}")
                     return default
-            return val
+            return val if val is not None else default
 
-        with transaction.atomic():
-            # Parse dates
-            consultation_date = data.get('consultation_date')
-            if consultation_date:
-                consultation_date = datetime.strptime(consultation_date, '%Y-%m-%d').date()
-            else:
-                consultation_date = datetime.now().date()
-
-            submission_date = data.get('submission_date')
-            if submission_date:
-                submission_date = datetime.strptime(submission_date, '%Y-%m-%d').date()
-            else:
-                submission_date = datetime.now().date()
-
-            # Parse JSON fields
-            office_visited = parse_json_field('office_visited')
-            body_type = parse_json_field('body_type')
-            jurisdiction = parse_json_field('jurisdiction')
-            investment_pipeline = parse_json_field('investment_pipeline')
-            sectoral_analysis = parse_json_field('sectoral_analysis')
-            occupational_categories = parse_json_field('occupational_categories')
-            facilitation_mode = parse_json_field('facilitation_mode')
-            recruitment_challenges = parse_json_field('recruitment_challenges')
-            supporting_evidence = parse_json_field('supporting_evidence')
-
-            # Parse integer field
-            aware_count = data.get('aware_establishments_count', '').strip()
+        # ------------------------------------------------------------
+        # STEP 3: Parse dates
+        # ------------------------------------------------------------
+        consultation_date = data.get('consultation_date', '').strip()
+        if consultation_date:
             try:
-                aware_count = int(aware_count) if aware_count else None
-            except (ValueError, TypeError):
-                aware_count = None
+                consultation_date = datetime.strptime(consultation_date, '%Y-%m-%d').date()
+            except ValueError:
+                print(f"⚠️ Invalid consultation_date: {consultation_date}. Using today.")
+                consultation_date = datetime.now().date()
+        else:
+            consultation_date = datetime.now().date()
 
-            # Create consultation
+        submission_date = data.get('submission_date', '').strip()
+        if submission_date:
+            try:
+                submission_date = datetime.strptime(submission_date, '%Y-%m-%d').date()
+            except ValueError:
+                submission_date = datetime.now().date()
+        else:
+            submission_date = datetime.now().date()
+
+        # ------------------------------------------------------------
+        # STEP 4: Parse JSON fields
+        # ------------------------------------------------------------
+        office_visited = parse_json_field('office_visited')
+        body_type = parse_json_field('body_type')
+        jurisdiction = parse_json_field('jurisdiction')
+        investment_pipeline = parse_json_field('investment_pipeline')
+        sectoral_analysis = parse_json_field('sectoral_analysis')
+        occupational_categories = parse_json_field('occupational_categories')
+        facilitation_mode = parse_json_field('facilitation_mode')
+        recruitment_challenges = parse_json_field('recruitment_challenges')
+        supporting_evidence = parse_json_field('supporting_evidence')
+
+        print(f"   office_visited: {office_visited}")
+        print(f"   body_type: {body_type}")
+        print(f"   jurisdiction: {jurisdiction}")
+        print(f"   investment_pipeline rows: {len(investment_pipeline)}")
+        print(f"   occupational_categories rows: {len(occupational_categories)}")
+
+        # ------------------------------------------------------------
+        # STEP 5: Parse integer field
+        # ------------------------------------------------------------
+        aware_count = data.get('aware_establishments_count', '').strip()
+        try:
+            aware_count = int(aware_count) if aware_count else None
+        except (ValueError, TypeError):
+            aware_count = None
+
+        # ------------------------------------------------------------
+        # STEP 6: Validate mandatory fields
+        # ------------------------------------------------------------
+        required_fields = {
+            'consultation_id': 'Consultation ID',
+            'district_region': 'District / Region',
+            'mode': 'Mode of Consultation',
+            'surveyor_name': 'Surveyor Name',
+            'respondent_name': 'Respondent Name',
+            'respondent_mobile': 'Respondent Mobile',
+            'respondent_email': 'Respondent Email',
+        }
+        missing = []
+        for key, label in required_fields.items():
+            if not str(data.get(key, '')).strip():
+                missing.append(label)
+
+        if missing:
+            print(f"❌ Missing required fields: {missing}")
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Missing required fields: {", ".join(missing)}'
+            }, status=400)
+
+        # ------------------------------------------------------------
+        # STEP 7: Create consultation record
+        # ------------------------------------------------------------
+        with transaction.atomic():
             consultation = GovtConsultation.objects.create(
                 consultation_id=data.get('consultation_id', '').strip(),
                 district_region=data.get('district_region', '').strip(),
@@ -1468,19 +1559,22 @@ def submit_govt(request):
                 place=data.get('place', '').strip(),
                 authorized_signature=data.get('authorized_signature', '').strip(),
                 respondent_signature=data.get('respondent_signature', '').strip(),
-                official_stamp=(data.get('official_stamp') == 'true' or data.get('official_stamp') == 'on'),
+                official_stamp=(str(data.get('official_stamp', '')).lower() in ['true', 'on', '1', 'yes']),
             )
 
             print(f"✅ Govt Consultation Created! ID: {consultation.id}")
 
-            # Handle file upload
+            # --------------------------------------------------------
+            # STEP 8: Handle file upload
+            # --------------------------------------------------------
             if 'supporting_document' in files:
                 uploaded_file = files['supporting_document']
+                print(f"📎 File received: {uploaded_file.name} ({uploaded_file.size} bytes)")
+
                 if uploaded_file.size > 50 * 1024:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'File size exceeds 50KB limit.'
-                    }, status=400)
+                    print(f"❌ File too large: {uploaded_file.size} bytes")
+                    # Roll back the transaction by raising
+                    raise ValueError('File size exceeds 50KB limit.')
 
                 file_name = f"govt_{consultation.id}_{uploaded_file.name}"
                 saved_path = default_storage.save(
@@ -1489,6 +1583,7 @@ def submit_govt(request):
                 )
                 consultation.supporting_document = saved_path
                 consultation.save()
+                print(f"✅ File saved: {saved_path}")
 
         return JsonResponse({
             'status': 'success',
@@ -1496,12 +1591,19 @@ def submit_govt(request):
             'consultation_id': consultation.id
         }, status=201)
 
+    except ValueError as ve:
+        print(f"❌ Validation error: {ve}")
+        return JsonResponse({
+            'status': 'error',
+            'message': str(ve)
+        }, status=400)
+
     except Exception as e:
         print(f"❌ ERROR: {str(e)}")
         traceback.print_exc()
         return JsonResponse({
             'status': 'error',
-            'message': str(e)
+            'message': f'{type(e).__name__}: {str(e)}'
         }, status=500)
 
 

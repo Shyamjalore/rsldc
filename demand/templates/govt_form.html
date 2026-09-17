@@ -123,6 +123,7 @@
         .btn-outline { background: transparent; border: 1px solid #d1d5db; color: #4a5568; }
         .btn-outline:hover { background: #f7fafc; }
         .btn-sm { padding: 0.25rem 0.8rem; font-size: 0.8rem; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .remove-btn {
             color: #e53e3e;
             background: none;
@@ -459,9 +460,7 @@
                                 <th style="width: 5%;"></th>
                             </tr>
                         </thead>
-                        <tbody id="investmentPipelineBody">
-                            <!-- Rows will be added here -->
-                        </tbody>
+                        <tbody id="investmentPipelineBody"></tbody>
                     </table>
                 </div>
                 <button type="button" class="btn btn-outline btn-sm mt-2" onclick="addInvestmentPipelineRow()">
@@ -487,9 +486,7 @@
                                 <th style="width: 5%;"></th>
                             </tr>
                         </thead>
-                        <tbody id="sectoralAnalysisBody">
-                            <!-- Rows will be added here -->
-                        </tbody>
+                        <tbody id="sectoralAnalysisBody"></tbody>
                     </table>
                 </div>
                 <button type="button" class="btn btn-outline btn-sm mt-2" onclick="addSectoralAnalysisRow()">
@@ -523,9 +520,7 @@
                                     <th style="width: 5%;"></th>
                                 </tr>
                             </thead>
-                            <tbody id="occupationalCategoriesBody">
-                                <!-- Rows will be added here -->
-                            </tbody>
+                            <tbody id="occupationalCategoriesBody"></tbody>
                         </table>
                     </div>
                     <button type="button" class="btn btn-outline btn-sm mt-2" onclick="addOccupationalCategoryRow()">
@@ -808,7 +803,8 @@
                 </div>
                 <div>
                     <button type="submit" class="btn btn-success px-6" id="submitBtn">
-                        <i class="fas fa-paper-plane"></i> Submit Consultation
+                        <i class="fas fa-paper-plane"></i>
+                        <span id="submitBtnText">Submit Consultation</span>
                         <span id="submitSpinner" class="spinner hidden ml-2"></span>
                     </button>
                 </div>
@@ -818,6 +814,30 @@
 
     <script>
         // ============================================================
+        // GLOBAL ERROR CATCHER
+        // ============================================================
+        window.onerror = function(msg, url, line, col, error) {
+            console.error('🔴 GLOBAL JS ERROR:', msg, 'at line', line);
+            console.error('Error object:', error);
+            return false;
+        };
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('🔴 UNHANDLED PROMISE REJECTION:', e.reason);
+        });
+
+        // ============================================================
+        // DEBUG HELPER
+        // ============================================================
+        const DEBUG = true;
+        function log(...args) {
+            if (DEBUG) console.log('%c[GOVT-FORM]', 'color:#3182ce;font-weight:bold', ...args);
+        }
+        function logErr(...args) {
+            console.error('%c[GOVT-FORM ERROR]', 'color:#e53e3e;font-weight:bold', ...args);
+        }
+
+        // ============================================================
         // GLOBALS
         // ============================================================
         let startTime = new Date();
@@ -826,14 +846,35 @@
         let occupationalRowCounter = 0;
 
         // ============================================================
+        // SAFE DOM HELPERS
+        // ============================================================
+        function getEl(id) {
+            const el = document.getElementById(id);
+            if (!el) logErr('Element not found:', id);
+            return el;
+        }
+        function val(id) {
+            const el = document.getElementById(id);
+            return el ? el.value : '';
+        }
+        function setBtnText(text) {
+            const el = document.getElementById('submitBtnText');
+            if (el) el.textContent = text;
+            else logErr('submitBtnText span not found!');
+        }
+
+        // ============================================================
         // DOM READY
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('consultationDate').value = today;
-            document.getElementById('submissionDate').value = today;
+            log('DOM loaded — initializing form');
 
-            // Add initial rows
+            const today = new Date().toISOString().split('T')[0];
+            const cdEl = document.getElementById('consultationDate');
+            const sdEl = document.getElementById('submissionDate');
+            if (cdEl) cdEl.value = today;
+            if (sdEl) sdEl.value = today;
+
             addInvestmentPipelineRow();
             addSectoralAnalysisRow();
             addOccupationalCategoryRow();
@@ -842,7 +883,20 @@
             setupFileUpload();
             setupOtherToggles();
 
-            document.getElementById('govtForm').addEventListener('submit', handleSubmit);
+            const form = document.getElementById('govtForm');
+            if (form) {
+                form.addEventListener('submit', handleSubmit);
+                log('Form submit handler attached');
+            } else {
+                logErr('govtForm element NOT FOUND — submit will fail!');
+            }
+
+            const csrf = document.querySelector('[name="csrfmiddlewaretoken"]');
+            if (csrf) {
+                log('CSRF token present:', csrf.value.substring(0, 10) + '...');
+            } else {
+                logErr('CSRF token NOT FOUND in form!');
+            }
         });
 
         // ============================================================
@@ -852,7 +906,8 @@
             const elapsed = Math.floor((new Date() - startTime) / 1000);
             const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
             const secs = String(elapsed % 60).padStart(2, '0');
-            document.getElementById('formTimer').textContent = `${mins}:${secs}`;
+            const timerEl = document.getElementById('formTimer');
+            if (timerEl) timerEl.textContent = `${mins}:${secs}`;
         }
 
         // ============================================================
@@ -888,33 +943,57 @@
         // ============================================================
         function toggleOfficeVisitedOther(cb) {
             const w = document.getElementById('officeVisitedOtherWrapper');
+            if (!w) return;
             cb.checked ? w.classList.add('show') : w.classList.remove('show');
-            if (!cb.checked) document.getElementById('officeVisitedOther').value = '';
+            if (!cb.checked) {
+                const o = document.getElementById('officeVisitedOther');
+                if (o) o.value = '';
+            }
         }
         function toggleBodyTypeOther(cb) {
             const w = document.getElementById('bodyTypeOtherWrapper');
+            if (!w) return;
             cb.checked ? w.classList.add('show') : w.classList.remove('show');
-            if (!cb.checked) document.getElementById('bodyTypeOther').value = '';
+            if (!cb.checked) {
+                const o = document.getElementById('bodyTypeOther');
+                if (o) o.value = '';
+            }
         }
         function toggleJurisdictionOther(cb) {
             const w = document.getElementById('jurisdictionOtherWrapper');
+            if (!w) return;
             cb.checked ? w.classList.add('show') : w.classList.remove('show');
-            if (!cb.checked) document.getElementById('jurisdictionOther').value = '';
+            if (!cb.checked) {
+                const o = document.getElementById('jurisdictionOther');
+                if (o) o.value = '';
+            }
         }
         function toggleFacilitationModeOther(cb) {
             const w = document.getElementById('facilitationModeOtherWrapper');
+            if (!w) return;
             cb.checked ? w.classList.add('show') : w.classList.remove('show');
-            if (!cb.checked) document.getElementById('facilitationModeOther').value = '';
+            if (!cb.checked) {
+                const o = document.getElementById('facilitationModeOther');
+                if (o) o.value = '';
+            }
         }
         function toggleRecruitmentOther(cb) {
             const w = document.getElementById('recruitmentOtherWrapper');
+            if (!w) return;
             cb.checked ? w.classList.add('show') : w.classList.remove('show');
-            if (!cb.checked) document.getElementById('recruitmentOther').value = '';
+            if (!cb.checked) {
+                const o = document.getElementById('recruitmentOther');
+                if (o) o.value = '';
+            }
         }
         function toggleEvidenceOther(cb) {
             const w = document.getElementById('evidenceOtherWrapper');
+            if (!w) return;
             cb.checked ? w.classList.add('show') : w.classList.remove('show');
-            if (!cb.checked) document.getElementById('evidenceOther').value = '';
+            if (!cb.checked) {
+                const o = document.getElementById('evidenceOther');
+                if (o) o.value = '';
+            }
         }
 
         // ============================================================
@@ -923,6 +1002,7 @@
         function addInvestmentPipelineRow() {
             investmentRowCounter++;
             const tbody = document.getElementById('investmentPipelineBody');
+            if (!tbody) return;
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><input type="text" name="inv_sector[]" placeholder="e.g. Manufacturing & Heavy Engineering" /></td>
@@ -941,6 +1021,7 @@
         function addSectoralAnalysisRow() {
             sectoralRowCounter++;
             const tbody = document.getElementById('sectoralAnalysisBody');
+            if (!tbody) return;
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><input type="text" name="sector_classification[]" placeholder="e.g. Textile, Handloom & Leather" /></td>
@@ -957,6 +1038,7 @@
         function addOccupationalCategoryRow() {
             occupationalRowCounter++;
             const tbody = document.getElementById('occupationalCategoriesBody');
+            if (!tbody) return;
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><input type="text" name="occ_category[]" placeholder="e.g. Welder, Electrician" /></td>
@@ -988,6 +1070,7 @@
         function setupFileUpload() {
             const dropArea = document.getElementById('fileDropArea');
             const fileInput = document.getElementById('supportingDocument');
+            if (!dropArea || !fileInput) return;
 
             dropArea.addEventListener('click', () => fileInput.click());
             dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('dragover'); });
@@ -1016,15 +1099,21 @@
                 showToast('File size exceeds 50KB limit.', 'error');
                 clearFile(); return;
             }
-            document.getElementById('fileName').textContent = file.name;
-            document.getElementById('fileInfo').classList.remove('hidden');
-            document.getElementById('fileDropArea').style.display = 'none';
+            const fnEl = document.getElementById('fileName');
+            const fiEl = document.getElementById('fileInfo');
+            const fdEl = document.getElementById('fileDropArea');
+            if (fnEl) fnEl.textContent = file.name;
+            if (fiEl) fiEl.classList.remove('hidden');
+            if (fdEl) fdEl.style.display = 'none';
         }
 
         function clearFile() {
-            document.getElementById('supportingDocument').value = '';
-            document.getElementById('fileInfo').classList.add('hidden');
-            document.getElementById('fileDropArea').style.display = 'block';
+            const input = document.getElementById('supportingDocument');
+            const fi = document.getElementById('fileInfo');
+            const fd = document.getElementById('fileDropArea');
+            if (input) input.value = '';
+            if (fi) fi.classList.add('hidden');
+            if (fd) fd.style.display = 'block';
         }
 
         // ============================================================
@@ -1044,35 +1133,67 @@
         }
 
         // ============================================================
+        // GET CSRF TOKEN
+        // ============================================================
+        function getCsrfToken() {
+            const input = document.querySelector('[name="csrfmiddlewaretoken"]');
+            if (input && input.value) return input.value;
+
+            const name = 'csrftoken';
+            const cookies = document.cookie.split(';');
+            for (let c of cookies) {
+                c = c.trim();
+                if (c.startsWith(name + '=')) {
+                    return decodeURIComponent(c.substring(name.length + 1));
+                }
+            }
+            return '';
+        }
+
+        // ============================================================
         // FORM SUBMIT
         // ============================================================
         async function handleSubmit(e) {
             e.preventDefault();
+            log('========== SUBMIT STARTED ==========');
 
             const submitBtn = document.getElementById('submitBtn');
             const spinner = document.getElementById('submitSpinner');
 
-            // Validate required
+            if (!submitBtn || !spinner) {
+                logErr('Submit button or spinner not found!');
+                return;
+            }
+
+            // ------------------------------------------------------------
+            // Validation
+            // ------------------------------------------------------------
             const requiredFields = [
-                'consultationId', 'districtRegion', 'mode', 'consultationDate', 'surveyorName',
-                'respondentName', 'respondentMobile', 'respondentEmail'
+                ['consultationId', 'Consultation ID'],
+                ['districtRegion', 'District / Region'],
+                ['mode', 'Mode of Consultation'],
+                ['consultationDate', 'Date'],
+                ['surveyorName', 'Surveyor Name'],
+                ['respondentName', 'Respondent Name'],
+                ['respondentMobile', 'Mobile Number'],
+                ['respondentEmail', 'Official Email'],
             ];
-            for (const id of requiredFields) {
+            for (const [id, label] of requiredFields) {
                 const el = document.getElementById(id);
+                if (!el) { logErr(`Field #${id} not found`); continue; }
                 if (!el.value.trim()) {
-                    showToast('Please fill in all required fields.', 'error');
-                    el.focus(); return;
+                    logErr(`Required field empty: ${label}`);
+                    showToast(`Please fill: ${label}`, 'error');
+                    el.focus();
+                    return;
                 }
             }
 
-            // Validate office visited
             if (getCheckedValues('office_visited').length === 0 &&
                 !document.getElementById('officeVisitedOtherCheck').checked) {
                 showToast('Please select at least one Department / Office Visited.', 'error');
                 return;
             }
-
-            // Validate body type & jurisdiction
             if (getCheckedValues('body_type').length === 0 &&
                 !document.getElementById('bodyTypeOtherCheck').checked) {
                 showToast('Please select Level / Type of Body.', 'error');
@@ -1084,57 +1205,64 @@
                 return;
             }
 
+            log('✅ Validation passed');
+
+            // ------------------------------------------------------------
+            // Build FormData
+            // ------------------------------------------------------------
             const formData = new FormData();
 
-            // A. Consultation Control
-            formData.append('consultation_id', document.getElementById('consultationId').value.trim());
-            formData.append('district_region', document.getElementById('districtRegion').value.trim());
-            formData.append('mode', document.getElementById('mode').value);
-            formData.append('mode_other', document.getElementById('modeOther').value.trim());
-            formData.append('consultation_date', document.getElementById('consultationDate').value);
-            formData.append('surveyor_name', document.getElementById('surveyorName').value.trim());
+            formData.append('consultation_id', val('consultationId').trim());
+            formData.append('district_region', val('districtRegion').trim());
+            formData.append('mode', val('mode'));
+            formData.append('mode_other', val('modeOther').trim());
+            formData.append('consultation_date', val('consultationDate'));
+            formData.append('surveyor_name', val('surveyorName').trim());
 
-            // Office visited
             const officesVisited = getCheckedValues('office_visited');
             if (document.getElementById('officeVisitedOtherCheck').checked) {
-                const other = document.getElementById('officeVisitedOther').value.trim();
+                const other = val('officeVisitedOther').trim();
                 if (other) officesVisited.push(other);
             }
             formData.append('office_visited', JSON.stringify(officesVisited));
 
-            // B. Department Profile
             const bodyTypes = getCheckedValues('body_type');
             if (document.getElementById('bodyTypeOtherCheck').checked) {
-                const other = document.getElementById('bodyTypeOther').value.trim();
+                const other = val('bodyTypeOther').trim();
                 if (other) bodyTypes.push(other);
             }
             formData.append('body_type', JSON.stringify(bodyTypes));
 
             const jurisdictions = getCheckedValues('jurisdiction');
             if (document.getElementById('jurisdictionOtherCheck').checked) {
-                const other = document.getElementById('jurisdictionOther').value.trim();
+                const other = val('jurisdictionOther').trim();
                 if (other) jurisdictions.push(other);
             }
             formData.append('jurisdiction', JSON.stringify(jurisdictions));
 
-            formData.append('respondent_name', document.getElementById('respondentName').value.trim());
-            formData.append('respondent_mobile', document.getElementById('respondentMobile').value.trim());
-            formData.append('respondent_email', document.getElementById('respondentEmail').value.trim());
-            formData.append('office_address', document.getElementById('officeAddress').value.trim());
-            formData.append('department_website', document.getElementById('departmentWebsite').value.trim());
-            formData.append('nodal_officer_name', document.getElementById('nodalOfficerName').value.trim());
-            formData.append('nodal_officer_mobile', document.getElementById('nodalOfficerMobile').value.trim());
-            formData.append('nodal_officer_email', document.getElementById('nodalOfficerEmail').value.trim());
+            formData.append('respondent_name', val('respondentName').trim());
+            formData.append('respondent_mobile', val('respondentMobile').trim());
+            formData.append('respondent_email', val('respondentEmail').trim());
+            formData.append('office_address', val('officeAddress').trim());
+            formData.append('department_website', val('departmentWebsite').trim());
+            formData.append('nodal_officer_name', val('nodalOfficerName').trim());
+            formData.append('nodal_officer_mobile', val('nodalOfficerMobile').trim());
+            formData.append('nodal_officer_email', val('nodalOfficerEmail').trim());
 
             // C. Investment Pipeline
             const investmentPipeline = [];
             document.querySelectorAll('#investmentPipelineBody tr').forEach(tr => {
+                const s1 = tr.querySelector('[name="inv_sector[]"]');
+                const s2 = tr.querySelector('[name="inv_dominant[]"]');
+                const s3 = tr.querySelector('[name="inv_emerging[]"]');
+                const s4 = tr.querySelector('[name="inv_investment[]"]');
+                const s5 = tr.querySelector('[name="inv_district[]"]');
                 const row = {
-                    sector_classification: tr.querySelector('[name="inv_sector[]"]').value.trim(),
-                    dominant_sectors: tr.querySelector('[name="inv_dominant[]"]').value.trim(),
-                    emerging_sectors: tr.querySelector('[name="inv_emerging[]"]').value.trim(),
-                    approx_investment: tr.querySelector('[name="inv_investment[]"]').value.trim(),
-                    specific_district: tr.querySelector('[name="inv_district[]"]').value.trim()
+                    sector_classification: s1 ? s1.value.trim() : '',
+                    dominant_sectors: s2 ? s2.value.trim() : '',
+                    emerging_sectors: s3 ? s3.value.trim() : '',
+                    approx_investment: s4 ? s4.value.trim() : '',
+                    specific_district: s5 ? s5.value.trim() : ''
                 };
                 if (row.sector_classification || row.dominant_sectors || row.emerging_sectors ||
                     row.approx_investment || row.specific_district) {
@@ -1146,10 +1274,13 @@
             // D. Sectoral Analysis
             const sectoralAnalysis = [];
             document.querySelectorAll('#sectoralAnalysisBody tr').forEach(tr => {
+                const s1 = tr.querySelector('[name="sector_classification[]"]');
+                const s2 = tr.querySelector('[name="sector_dominant[]"]');
+                const s3 = tr.querySelector('[name="sector_emerging[]"]');
                 const row = {
-                    sector_classification: tr.querySelector('[name="sector_classification[]"]').value.trim(),
-                    dominant_sectors: tr.querySelector('[name="sector_dominant[]"]').value.trim(),
-                    emerging_sectors: tr.querySelector('[name="sector_emerging[]"]').value.trim()
+                    sector_classification: s1 ? s1.value.trim() : '',
+                    dominant_sectors: s2 ? s2.value.trim() : '',
+                    emerging_sectors: s3 ? s3.value.trim() : ''
                 };
                 if (row.sector_classification || row.dominant_sectors || row.emerging_sectors) {
                     sectoralAnalysis.push(row);
@@ -1160,112 +1291,165 @@
             // E.1 Occupational Categories
             const occupationalCategories = [];
             document.querySelectorAll('#occupationalCategoriesBody tr').forEach(tr => {
+                const c1 = tr.querySelector('[name="occ_category[]"]');
+                const c2 = tr.querySelector('[name="occ_sector[]"]');
+                const c3 = tr.querySelector('[name="occ_qualification[]"]');
+                const c4 = tr.querySelector('[name="occ_current[]"]');
+                const c5 = tr.querySelector('[name="occ_projected[]"]');
+                const c6 = tr.querySelector('[name="occ_wage[]"]');
                 const row = {
-                    category: tr.querySelector('[name="occ_category[]"]').value.trim(),
-                    sector: tr.querySelector('[name="occ_sector[]"]').value.trim(),
-                    qualification: tr.querySelector('[name="occ_qualification[]"]').value,
-                    current_openings: parseInt(tr.querySelector('[name="occ_current[]"]').value) || 0,
-                    projected_demand: parseInt(tr.querySelector('[name="occ_projected[]"]').value) || 0,
-                    wage_range: tr.querySelector('[name="occ_wage[]"]').value.trim()
+                    category: c1 ? c1.value.trim() : '',
+                    sector: c2 ? c2.value.trim() : '',
+                    qualification: c3 ? c3.value : '',
+                    current_openings: c4 ? (parseInt(c4.value) || 0) : 0,
+                    projected_demand: c5 ? (parseInt(c5.value) || 0) : 0,
+                    wage_range: c6 ? c6.value.trim() : ''
                 };
                 if (row.category || row.sector) occupationalCategories.push(row);
             });
             formData.append('occupational_categories', JSON.stringify(occupationalCategories));
 
-            // E.2, E.3
-            formData.append('upcoming_schemes', document.getElementById('upcomingSchemes').value.trim());
-            formData.append('emerging_technologies', document.getElementById('emergingTechnologies').value.trim());
+            formData.append('upcoming_schemes', val('upcomingSchemes').trim());
+            formData.append('emerging_technologies', val('emergingTechnologies').trim());
 
-            // E.4
             formData.append('aware_establishments', getRadioValue('aware_establishments'));
             formData.append('can_facilitate', getRadioValue('can_facilitate'));
-            formData.append('aware_establishments_count', document.getElementById('awareEstablishmentsCount').value);
-            formData.append('concentration_sectors', document.getElementById('concentrationSectors').value.trim());
-            formData.append('known_employers', document.getElementById('knownEmployers').value.trim());
+            formData.append('aware_establishments_count', val('awareEstablishmentsCount'));
+            formData.append('concentration_sectors', val('concentrationSectors').trim());
+            formData.append('known_employers', val('knownEmployers').trim());
 
             const facilitationModes = getCheckedValues('facilitation_mode');
             if (document.getElementById('facilitationModeOtherCheck').checked) {
-                const other = document.getElementById('facilitationModeOther').value.trim();
+                const other = val('facilitationModeOther').trim();
                 if (other) facilitationModes.push(other);
             }
             formData.append('facilitation_mode', JSON.stringify(facilitationModes));
 
-            // F. Recruitment Challenges
             const recruitmentChallenges = getCheckedValues('recruitment_challenges');
             if (document.getElementById('recruitmentOtherCheck').checked) {
-                const other = document.getElementById('recruitmentOther').value.trim();
+                const other = val('recruitmentOther').trim();
                 if (other) recruitmentChallenges.push(other);
             }
             formData.append('recruitment_challenges', JSON.stringify(recruitmentChallenges));
 
-            formData.append('difficult_roles', document.getElementById('difficultRoles').value.trim());
-            formData.append('emerging_roles', document.getElementById('emergingRoles').value.trim());
-            formData.append('changing_competencies', document.getElementById('changingCompetencies').value.trim());
-            formData.append('skill_gaps', document.getElementById('skillGaps').value.trim());
-            formData.append('high_demand_districts', document.getElementById('highDemandDistricts').value.trim());
-            formData.append('unfilled_reasons', document.getElementById('unfilledReasons').value.trim());
-            formData.append('operational_challenges', document.getElementById('operationalChallenges').value.trim());
+            formData.append('difficult_roles', val('difficultRoles').trim());
+            formData.append('emerging_roles', val('emergingRoles').trim());
+            formData.append('changing_competencies', val('changingCompetencies').trim());
+            formData.append('skill_gaps', val('skillGaps').trim());
+            formData.append('high_demand_districts', val('highDemandDistricts').trim());
+            formData.append('unfilled_reasons', val('unfilledReasons').trim());
+            formData.append('operational_challenges', val('operationalChallenges').trim());
 
-            // G. Department Support
             formData.append('facilitate_surveys', getRadioValue('facilitate_surveys'));
             formData.append('share_registration_data', getRadioValue('share_registration_data'));
             formData.append('participate_coordination', getRadioValue('participate_coordination'));
             formData.append('share_demand_updates', getRadioValue('share_demand_updates'));
-            formData.append('dept_nodal_officer_name', document.getElementById('deptNodalOfficerName').value.trim());
-            formData.append('dept_nodal_officer_mobile', document.getElementById('deptNodalOfficerMobile').value.trim());
-            formData.append('dept_nodal_officer_email', document.getElementById('deptNodalOfficerEmail').value.trim());
+            formData.append('dept_nodal_officer_name', val('deptNodalOfficerName').trim());
+            formData.append('dept_nodal_officer_mobile', val('deptNodalOfficerMobile').trim());
+            formData.append('dept_nodal_officer_email', val('deptNodalOfficerEmail').trim());
 
-            // H. Evidence
             const supportingEvidence = getCheckedValues('supporting_evidence');
             if (document.getElementById('evidenceOtherCheck').checked) {
-                const other = document.getElementById('evidenceOther').value.trim();
+                const other = val('evidenceOther').trim();
                 if (other) supportingEvidence.push(other);
             }
             formData.append('supporting_evidence', JSON.stringify(supportingEvidence));
             formData.append('demand_evidence_status', getRadioValue('demand_evidence_status'));
-            formData.append('submission_date', document.getElementById('submissionDate').value);
-            formData.append('place', document.getElementById('place').value.trim());
-            formData.append('authorized_signature', document.getElementById('authorizedSignature').value.trim());
-            formData.append('respondent_signature', document.getElementById('respondentSignature').value.trim());
-            formData.append('official_stamp', document.getElementById('officialStamp').checked ? 'true' : 'false');
+            formData.append('submission_date', val('submissionDate'));
+            formData.append('place', val('place').trim());
+            formData.append('authorized_signature', val('authorizedSignature').trim());
+            formData.append('respondent_signature', val('respondentSignature').trim());
+            
+            const stampEl = document.getElementById('officialStamp');
+            formData.append('official_stamp', stampEl && stampEl.checked ? 'true' : 'false');
 
-            // Supporting document
             const fileInput = document.getElementById('supportingDocument');
-            if (fileInput.files.length) {
+            if (fileInput && fileInput.files.length) {
                 formData.append('supporting_document', fileInput.files[0]);
+                log('File attached:', fileInput.files[0].name);
             }
 
-            // CSRF
-            formData.append('csrfmiddlewaretoken', document.querySelector('[name="csrfmiddlewaretoken"]').value);
+            // Append CSRF
+            const csrfToken = getCsrfToken();
+            if (!csrfToken) {
+                logErr('CSRF token missing!');
+                showToast('CSRF token missing. Please refresh the page.', 'error');
+                return;
+            }
+            log('CSRF token found:', csrfToken.substring(0, 10) + '...');
 
-            // Show loading
+            // Log what we are about to send
+            log('--- FormData contents ---');
+            for (let [k, v] of formData.entries()) {
+                if (v instanceof File) {
+                    log(`  ${k}: [File] ${v.name} (${v.size} bytes)`);
+                } else {
+                    const s = String(v);
+                    log(`  ${k}: ${s.length > 100 ? s.substring(0, 100) + '...' : s}`);
+                }
+            }
+            log('--- End FormData ---');
+
+            // ------------------------------------------------------------
+            // Send request
+            // ------------------------------------------------------------
+            const submitUrl = '/api/govt/submit/';
+            log('POST →', submitUrl);
+
             submitBtn.disabled = true;
             spinner.classList.remove('hidden');
-            submitBtn.querySelector('span:not(.spinner)').textContent = 'Submitting...';
+            setBtnText('Submitting...');
 
             try {
-                const response = await fetch('/api/govt/submit/', {
+                const response = await fetch(submitUrl, {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
-                    }
+                        'X-CSRFToken': csrfToken
+                    },
+                    credentials: 'same-origin'
                 });
 
-                const result = await response.json();
+                log('Response status:', response.status);
+                log('Response ok:', response.ok);
+                log('Response content-type:', response.headers.get('content-type'));
+
+                const rawText = await response.text();
+                log('Raw response (first 500 chars):', rawText.substring(0, 500));
+
+                let result;
+                try {
+                    result = JSON.parse(rawText);
+                } catch (pe) {
+                    logErr('Response is not JSON:', pe);
+                    logErr('Raw body:', rawText);
+                    showToast(`Server returned non-JSON (status ${response.status}). Check console.`, 'error');
+                    return;
+                }
+
+                log('Parsed response:', result);
+
                 if (result.status === 'success') {
+                    log('✅ SUCCESS — redirecting');
                     showToast('Consultation submitted successfully!', 'success');
-                    setTimeout(() => { window.location.href = '/portal/govt-departments/'; }, 1500);
+                    setTimeout(() => {
+                        window.location.href = '/govt/';
+                    }, 1500);
                 } else {
+                    logErr('Server returned error:', result.message);
                     showToast(result.message || 'Submission failed.', 'error');
                 }
             } catch (error) {
-                console.error('Submit error:', error);
-                showToast('Network error. Please check your connection.', 'error');
+                logErr('Fetch error:', error);
+                logErr('Error name:', error.name);
+                logErr('Error message:', error.message);
+                showToast(`Network error: ${error.message}`, 'error');
             } finally {
+                // Safe reset — never crashes
                 submitBtn.disabled = false;
-                spinner.classList.add('hidden');
-                submitBtn.querySelector('span:not(.spinner)').textContent = 'Submit Consultation';
+                if (spinner) spinner.classList.add('hidden');
+                setBtnText('Submit Consultation');
+                log('========== SUBMIT ENDED ==========');
             }
         }
 
@@ -1274,22 +1458,38 @@
         // ============================================================
         function resetForm() {
             if (!confirm('Are you sure you want to reset the form? All data will be cleared.')) return;
-            document.getElementById('govtForm').reset();
-            document.getElementById('investmentPipelineBody').innerHTML = '';
-            document.getElementById('sectoralAnalysisBody').innerHTML = '';
-            document.getElementById('occupationalCategoriesBody').innerHTML = '';
-            document.getElementById('fileInfo').classList.add('hidden');
-            document.getElementById('fileDropArea').style.display = 'block';
+            log('Resetting form');
+
+            const form = document.getElementById('govtForm');
+            if (form) form.reset();
+
+            const ipb = document.getElementById('investmentPipelineBody');
+            const sab = document.getElementById('sectoralAnalysisBody');
+            const ocb = document.getElementById('occupationalCategoriesBody');
+            if (ipb) ipb.innerHTML = '';
+            if (sab) sab.innerHTML = '';
+            if (ocb) ocb.innerHTML = '';
+
+            const fi = document.getElementById('fileInfo');
+            const fd = document.getElementById('fileDropArea');
+            if (fi) fi.classList.add('hidden');
+            if (fd) fd.style.display = 'block';
+
             document.querySelectorAll('.other-specify-wrapper').forEach(el => el.classList.remove('show'));
+
             investmentRowCounter = 0;
             sectoralRowCounter = 0;
             occupationalRowCounter = 0;
             addInvestmentPipelineRow();
             addSectoralAnalysisRow();
             addOccupationalCategoryRow();
+
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('consultationDate').value = today;
-            document.getElementById('submissionDate').value = today;
+            const cd = document.getElementById('consultationDate');
+            const sd = document.getElementById('submissionDate');
+            if (cd) cd.value = today;
+            if (sd) sd.value = today;
+
             showToast('Form has been reset.', 'info');
         }
 
@@ -1298,6 +1498,7 @@
         // ============================================================
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
+            if (!toast) { alert(message); return; }
             toast.textContent = message;
             toast.className = `toast toast-${type} show`;
             clearTimeout(toast._timeout);
