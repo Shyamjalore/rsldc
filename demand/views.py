@@ -1730,41 +1730,160 @@ def delete_govt(request, consultation_id):
 
 @login_required
 def admin_export_govt_csv(request):
-    """Export government consultation data to CSV"""
+    """
+    Export government consultation data to CSV
+    -- Detailed export matching all fields in govt_form.html
+    -- Multi-row data (Investment Pipeline, Sectoral Analysis, Occupational Categories)
+       is exported using max-row column expansion (same pattern as survey export)
+    """
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="govt_consultations_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
 
     writer = csv.writer(response)
 
-    headers = [
-        'Consultation ID', 'Date', 'District/Region', 'Mode', 'Surveyor Name',
-        'Office Visited', 'Body Type', 'Jurisdiction',
-        'Respondent Name', 'Respondent Mobile', 'Respondent Email',
-        'Office Address', 'Department Website',
-        'Nodal Officer Name', 'Nodal Officer Mobile', 'Nodal Officer Email',
-        'Total Investment Pipeline (₹ Cr)', 'Total Current Openings',
-        'Total Projected Demand', 'Aware of Establishments',
-        'Can Facilitate', 'Facilitate Surveys', 'Share Registration Data',
-        'Participate Coordination', 'Share Demand Updates',
-        'Demand Evidence Status', 'Place', 'Official Stamp', 'Created At'
+    # ===== HELPER: safely parse a JSON list field =====
+    def ensure_list(val):
+        if isinstance(val, list):
+            return val
+        if isinstance(val, str):
+            try:
+                return json.loads(val)
+            except Exception:
+                return []
+        return []
+
+    # ===== HELPER: max rows across all consultations for a given list field =====
+    def get_max_rows(field_name):
+        max_rows = 0
+        for c in GovtConsultation.objects.all():
+            rows = ensure_list(getattr(c, field_name, []))
+            if isinstance(rows, list) and len(rows) > max_rows:
+                max_rows = len(rows)
+        return max_rows
+
+    # ===== CALCULATE MAX ROWS FOR EACH MULTI-ROW FIELD =====
+    max_inv_rows = get_max_rows('investment_pipeline')
+    max_sector_rows = get_max_rows('sectoral_analysis')
+    max_occ_rows = get_max_rows('occupational_categories')
+
+    # ===== MAIN (SINGLE-VALUE) HEADERS =====
+    main_headers = [
+        'Consultation ID',
+        'District / Region',
+        'Mode',
+        'Mode (Other)',
+        'Consultation Date',
+        'Surveyor Name',
+        'Office Visited',
+        'Office Visited (Other)',
+        'Body Type',
+        'Body Type (Other)',
+        'Jurisdiction',
+        'Jurisdiction (Other)',
+        'Respondent Name',
+        'Respondent Mobile',
+        'Respondent Email',
+        'Office Address',
+        'Department Website',
+        'Nodal Officer Name',
+        'Nodal Officer Mobile',
+        'Nodal Officer Email',
+        'E.2 Upcoming Schemes',
+        'E.3 Emerging Technologies',
+        'Aware of Establishments',
+        'Can Facilitate',
+        'Approx. No. of Such Establishments',
+        'Concentration Sectors',
+        'Known Employers',
+        'Facilitation Mode',
+        'Recruitment Challenges',
+        'Most Difficult-to-Fill Roles',
+        'Emerging Job Roles',
+        'Changing Technical Competencies',
+        'Employability Skill Gaps',
+        'Districts / Clusters with Highest Demand',
+        'Reasons for Unfilled Vacancies',
+        'Manpower & Operational Challenges',
+        'Facilitate Employer Surveys',
+        'Share Registration Data',
+        'Participate in Coordination',
+        'Share Periodic Demand Updates',
+        'Dept. Nodal Officer Name',
+        'Dept. Nodal Officer Mobile',
+        'Dept. Nodal Officer Email',
+        'Supporting Evidence',
+        'Demand Evidence Status',
+        'Submission Date',
+        'Place',
+        'Authorized Signature',
+        'Respondent Signature',
+        'Official Stamp',
+        'Supporting Document',
+        'Total Investment Pipeline (₹ Cr)',
+        'Total Current Openings',
+        'Total Projected Demand',
+        'Created At',
     ]
-    writer.writerow(headers)
 
+    # ===== INVESTMENT PIPELINE HEADERS (C) =====
+    inv_headers = []
+    for i in range(1, max_inv_rows + 1):
+        inv_headers.extend([
+            f'Investment-{i} (Sector Classification)',
+            f'Investment-{i} (Dominant / Existing Sectors)',
+            f'Investment-{i} (Emerging Sectors)',
+            f'Investment-{i} (Approx. Investment ₹ Cr)',
+            f'Investment-{i} (Specific District)',
+        ])
+
+    # ===== SECTORAL ANALYSIS HEADERS (D) =====
+    sector_headers = []
+    for i in range(1, max_sector_rows + 1):
+        sector_headers.extend([
+            f'Sectoral-{i} (Sector Classification)',
+            f'Sectoral-{i} (Dominant / Existing Sectors)',
+            f'Sectoral-{i} (Emerging Sectors)',
+        ])
+
+    # ===== OCCUPATIONAL CATEGORIES HEADERS (E.1) =====
+    occ_headers = []
+    for i in range(1, max_occ_rows + 1):
+        occ_headers.extend([
+            f'Occupational-{i} (Category / Role)',
+            f'Occupational-{i} (Sector)',
+            f'Occupational-{i} (Minimum Qualification)',
+            f'Occupational-{i} (Est. Current Openings)',
+            f'Occupational-{i} (Projected Demand 12 Mo)',
+            f'Occupational-{i} (Indicative Wage ₹/Month)',
+        ])
+
+    # ===== COMBINE ALL HEADERS =====
+    all_headers = main_headers + inv_headers + sector_headers + occ_headers
+    writer.writerow(all_headers)
+
+    # ===== HELPER: list -> comma string =====
+    def list_to_str(val):
+        if isinstance(val, list):
+            return ', '.join(str(v) for v in val if v not in (None, ''))
+        return str(val or '')
+
+    # ===== DATA ROWS =====
     for c in GovtConsultation.objects.all():
-        def safe_list(val):
-            if isinstance(val, list):
-                return ', '.join(str(v) for v in val)
-            return str(val or '')
 
-        writer.writerow([
+        # ---- MAIN ROW ----
+        row = [
             c.consultation_id or '',
-            c.consultation_date.strftime('%Y-%m-%d') if c.consultation_date else '',
             c.district_region or '',
             c.mode or '',
+            c.mode_other or '',
+            c.consultation_date.strftime('%Y-%m-%d') if c.consultation_date else '',
             c.surveyor_name or '',
-            safe_list(c.office_visited),
-            safe_list(c.body_type),
-            safe_list(c.jurisdiction),
+            list_to_str(ensure_list(c.office_visited)),
+            c.office_visited_other or '',
+            list_to_str(ensure_list(c.body_type)),
+            c.body_type_other or '',
+            list_to_str(ensure_list(c.jurisdiction)),
+            c.jurisdiction_other or '',
             c.respondent_name or '',
             c.respondent_mobile or '',
             c.respondent_email or '',
@@ -1773,19 +1892,87 @@ def admin_export_govt_csv(request):
             c.nodal_officer_name or '',
             c.nodal_officer_mobile or '',
             c.nodal_officer_email or '',
-            c.total_investment_pipeline,
-            c.total_current_openings,
-            c.total_occupational_demand,
+            c.upcoming_schemes or '',
+            c.emerging_technologies or '',
             c.aware_establishments or '',
             c.can_facilitate or '',
+            c.aware_establishments_count if c.aware_establishments_count is not None else '',
+            c.concentration_sectors or '',
+            c.known_employers or '',
+            list_to_str(ensure_list(c.facilitation_mode)),
+            list_to_str(ensure_list(c.recruitment_challenges)),
+            c.difficult_roles or '',
+            c.emerging_roles or '',
+            c.changing_competencies or '',
+            c.skill_gaps or '',
+            c.high_demand_districts or '',
+            c.unfilled_reasons or '',
+            c.operational_challenges or '',
             c.facilitate_surveys or '',
             c.share_registration_data or '',
             c.participate_coordination or '',
             c.share_demand_updates or '',
+            c.dept_nodal_officer_name or '',
+            c.dept_nodal_officer_mobile or '',
+            c.dept_nodal_officer_email or '',
+            list_to_str(ensure_list(c.supporting_evidence)),
             c.demand_evidence_status or '',
+            c.submission_date.strftime('%Y-%m-%d') if c.submission_date else '',
             c.place or '',
+            c.authorized_signature or '',
+            c.respondent_signature or '',
             'Yes' if c.official_stamp else 'No',
-            c.created_at.strftime('%Y-%m-%d %H:%M:%S')
-        ])
+            c.supporting_document.name if c.supporting_document else '',
+            c.total_investment_pipeline,
+            c.total_current_openings,
+            c.total_occupational_demand,
+            c.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+        ]
+
+        # ---- INVESTMENT PIPELINE ROWS ----
+        inv_rows = ensure_list(c.investment_pipeline)
+        for i in range(max_inv_rows):
+            if i < len(inv_rows):
+                r = inv_rows[i] or {}
+                row.extend([
+                    r.get('sector_classification', '') or '',
+                    r.get('dominant_sectors', '') or '',
+                    r.get('emerging_sectors', '') or '',
+                    r.get('approx_investment', '') or '',
+                    r.get('specific_district', '') or '',
+                ])
+            else:
+                row.extend([''] * 5)
+
+        # ---- SECTORAL ANALYSIS ROWS ----
+        sector_rows = ensure_list(c.sectoral_analysis)
+        for i in range(max_sector_rows):
+            if i < len(sector_rows):
+                r = sector_rows[i] or {}
+                row.extend([
+                    r.get('sector_classification', '') or '',
+                    r.get('dominant_sectors', '') or '',
+                    r.get('emerging_sectors', '') or '',
+                ])
+            else:
+                row.extend([''] * 3)
+
+        # ---- OCCUPATIONAL CATEGORIES ROWS ----
+        occ_rows = ensure_list(c.occupational_categories)
+        for i in range(max_occ_rows):
+            if i < len(occ_rows):
+                r = occ_rows[i] or {}
+                row.extend([
+                    r.get('category', '') or '',
+                    r.get('sector', '') or '',
+                    r.get('qualification', '') or '',
+                    r.get('current_openings', 0) if r.get('current_openings') is not None else 0,
+                    r.get('projected_demand', 0) if r.get('projected_demand') is not None else 0,
+                    r.get('wage_range', '') or '',
+                ])
+            else:
+                row.extend([''] * 6)
+
+        writer.writerow(row)
 
     return response
