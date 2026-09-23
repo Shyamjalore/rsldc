@@ -448,10 +448,11 @@
                 <span>Survey Records</span>
                 <span class="nav-badge">{{ total_surveys|default:0 }}</span>
             </a>
-            <a href="{% url 'survey:admin_job_demands' %}" class="nav-link-modern">
-                <span class="nav-icon-modern"><i class="fas fa-briefcase"></i></span>
-                <span>Job Demands</span>
-                <span class="nav-badge">{{ total_jobs|default:0 }}</span>
+            
+            <a href="{% url 'survey:admin_association_list' %}" class="nav-link-modern">
+                <span class="nav-icon-modern"><i class="fas fa-landmark"></i></span>
+                <span>Associations</span>
+                <span class="nav-badge">{{ total_associations|default:0 }}</span>
             </a>
             <a href="{% url 'survey:admin_govt_list' %}" class="nav-link-modern">
                 <span class="nav-icon-modern"><i class="fas fa-landmark"></i></span>
@@ -463,6 +464,11 @@
             <a href="#" class="nav-link-modern">
                 <span class="nav-icon-modern"><i class="fas fa-download"></i></span>
                 <span>Export CSV</span>
+            </a>
+            <a href="{% url 'survey:admin_job_demands' %}" class="nav-link-modern">
+                <span class="nav-icon-modern"><i class="fas fa-briefcase"></i></span>
+                <span>Job Demands</span>
+                <span class="nav-badge">{{ total_jobs|default:0 }}</span>
             </a>
             <a href="{% url 'survey:admin_logout' %}" class="nav-link-modern" style="margin-top:8px; border-top:1px solid rgba(255,255,255,0.05); padding-top:16px;">
                 <span class="nav-icon-modern"><i class="fas fa-sign-out-alt"></i></span>
